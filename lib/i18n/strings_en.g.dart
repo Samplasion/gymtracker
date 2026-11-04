@@ -6901,6 +6901,75 @@ class Translations$library$cardio$exercises$en {
 
 	/// en: 'Crunches (timed)'
 	String get crunchesTimed => 'Crunches (timed)';
+
+	/// en: 'Straddle jumps'
+	String get straddleJumps => 'Straddle jumps';
+
+	/// en: 'Forward and backward steps'
+	String get forwardAndBackwardSteps => 'Forward and backward steps';
+
+	/// en: 'Bear crawl'
+	String get bearCrawl => 'Bear crawl';
+
+	/// en: 'Elliptical cycling'
+	String get ellipticalCycling => 'Elliptical cycling';
+
+	/// en: 'Burpee (dumbbell)'
+	String get burpeeDumbbell => 'Burpee (dumbbell)';
+
+	/// en: 'Partial knee bends'
+	String get partialKneeBends => 'Partial knee bends';
+
+	/// en: 'Arm-cycle ergometer'
+	String get armCycleErgometer => 'Arm-cycle ergometer';
+
+	/// en: 'Wall-supported high knees'
+	String get wallSupportedHighKnees => 'Wall-supported high knees';
+
+	/// en: 'Burpee with jumping jack'
+	String get burpeeWithJumpingJack => 'Burpee with jumping jack';
+
+	/// en: 'Jumping-jack hops'
+	String get jumpingJackHops => 'Jumping-jack hops';
+
+	/// en: 'Push-up into running start'
+	String get pushUpIntoRunningStart => 'Push-up into running start';
+
+	/// en: 'Scissor jumps'
+	String get scissorJumps => 'Scissor jumps';
+
+	/// en: 'Squat (semi, jump)'
+	String get squatSemiJump => 'Squat (semi, jump)';
+
+	/// en: 'Short-stride running'
+	String get shortStrideRunning => 'Short-stride running';
+
+	/// en: 'SkiErg double-pole pull'
+	String get skiergDoublePolePull => 'SkiErg double-pole pull';
+
+	/// en: 'Alternating ski steps'
+	String get alternatingSkiSteps => 'Alternating ski steps';
+
+	/// en: 'Explosive star jumps'
+	String get explosiveStarJumps => 'Explosive star jumps';
+
+	/// en: 'Kettlebell circular swing'
+	String get kettlebellCircularSwing => 'Kettlebell circular swing';
+
+	/// en: 'Elliptical trainer walking'
+	String get ellipticalTrainerWalking => 'Elliptical trainer walking';
+
+	/// en: 'Lunge (walking, high knee)'
+	String get lungeWalkingHighKnee => 'Lunge (walking, high knee)';
+
+	/// en: 'Incline treadmill walking'
+	String get inclineTreadmillWalking => 'Incline treadmill walking';
+
+	/// en: 'Stair-climber stepping'
+	String get stairClimberStepping => 'Stair-climber stepping';
+
+	/// en: 'Repeated sprint intervals'
+	String get repeatedSprintIntervals => 'Repeated sprint intervals';
 }
 
 // Path: library.chest.exercises
@@ -6997,6 +7066,381 @@ class Translations$library$chest$exercises$en {
 
 	/// en: 'Bench flyes'
 	String get benchFlys => 'Bench flyes';
+
+	/// en: 'Push-up (archer)'
+	String get pushUpArcher => 'Push-up (archer)';
+
+	/// en: 'Chest dip (assisted, kneeling)'
+	String get chestDipAssistedKneeling => 'Chest dip (assisted, kneeling)';
+
+	/// en: 'Pectoralis major stretch (assisted, seated, stability ball)'
+	String get pectoralisMajorStretchAssistedSeatedStabilityBall => 'Pectoralis major stretch (assisted, seated, stability ball)';
+
+	/// en: 'Chest dip (assisted, wide grip, kneeling)'
+	String get chestDipAssistedWideGripKneeling => 'Chest dip (assisted, wide grip, kneeling)';
+
+	/// en: 'Bench press (band)'
+	String get benchPressBand => 'Bench press (band)';
+
+	/// en: 'Chest press (band, one arm, twisting)'
+	String get chestPressBandOneArmTwisting => 'Chest press (band, one arm, twisting)';
+
+	/// en: 'Pullover (barbell, decline)'
+	String get pulloverBarbellDecline => 'Pullover (barbell, decline)';
+
+	/// en: 'Press (barbell, decline, wide grip)'
+	String get pressBarbellDeclineWideGrip => 'Press (barbell, decline, wide grip)';
+
+	/// en: 'Bench press (barbell, guillotine)'
+	String get benchPressBarbellGuillotine => 'Bench press (barbell, guillotine)';
+
+	/// en: 'Bench press (barbell, reverse grip, decline)'
+	String get benchPressBarbellReverseGripDecline => 'Bench press (barbell, reverse grip, decline)';
+
+	/// en: 'Bench press (barbell, reverse grip, incline)'
+	String get benchPressBarbellReverseGripIncline => 'Bench press (barbell, reverse grip, incline)';
+
+	/// en: 'Bench press (barbell, wide)'
+	String get benchPressBarbellWide => 'Bench press (barbell, wide)';
+
+	/// en: 'Bench press (barbell, wide, reverse grip)'
+	String get benchPressBarbellWideReverseGrip => 'Bench press (barbell, wide, reverse grip)';
+
+	/// en: 'Chest stretch (behind head)'
+	String get chestStretchBehindHead => 'Chest stretch (behind head)';
+
+	/// en: 'Seated butterfly stretch'
+	String get seatedButterflyStretch => 'Seated butterfly stretch';
+
+	/// en: 'Press (cable, decline, one arm)'
+	String get pressCableDeclineOneArm => 'Press (cable, decline, one arm)';
+
+	/// en: 'Fly (cable, incline)'
+	String get flyCableIncline => 'Fly (cable, incline)';
+
+	/// en: 'Fly (cable, incline, stability ball)'
+	String get flyCableInclineStabilityBall => 'Fly (cable, incline, stability ball)';
+
+	/// en: 'Fly (cable, lying)'
+	String get flyCableLying => 'Fly (cable, lying)';
+
+	/// en: 'Chest fly (cable, one arm, decline)'
+	String get chestFlyCableOneArmDecline => 'Chest fly (cable, one arm, decline)';
+
+	/// en: 'Fly (cable, one arm, exercise ball)'
+	String get flyCableOneArmExerciseBall => 'Fly (cable, one arm, exercise ball)';
+
+	/// en: 'Fly (cable, one arm, incline, exercise ball)'
+	String get flyCableOneArmInclineExerciseBall => 'Fly (cable, one arm, incline, exercise ball)';
+
+	/// en: 'Press (cable, one arm, incline)'
+	String get pressCableOneArmIncline => 'Press (cable, one arm, incline)';
+
+	/// en: 'Press (cable, one arm, incline, exercise ball)'
+	String get pressCableOneArmInclineExerciseBall => 'Press (cable, one arm, incline, exercise ball)';
+
+	/// en: 'Press (cable, one arm, exercise ball)'
+	String get pressCableOneArmExerciseBall => 'Press (cable, one arm, exercise ball)';
+
+	/// en: 'Press (cable, exercise ball)'
+	String get pressCableExerciseBall => 'Press (cable, exercise ball)';
+
+	/// en: 'Chest and anterior shoulder stretch'
+	String get chestAndAnteriorShoulderStretch => 'Chest and anterior shoulder stretch';
+
+	/// en: 'Chest dip'
+	String get chestDip => 'Chest dip';
+
+	/// en: 'Chest dip (straight bar)'
+	String get chestDipStraightBar => 'Chest dip (straight bar)';
+
+	/// en: 'Chest stretch (exercise ball)'
+	String get chestStretchExerciseBall => 'Chest stretch (exercise ball)';
+
+	/// en: 'Push-up (chest tap)'
+	String get pushUpChestTap => 'Push-up (chest tap)';
+
+	/// en: 'Push-up (clap)'
+	String get pushUpClap => 'Push-up (clap)';
+
+	/// en: 'Push-up with alternating side reach'
+	String get pushUpWithAlternatingSideReach => 'Push-up with alternating side reach';
+
+	/// en: 'Push-up (deep)'
+	String get pushUpDeep => 'Push-up (deep)';
+
+	/// en: 'Push-up (drop)'
+	String get pushUpDrop => 'Push-up (drop)';
+
+	/// en: 'Fly (dumbbell, decline)'
+	String get flyDumbbellDecline => 'Fly (dumbbell, decline)';
+
+	/// en: 'Bench press (dumbbell, decline, neutral grip)'
+	String get benchPressDumbbellDeclineNeutralGrip => 'Bench press (dumbbell, decline, neutral grip)';
+
+	/// en: 'Fly (dumbbell, decline, one arm)'
+	String get flyDumbbellDeclineOneArm => 'Fly (dumbbell, decline, one arm)';
+
+	/// en: 'Fly (dumbbell, decline, twisting)'
+	String get flyDumbbellDeclineTwisting => 'Fly (dumbbell, decline, twisting)';
+
+	/// en: 'Fly (dumbbell, exercise ball)'
+	String get flyDumbbellExerciseBall => 'Fly (dumbbell, exercise ball)';
+
+	/// en: 'Bench press (dumbbell, incline, alternate)'
+	String get benchPressDumbbellInclineAlternate => 'Bench press (dumbbell, incline, alternate)';
+
+	/// en: 'Fly (dumbbell, incline, exercise ball)'
+	String get flyDumbbellInclineExerciseBall => 'Fly (dumbbell, incline, exercise ball)';
+
+	/// en: 'Bench press (dumbbell, incline, neutral grip)'
+	String get benchPressDumbbellInclineNeutralGrip => 'Bench press (dumbbell, incline, neutral grip)';
+
+	/// en: 'Fly (dumbbell, incline, one arm)'
+	String get flyDumbbellInclineOneArm => 'Fly (dumbbell, incline, one arm)';
+
+	/// en: 'Fly (dumbbell, incline, one arm, exercise ball)'
+	String get flyDumbbellInclineOneArmExerciseBall => 'Fly (dumbbell, incline, one arm, exercise ball)';
+
+	/// en: 'Press (dumbbell, incline, one arm)'
+	String get pressDumbbellInclineOneArm => 'Press (dumbbell, incline, one arm)';
+
+	/// en: 'Press (dumbbell, incline, one arm, exercise ball)'
+	String get pressDumbbellInclineOneArmExerciseBall => 'Press (dumbbell, incline, one arm, exercise ball)';
+
+	/// en: 'Press (dumbbell, incline, exercise ball)'
+	String get pressDumbbellInclineExerciseBall => 'Press (dumbbell, incline, exercise ball)';
+
+	/// en: 'Shoulder raise (dumbbell, incline)'
+	String get shoulderRaiseDumbbellIncline => 'Shoulder raise (dumbbell, incline)';
+
+	/// en: 'Fly (dumbbell, incline, twisting)'
+	String get flyDumbbellInclineTwisting => 'Fly (dumbbell, incline, twisting)';
+
+	/// en: 'Press (dumbbell, lying, neutral grip)'
+	String get pressDumbbellLyingNeutralGrip => 'Press (dumbbell, lying, neutral grip)';
+
+	/// en: 'Press (dumbbell, lying, one arm)'
+	String get pressDumbbellLyingOneArm => 'Press (dumbbell, lying, one arm)';
+
+	/// en: 'Pullover (dumbbell, exercise ball)'
+	String get pulloverDumbbellExerciseBall => 'Pullover (dumbbell, exercise ball)';
+
+	/// en: 'Bench press (dumbbell, neutral grip)'
+	String get benchPressDumbbellNeutralGrip => 'Bench press (dumbbell, neutral grip)';
+
+	/// en: 'Fly (dumbbell, one arm, bench)'
+	String get flyDumbbellOneArmBench => 'Fly (dumbbell, one arm, bench)';
+
+	/// en: 'Chest fly (dumbbell, one arm, exercise ball)'
+	String get chestFlyDumbbellOneArmExerciseBall => 'Chest fly (dumbbell, one arm, exercise ball)';
+
+	/// en: 'Chest press (dumbbell, one arm, decline)'
+	String get chestPressDumbbellOneArmDecline => 'Chest press (dumbbell, one arm, decline)';
+
+	/// en: 'Chest press (dumbbell, one arm, incline)'
+	String get chestPressDumbbellOneArmIncline => 'Chest press (dumbbell, one arm, incline)';
+
+	/// en: 'Press (dumbbell, one arm, exercise ball)'
+	String get pressDumbbellOneArmExerciseBall => 'Press (dumbbell, one arm, exercise ball)';
+
+	/// en: 'Pullover (dumbbell, one arm, exercise ball)'
+	String get pulloverDumbbellOneArmExerciseBall => 'Pullover (dumbbell, one arm, exercise ball)';
+
+	/// en: 'Press (dumbbell, one arm, reverse grip)'
+	String get pressDumbbellOneArmReverseGrip => 'Press (dumbbell, one arm, reverse grip)';
+
+	/// en: 'Fly (dumbbell, one leg, exercise ball)'
+	String get flyDumbbellOneLegExerciseBall => 'Fly (dumbbell, one leg, exercise ball)';
+
+	/// en: 'Press (dumbbell, exercise ball)'
+	String get pressDumbbellExerciseBall => 'Press (dumbbell, exercise ball)';
+
+	/// en: 'Bench press (dumbbell, reverse)'
+	String get benchPressDumbbellReverse => 'Bench press (dumbbell, reverse)';
+
+	/// en: 'Bench press (dumbbell, twisting)'
+	String get benchPressDumbbellTwisting => 'Bench press (dumbbell, twisting)';
+
+	/// en: 'Dynamic pectoral stretch'
+	String get dynamicPectoralStretch => 'Dynamic pectoral stretch';
+
+	/// en: 'Supine elbow press-up'
+	String get supineElbowPressUp => 'Supine elbow press-up';
+
+	/// en: 'Pike push up (exercise ball)'
+	String get pikePushUpExerciseBall => 'Pike push up (exercise ball)';
+
+	/// en: 'Fly (floor, barbell)'
+	String get flyFloorBarbell => 'Fly (floor, barbell)';
+
+	/// en: 'Fly (hyght, dumbbell)'
+	String get flyHyghtDumbbell => 'Fly (hyght, dumbbell)';
+
+	/// en: 'Push-up (incline, depth jump)'
+	String get pushUpInclineDepthJump => 'Push-up (incline, depth jump)';
+
+	/// en: 'Push-up (incline, reverse grip)'
+	String get pushUpInclineReverseGrip => 'Push-up (incline, reverse grip)';
+
+	/// en: 'Push-up (incline, scapula)'
+	String get pushUpInclineScapula => 'Push-up (incline, scapula)';
+
+	/// en: 'Isometric palm-to-palm chest squeeze'
+	String get isometricPalmToPalmChestSqueeze => 'Isometric palm-to-palm chest squeeze';
+
+	/// en: 'Isometric push-up with side shifts'
+	String get isometricPushUpWithSideShifts => 'Isometric push-up with side shifts';
+
+	/// en: 'Press (kettlebell, alternate, floor)'
+	String get pressKettlebellAlternateFloor => 'Press (kettlebell, alternate, floor)';
+
+	/// en: 'Press (kettlebell, extended range, one arm, floor)'
+	String get pressKettlebellExtendedRangeOneArmFloor => 'Press (kettlebell, extended range, one arm, floor)';
+
+	/// en: 'Floor press (kettlebell, one arm)'
+	String get floorPressKettlebellOneArm => 'Floor press (kettlebell, one arm)';
+
+	/// en: 'Push-up (kettlebell, plyo)'
+	String get pushUpKettlebellPlyo => 'Push-up (kettlebell, plyo)';
+
+	/// en: 'Push-up (kneeling)'
+	String get pushUpKneeling => 'Push-up (kneeling)';
+
+	/// en: 'Rear-bar dips'
+	String get rearBarDips => 'Rear-bar dips';
+
+	/// en: 'Chest press (lever, decline)'
+	String get chestPressLeverDecline => 'Chest press (lever, decline)';
+
+	/// en: 'Chest press (lever, standing)'
+	String get chestPressLeverStanding => 'Chest press (lever, standing)';
+
+	/// en: 'Machine chest squeeze press'
+	String get machineChestSqueezePress => 'Machine chest squeeze press';
+
+	/// en: 'Medicine-ball chest pass'
+	String get medicineBallChestPass => 'Medicine-ball chest pass';
+
+	/// en: 'Medicine-ball chest throw from three-point start'
+	String get medicineBallChestThrowFromThreePointStart => 'Medicine-ball chest throw from three-point start';
+
+	/// en: 'Repeated medicine-ball chest passes'
+	String get repeatedMedicineBallChestPasses => 'Repeated medicine-ball chest passes';
+
+	/// en: 'Single medicine-ball chest throw'
+	String get singleMedicineBallChestThrow => 'Single medicine-ball chest throw';
+
+	/// en: 'Medicine-ball chest throw with run-out'
+	String get medicineBallChestThrowWithRunOut => 'Medicine-ball chest throw with run-out';
+
+	/// en: 'Push-up (modified hindu)'
+	String get pushUpModifiedHindu => 'Push-up (modified hindu)';
+
+	/// en: 'Kneeling push-up to forearms'
+	String get kneelingPushUpToForearms => 'Kneeling push-up to forearms';
+
+	/// en: 'Push-up (narrow, exercise ball)'
+	String get pushUpNarrowExerciseBall => 'Push-up (narrow, exercise ball)';
+
+	/// en: 'Push-up (outside leg kick)'
+	String get pushUpOutsideLegKick => 'Push-up (outside leg kick)';
+
+	/// en: 'Push-up (plyo)'
+	String get pushUpPlyo => 'Push-up (plyo)';
+
+	/// en: 'Bodyweight push-and-pull'
+	String get bodyweightPushAndPull => 'Bodyweight push-and-pull';
+
+	/// en: 'Push-up (bosu ball)'
+	String get pushUpBosuBall => 'Push-up (bosu ball)';
+
+	/// en: 'Push-up (stability ball)'
+	String get pushUpStabilityBall => 'Push-up (stability ball)';
+
+	/// en: 'Push-up (wall)'
+	String get pushUpWall => 'Push-up (wall)';
+
+	/// en: 'Push-up (inside leg kick)'
+	String get pushUpInsideLegKick => 'Push-up (inside leg kick)';
+
+	/// en: 'Push-up (medicine ball)'
+	String get pushUpMedicineBall => 'Push-up (medicine ball)';
+
+	/// en: 'Push-up (lower arms)'
+	String get pushUpLowerArms => 'Push-up (lower arms)';
+
+	/// en: 'Push-up (plus)'
+	String get pushUpPlus => 'Push-up (plus)';
+
+	/// en: 'Push-up into side plank'
+	String get pushUpIntoSidePlank => 'Push-up into side plank';
+
+	/// en: 'Chest press (resistance band, seated)'
+	String get chestPressResistanceBandSeated => 'Chest press (resistance band, seated)';
+
+	/// en: 'Seated roller reach-forward'
+	String get seatedRollerReachForward => 'Seated roller reach-forward';
+
+	/// en: 'Seated straight-arm roller raise'
+	String get seatedStraightArmRollerRaise => 'Seated straight-arm roller raise';
+
+	/// en: 'Push-up (scapula)'
+	String get pushUpScapula => 'Push-up (scapula)';
+
+	/// en: 'Push-up with shoulder taps'
+	String get pushUpWithShoulderTaps => 'Push-up with shoulder taps';
+
+	/// en: 'Push-up (side)'
+	String get pushUpSide => 'Push-up (side)';
+
+	/// en: 'Push-up (one arm)'
+	String get pushUpOneArm => 'Push-up (one arm)';
+
+	/// en: 'Press (smith, decline, reverse grip)'
+	String get pressSmithDeclineReverseGrip => 'Press (smith, decline, reverse grip)';
+
+	/// en: 'Press (smith, incline, reverse grip)'
+	String get pressSmithInclineReverseGrip => 'Press (smith, incline, reverse grip)';
+
+	/// en: 'Incline Smith-machine high pull'
+	String get inclineSmithMachineHighPull => 'Incline Smith-machine high pull';
+
+	/// en: 'Bench press (smith machine, reverse, decline, close grip)'
+	String get benchPressSmithMachineReverseDeclineCloseGrip => 'Bench press (smith machine, reverse, decline, close grip)';
+
+	/// en: 'Press (smith, reverse grip)'
+	String get pressSmithReverseGrip => 'Press (smith, reverse grip)';
+
+	/// en: 'Bench press (smith, wide grip)'
+	String get benchPressSmithWideGrip => 'Bench press (smith, wide grip)';
+
+	/// en: 'Bench press (smith, wide grip, decline)'
+	String get benchPressSmithWideGripDecline => 'Bench press (smith, wide grip, decline)';
+
+	/// en: 'Push-up (spider crawl)'
+	String get pushUpSpiderCrawl => 'Push-up (spider crawl)';
+
+	/// en: 'Push-up (superman)'
+	String get pushUpSuperman => 'Push-up (superman)';
+
+	/// en: 'Push-up (suspended)'
+	String get pushUpSuspended => 'Push-up (suspended)';
+
+	/// en: 'Push-up (weighted, drop)'
+	String get pushUpWeightedDrop => 'Push-up (weighted, drop)';
+
+	/// en: 'Dip (weighted, straight bar)'
+	String get dipWeightedStraightBar => 'Dip (weighted, straight bar)';
+
+	/// en: 'Svend press (weighted)'
+	String get svendPressWeighted => 'Svend press (weighted)';
+
+	/// en: 'Push-up (wide, hand)'
+	String get pushUpWideHand => 'Push-up (wide, hand)';
+
+	/// en: 'Chest dip (wide grip, high, parallel bars)'
+	String get chestDipWideGripHighParallelBars => 'Chest dip (wide grip, high, parallel bars)';
 }
 
 // Path: library.biceps.exercises
@@ -7045,6 +7489,360 @@ class Translations$library$biceps$exercises$en {
 
 	/// en: 'Dual-cable high curls'
 	String get dualCableHighCurl => 'Dual-cable high curls';
+
+	/// en: 'Biceps curl (band, alternate)'
+	String get bicepsCurlBandAlternate => 'Biceps curl (band, alternate)';
+
+	/// en: 'Concentration curl (band)'
+	String get concentrationCurlBand => 'Concentration curl (band)';
+
+	/// en: 'Biceps curl (band, one arm, overhead)'
+	String get bicepsCurlBandOneArmOverhead => 'Biceps curl (band, one arm, overhead)';
+
+	/// en: 'Biceps curl (barbell, alternate)'
+	String get bicepsCurlBarbellAlternate => 'Biceps curl (barbell, alternate)';
+
+	/// en: 'Biceps curl (barbell, arm blaster)'
+	String get bicepsCurlBarbellArmBlaster => 'Biceps curl (barbell, arm blaster)';
+
+	/// en: 'Drag curl (barbell)'
+	String get dragCurlBarbell => 'Drag curl (barbell)';
+
+	/// en: 'Preacher curl (barbell, lying)'
+	String get preacherCurlBarbellLying => 'Preacher curl (barbell, lying)';
+
+	/// en: 'Preacher curl (barbell)'
+	String get preacherCurlBarbell => 'Preacher curl (barbell)';
+
+	/// en: 'Reverse preacher curl (barbell)'
+	String get reversePreacherCurlBarbell => 'Reverse preacher curl (barbell)';
+
+	/// en: 'Concentration curl (barbell, seated, close grip)'
+	String get concentrationCurlBarbellSeatedCloseGrip => 'Concentration curl (barbell, seated, close grip)';
+
+	/// en: 'Curl (barbell, standing, close grip)'
+	String get curlBarbellStandingCloseGrip => 'Curl (barbell, standing, close grip)';
+
+	/// en: 'Concentration curl (barbell, standing)'
+	String get concentrationCurlBarbellStanding => 'Concentration curl (barbell, standing)';
+
+	/// en: 'Biceps curl (barbell, standing, wide grip)'
+	String get bicepsCurlBarbellStandingWideGrip => 'Biceps curl (barbell, standing, wide grip)';
+
+	/// en: 'Leg-resisted concentration curl'
+	String get legResistedConcentrationCurl => 'Leg-resisted concentration curl';
+
+	/// en: 'Chin-up (close grip)'
+	String get chinUpCloseGrip => 'Chin-up (close grip)';
+
+	/// en: 'Biceps curl (bodyweight, side lying)'
+	String get bicepsCurlBodyweightSideLying => 'Biceps curl (bodyweight, side lying)';
+
+	/// en: 'Curl (cable, close grip)'
+	String get curlCableCloseGrip => 'Curl (cable, close grip)';
+
+	/// en: 'Concentration curl (cable)'
+	String get concentrationCurlCable => 'Concentration curl (cable)';
+
+	/// en: 'Drag curl (cable)'
+	String get dragCurlCable => 'Drag curl (cable)';
+
+	/// en: 'Biceps curl (cable, lying)'
+	String get bicepsCurlCableLying => 'Biceps curl (cable, lying)';
+
+	/// en: 'Curl (cable, lying, close grip)'
+	String get curlCableLyingCloseGrip => 'Curl (cable, lying, close grip)';
+
+	/// en: 'Curl (cable, one arm)'
+	String get curlCableOneArm => 'Curl (cable, one arm)';
+
+	/// en: 'Preacher curl (cable, one arm)'
+	String get preacherCurlCableOneArm => 'Preacher curl (cable, one arm)';
+
+	/// en: 'Reverse preacher curl (cable, one arm)'
+	String get reversePreacherCurlCableOneArm => 'Reverse preacher curl (cable, one arm)';
+
+	/// en: 'Curl (cable, overhead, exercise ball)'
+	String get curlCableOverheadExerciseBall => 'Curl (cable, overhead, exercise ball)';
+
+	/// en: 'Preacher curl (cable)'
+	String get preacherCurlCable => 'Preacher curl (cable)';
+
+	/// en: 'Biceps curl (cable, pulldown)'
+	String get bicepsCurlCablePulldown => 'Biceps curl (cable, pulldown)';
+
+	/// en: 'Reverse curl (cable)'
+	String get reverseCurlCable => 'Reverse curl (cable)';
+
+	/// en: 'Reverse preacher curl (cable)'
+	String get reversePreacherCurlCable => 'Reverse preacher curl (cable)';
+
+	/// en: 'Hammer preacher curl (cable, rope)'
+	String get hammerPreacherCurlCableRope => 'Hammer preacher curl (cable, rope)';
+
+	/// en: 'Hammer preacher curl (cable, rope, one arm)'
+	String get hammerPreacherCurlCableRopeOneArm => 'Hammer preacher curl (cable, rope, one arm)';
+
+	/// en: 'Curl (cable, seated)'
+	String get curlCableSeated => 'Curl (cable, seated)';
+
+	/// en: 'Concentration curl (cable, seated, one arm)'
+	String get concentrationCurlCableSeatedOneArm => 'Concentration curl (cable, seated, one arm)';
+
+	/// en: 'Curl (cable, seated, overhead)'
+	String get curlCableSeatedOverhead => 'Curl (cable, seated, overhead)';
+
+	/// en: 'Curl (cable, squatting)'
+	String get curlCableSquatting => 'Curl (cable, squatting)';
+
+	/// en: 'Curl (cable, standing, inner)'
+	String get curlCableStandingInner => 'Curl (cable, standing, inner)';
+
+	/// en: 'Biceps curl (cable, rope, standing)'
+	String get bicepsCurlCableRopeStanding => 'Biceps curl (cable, rope, standing)';
+
+	/// en: 'Curl (cable, two arm, incline bench)'
+	String get curlCableTwoArmInclineBench => 'Curl (cable, two arm, incline bench)';
+
+	/// en: 'Biceps curl (dumbbell, alternate)'
+	String get bicepsCurlDumbbellAlternate => 'Biceps curl (dumbbell, alternate)';
+
+	/// en: 'Biceps curl (dumbbell, alternate, arm blaster)'
+	String get bicepsCurlDumbbellAlternateArmBlaster => 'Biceps curl (dumbbell, alternate, arm blaster)';
+
+	/// en: 'Hammer preacher curl (dumbbell, alternate)'
+	String get hammerPreacherCurlDumbbellAlternate => 'Hammer preacher curl (dumbbell, alternate)';
+
+	/// en: 'Preacher curl (dumbbell, alternate)'
+	String get preacherCurlDumbbellAlternate => 'Preacher curl (dumbbell, alternate)';
+
+	/// en: 'Hammer curl (dumbbell, alternate, seated)'
+	String get hammerCurlDumbbellAlternateSeated => 'Hammer curl (dumbbell, alternate, seated)';
+
+	/// en: 'Biceps curl (dumbbell, alternate, leg raised, exercise ball)'
+	String get bicepsCurlDumbbellAlternateLegRaisedExerciseBall => 'Biceps curl (dumbbell, alternate, leg raised, exercise ball)';
+
+	/// en: 'Biceps curl (dumbbell, alternate, seated, exercise ball)'
+	String get bicepsCurlDumbbellAlternateSeatedExerciseBall => 'Biceps curl (dumbbell, alternate, seated, exercise ball)';
+
+	/// en: 'Dumbbell curl with bowling lunge'
+	String get dumbbellCurlWithBowlingLunge => 'Dumbbell curl with bowling lunge';
+
+	/// en: 'Biceps curl (dumbbell, exercise ball, leg raised)'
+	String get bicepsCurlDumbbellExerciseBallLegRaised => 'Biceps curl (dumbbell, exercise ball, leg raised)';
+
+	/// en: 'Biceps curl (dumbbell, stork stance)'
+	String get bicepsCurlDumbbellStorkStance => 'Biceps curl (dumbbell, stork stance)';
+
+	/// en: 'Biceps curl (dumbbell, arm blaster)'
+	String get bicepsCurlDumbbellArmBlaster => 'Biceps curl (dumbbell, arm blaster)';
+
+	/// en: 'Biceps curl squat (dumbbell)'
+	String get bicepsCurlSquatDumbbell => 'Biceps curl squat (dumbbell)';
+
+	/// en: 'Biceps curl (dumbbell, v sit, bosu ball)'
+	String get bicepsCurlDumbbellVSitBosuBall => 'Biceps curl (dumbbell, v sit, bosu ball)';
+
+	/// en: 'Hammer curl (dumbbell, cross body)'
+	String get hammerCurlDumbbellCrossBody => 'Hammer curl (dumbbell, cross body)';
+
+	/// en: 'Hammer curl (dumbbell, exercise ball)'
+	String get hammerCurlDumbbellExerciseBall => 'Hammer curl (dumbbell, exercise ball)';
+
+	/// en: 'Hammer curl (dumbbell, arm blaster)'
+	String get hammerCurlDumbbellArmBlaster => 'Hammer curl (dumbbell, arm blaster)';
+
+	/// en: 'High curl (dumbbell)'
+	String get highCurlDumbbell => 'High curl (dumbbell)';
+
+	/// en: 'Preacher curl (dumbbell, incline)'
+	String get preacherCurlDumbbellIncline => 'Preacher curl (dumbbell, incline)';
+
+	/// en: 'Hammer curl (dumbbell, incline)'
+	String get hammerCurlDumbbellIncline => 'Hammer curl (dumbbell, incline)';
+
+	/// en: 'Inner biceps curl (dumbbell, incline)'
+	String get innerBicepsCurlDumbbellIncline => 'Inner biceps curl (dumbbell, incline)';
+
+	/// en: 'Biceps curl (dumbbell, kneeling, exercise ball)'
+	String get bicepsCurlDumbbellKneelingExerciseBall => 'Biceps curl (dumbbell, kneeling, exercise ball)';
+
+	/// en: 'Lunge biceps curl (dumbbell)'
+	String get lungeBicepsCurlDumbbell => 'Lunge biceps curl (dumbbell)';
+
+	/// en: 'Biceps curl (dumbbell, lying, supine)'
+	String get bicepsCurlDumbbellLyingSupine => 'Biceps curl (dumbbell, lying, supine)';
+
+	/// en: 'Biceps curl (dumbbell, lying)'
+	String get bicepsCurlDumbbellLying => 'Biceps curl (dumbbell, lying)';
+
+	/// en: 'Curl (dumbbell, lying, wide)'
+	String get curlDumbbellLyingWide => 'Curl (dumbbell, lying, wide)';
+
+	/// en: 'Concentration curl (dumbbell, one arm, stability ball)'
+	String get concentrationCurlDumbbellOneArmStabilityBall => 'Concentration curl (dumbbell, one arm, stability ball)';
+
+	/// en: 'Hammer preacher curl (dumbbell, one arm)'
+	String get hammerPreacherCurlDumbbellOneArm => 'Hammer preacher curl (dumbbell, one arm)';
+
+	/// en: 'Curl (dumbbell, one arm, prone)'
+	String get curlDumbbellOneArmProne => 'Curl (dumbbell, one arm, prone)';
+
+	/// en: 'Hammer curl (dumbbell, one arm, prone)'
+	String get hammerCurlDumbbellOneArmProne => 'Hammer curl (dumbbell, one arm, prone)';
+
+	/// en: 'Reverse preacher curl (dumbbell, one arm)'
+	String get reversePreacherCurlDumbbellOneArm => 'Reverse preacher curl (dumbbell, one arm)';
+
+	/// en: 'Reverse spider curl (dumbbell, one arm)'
+	String get reverseSpiderCurlDumbbellOneArm => 'Reverse spider curl (dumbbell, one arm)';
+
+	/// en: 'Biceps curl (dumbbell, one arm, seated, exercise ball)'
+	String get bicepsCurlDumbbellOneArmSeatedExerciseBall => 'Biceps curl (dumbbell, one arm, seated, exercise ball)';
+
+	/// en: 'Hammer curl (dumbbell, one arm, seated)'
+	String get hammerCurlDumbbellOneArmSeated => 'Hammer curl (dumbbell, one arm, seated)';
+
+	/// en: 'Curl (dumbbell, one arm, standing)'
+	String get curlDumbbellOneArmStanding => 'Curl (dumbbell, one arm, standing)';
+
+	/// en: 'Hammer curl (dumbbell, one arm, standing)'
+	String get hammerCurlDumbbellOneArmStanding => 'Hammer curl (dumbbell, one arm, standing)';
+
+	/// en: 'Zottman preacher curl (dumbbell, one arm)'
+	String get zottmanPreacherCurlDumbbellOneArm => 'Zottman preacher curl (dumbbell, one arm)';
+
+	/// en: 'Hammer preacher curl (dumbbell)'
+	String get hammerPreacherCurlDumbbell => 'Hammer preacher curl (dumbbell)';
+
+	/// en: 'Preacher curl (dumbbell, exercise ball)'
+	String get preacherCurlDumbbellExerciseBall => 'Preacher curl (dumbbell, exercise ball)';
+
+	/// en: 'Curl (dumbbell, prone, incline)'
+	String get curlDumbbellProneIncline => 'Curl (dumbbell, prone, incline)';
+
+	/// en: 'Hammer curl (dumbbell, prone, incline)'
+	String get hammerCurlDumbbellProneIncline => 'Hammer curl (dumbbell, prone, incline)';
+
+	/// en: 'Reverse preacher curl (dumbbell)'
+	String get reversePreacherCurlDumbbell => 'Reverse preacher curl (dumbbell)';
+
+	/// en: 'Reverse spider curl (dumbbell)'
+	String get reverseSpiderCurlDumbbell => 'Reverse spider curl (dumbbell)';
+
+	/// en: 'Hammer curl (dumbbell, seated, alternate, exercise ball)'
+	String get hammerCurlDumbbellSeatedAlternateExerciseBall => 'Hammer curl (dumbbell, seated, alternate, exercise ball)';
+
+	/// en: 'Biceps curl (dumbbell, seated)'
+	String get bicepsCurlDumbbellSeated => 'Biceps curl (dumbbell, seated)';
+
+	/// en: 'Biceps curl (dumbbell, seated, exercise ball)'
+	String get bicepsCurlDumbbellSeatedExerciseBall => 'Biceps curl (dumbbell, seated, exercise ball)';
+
+	/// en: 'Hammer curl (dumbbell, seated)'
+	String get hammerCurlDumbbellSeated => 'Hammer curl (dumbbell, seated)';
+
+	/// en: 'Inner biceps curl (dumbbell, seated)'
+	String get innerBicepsCurlDumbbellSeated => 'Inner biceps curl (dumbbell, seated)';
+
+	/// en: 'Biceps curl (dumbbell, seated, one arm, exercise ball, leg raised)'
+	String get bicepsCurlDumbbellSeatedOneArmExerciseBallLegRaised => 'Biceps curl (dumbbell, seated, one arm, exercise ball, leg raised)';
+
+	/// en: 'Preacher curl (dumbbell, seated)'
+	String get preacherCurlDumbbellSeated => 'Preacher curl (dumbbell, seated)';
+
+	/// en: 'Concentration curl (dumbbell, seated, reverse)'
+	String get concentrationCurlDumbbellSeatedReverse => 'Concentration curl (dumbbell, seated, reverse)';
+
+	/// en: 'Hammer curl and press (dumbbell, standing, alternate)'
+	String get hammerCurlAndPressDumbbellStandingAlternate => 'Hammer curl and press (dumbbell, standing, alternate)';
+
+	/// en: 'Concentration curl (dumbbell, standing)'
+	String get concentrationCurlDumbbellStanding => 'Concentration curl (dumbbell, standing)';
+
+	/// en: 'Inner biceps curl (dumbbell, standing)'
+	String get innerBicepsCurlDumbbellStanding => 'Inner biceps curl (dumbbell, standing)';
+
+	/// en: 'Concentration curl (dumbbell, standing, one arm)'
+	String get concentrationCurlDumbbellStandingOneArm => 'Concentration curl (dumbbell, standing, one arm)';
+
+	/// en: 'Curl (dumbbell, standing, one arm, incline bench)'
+	String get curlDumbbellStandingOneArmInclineBench => 'Curl (dumbbell, standing, one arm, incline bench)';
+
+	/// en: 'Preacher curl (dumbbell, standing)'
+	String get preacherCurlDumbbellStanding => 'Preacher curl (dumbbell, standing)';
+
+	/// en: 'Zottman preacher curl (dumbbell, standing)'
+	String get zottmanPreacherCurlDumbbellStanding => 'Zottman preacher curl (dumbbell, standing)';
+
+	/// en: 'Step-up with balance and dumbbell curl'
+	String get stepUpWithBalanceAndDumbbellCurl => 'Step-up with balance and dumbbell curl';
+
+	/// en: 'Biceps curl (dumbbell, waiter)'
+	String get bicepsCurlDumbbellWaiter => 'Biceps curl (dumbbell, waiter)';
+
+	/// en: 'Zottman curl (dumbbell)'
+	String get zottmanCurlDumbbell => 'Zottman curl (dumbbell)';
+
+	/// en: 'Zottman preacher curl (dumbbell)'
+	String get zottmanPreacherCurlDumbbell => 'Zottman preacher curl (dumbbell)';
+
+	/// en: 'Concentration curl (ez bar, seated, close grip)'
+	String get concentrationCurlEzBarSeatedCloseGrip => 'Concentration curl (ez bar, seated, close grip)';
+
+	/// en: 'Preacher curl (ez barbell, close grip)'
+	String get preacherCurlEzBarbellCloseGrip => 'Preacher curl (ez barbell, close grip)';
+
+	/// en: 'Curl (ez barbell, close grip)'
+	String get curlEzBarbellCloseGrip => 'Curl (ez barbell, close grip)';
+
+	/// en: 'Curl (ez barbell)'
+	String get curlEzBarbell => 'Curl (ez barbell)';
+
+	/// en: 'Reverse curl (ez barbell)'
+	String get reverseCurlEzBarbell => 'Reverse curl (ez barbell)';
+
+	/// en: 'Reverse preacher curl (ez barbell)'
+	String get reversePreacherCurlEzBarbell => 'Reverse preacher curl (ez barbell)';
+
+	/// en: 'Curl (ez barbell, seated)'
+	String get curlEzBarbellSeated => 'Curl (ez barbell, seated)';
+
+	/// en: 'Spider curl (ez barbell)'
+	String get spiderCurlEzBarbell => 'Spider curl (ez barbell)';
+
+	/// en: 'Biceps curl (ez bar, arm blaster)'
+	String get bicepsCurlEzBarArmBlaster => 'Biceps curl (ez bar, arm blaster)';
+
+	/// en: 'Biceps curl (ez barbell, standing, wide grip)'
+	String get bicepsCurlEzBarbellStandingWideGrip => 'Biceps curl (ez barbell, standing, wide grip)';
+
+	/// en: 'Clean (kettlebell, bottoms up, from hang position)'
+	String get cleanKettlebellBottomsUpFromHangPosition => 'Clean (kettlebell, bottoms up, from hang position)';
+
+	/// en: 'Hang clean (kettlebell, double, alternate)'
+	String get hangCleanKettlebellDoubleAlternate => 'Hang clean (kettlebell, double, alternate)';
+
+	/// en: 'Preacher curl (lever, hammer grip)'
+	String get preacherCurlLeverHammerGrip => 'Preacher curl (lever, hammer grip)';
+
+	/// en: 'Preacher curl (lever)'
+	String get preacherCurlLever => 'Preacher curl (lever)';
+
+	/// en: 'Reverse preacher curl (lever)'
+	String get reversePreacherCurlLever => 'Reverse preacher curl (lever)';
+
+	/// en: 'Hammer curl (olympic barbell)'
+	String get hammerCurlOlympicBarbell => 'Hammer curl (olympic barbell)';
+
+	/// en: 'Biceps curl (resistance band, seated)'
+	String get bicepsCurlResistanceBandSeated => 'Biceps curl (resistance band, seated)';
+
+	/// en: 'Biceps curl (smith machine)'
+	String get bicepsCurlSmithMachine => 'Biceps curl (smith machine)';
+
+	/// en: 'Biceps curl (weighted, seated, stability ball)'
+	String get bicepsCurlWeightedSeatedStabilityBall => 'Biceps curl (weighted, seated, stability ball)';
 }
 
 // Path: library.abs.exercises
@@ -7135,6 +7933,393 @@ class Translations$library$abs$exercises$en {
 
 	/// en: 'Lateral hyperextensions'
 	String get lateralHyperextensions => 'Lateral hyperextensions';
+
+	/// en: 'Sit-up (3/4)'
+	String get sitUp34 => 'Sit-up (3/4)';
+
+	/// en: 'Side bend on a 45° bench'
+	String get sideBendOnA45Bench => 'Side bend on a 45° bench';
+
+	/// en: 'Leg raise (hanging, straps)'
+	String get legRaiseHangingStraps => 'Leg raise (hanging, straps)';
+
+	/// en: 'Sit-up (arms overhead, full)'
+	String get sitUpArmsOverheadFull => 'Sit-up (arms overhead, full)';
+
+	/// en: 'Knee raise (assisted, hanging)'
+	String get kneeRaiseAssistedHanging => 'Knee raise (assisted, hanging)';
+
+	/// en: 'Knee raise (assisted, hanging, throw down)'
+	String get kneeRaiseAssistedHangingThrowDown => 'Knee raise (assisted, hanging, throw down)';
+
+	/// en: 'Leg raise (assisted, lying, lateral, throw down)'
+	String get legRaiseAssistedLyingLateralThrowDown => 'Leg raise (assisted, lying, lateral, throw down)';
+
+	/// en: 'Leg raise (assisted, lying, throw down)'
+	String get legRaiseAssistedLyingThrowDown => 'Leg raise (assisted, lying, throw down)';
+
+	/// en: 'Russian twist (assisted, motion)'
+	String get russianTwistAssistedMotion => 'Russian twist (assisted, motion)';
+
+	/// en: 'Sit-up (assisted)'
+	String get sitUpAssisted => 'Sit-up (assisted)';
+
+	/// en: 'V-up (band, alternate)'
+	String get vUpBandAlternate => 'V-up (band, alternate)';
+
+	/// en: 'Rollout (band, assisted, wheel)'
+	String get rolloutBandAssistedWheel => 'Rollout (band, assisted, wheel)';
+
+	/// en: 'Bicycle crunch (band)'
+	String get bicycleCrunchBand => 'Bicycle crunch (band)';
+
+	/// en: 'Pallof press (band, horizontal)'
+	String get pallofPressBandHorizontal => 'Pallof press (band, horizontal)';
+
+	/// en: 'Jackknife sit-up (band)'
+	String get jackknifeSitUpBand => 'Jackknife sit-up (band)';
+
+	/// en: 'Crunch (band, kneeling, twisting)'
+	String get crunchBandKneelingTwisting => 'Crunch (band, kneeling, twisting)';
+
+	/// en: 'Leg raise (band, lying, straight leg)'
+	String get legRaiseBandLyingStraightLeg => 'Leg raise (band, lying, straight leg)';
+
+	/// en: 'Sit-up (band, push)'
+	String get sitUpBandPush => 'Sit-up (band, push)';
+
+	/// en: 'Twist (band, seated)'
+	String get twistBandSeated => 'Twist (band, seated)';
+
+	/// en: 'Crunch (band, standing)'
+	String get crunchBandStanding => 'Crunch (band, standing)';
+
+	/// en: 'Crunch (band, standing, twisting)'
+	String get crunchBandStandingTwisting => 'Crunch (band, standing, twisting)';
+
+	/// en: 'V-up (band)'
+	String get vUpBand => 'V-up (band)';
+
+	/// en: 'Pallof press (band, vertical)'
+	String get pallofPressBandVertical => 'Pallof press (band, vertical)';
+
+	/// en: 'Sit-up (barbell, press)'
+	String get sitUpBarbellPress => 'Sit-up (barbell, press)';
+
+	/// en: 'Rollout (barbell)'
+	String get rolloutBarbell => 'Rollout (barbell)';
+
+	/// en: 'Rollout (barbell, from bench)'
+	String get rolloutBarbellFromBench => 'Rollout (barbell, from bench)';
+
+	/// en: 'Twist (barbell, seated)'
+	String get twistBarbellSeated => 'Twist (barbell, seated)';
+
+	/// en: 'Side bend (barbell)'
+	String get sideBendBarbell => 'Side bend (barbell)';
+
+	/// en: 'Leg raise (barbell, seated, alternate)'
+	String get legRaiseBarbellSeatedAlternate => 'Leg raise (barbell, seated, alternate)';
+
+	/// en: 'Ab rollout (barbell, standing)'
+	String get abRolloutBarbellStanding => 'Ab rollout (barbell, standing)';
+
+	/// en: 'Twist (barbell, standing)'
+	String get twistBarbellStanding => 'Twist (barbell, standing)';
+
+	/// en: 'Side plank (bodyweight, incline)'
+	String get sidePlankBodyweightIncline => 'Side plank (bodyweight, incline)';
+
+	/// en: 'Reverse crunch with vertical hip lift'
+	String get reverseCrunchWithVerticalHipLift => 'Reverse crunch with vertical hip lift';
+
+	/// en: 'Cross-body mountain climber'
+	String get crossBodyMountainClimber => 'Cross-body mountain climber';
+
+	/// en: 'Plank hip lifts'
+	String get plankHipLifts => 'Plank hip lifts';
+
+	/// en: 'Cable rotational shoulder throw'
+	String get cableRotationalShoulderThrow => 'Cable rotational shoulder throw';
+
+	/// en: 'Reverse crunch (cable)'
+	String get reverseCrunchCable => 'Reverse crunch (cable)';
+
+	/// en: 'Russian twist (cable, stability ball)'
+	String get russianTwistCableStabilityBall => 'Russian twist (cable, stability ball)';
+
+	/// en: 'Crunch (cable, seated)'
+	String get crunchCableSeated => 'Crunch (cable, seated)';
+
+	/// en: 'Twist (cable, seated)'
+	String get twistCableSeated => 'Twist (cable, seated)';
+
+	/// en: 'Side bend (cable)'
+	String get sideBendCable => 'Side bend (cable)';
+
+	/// en: 'Side bend (cable, crunch, bosu ball)'
+	String get sideBendCableCrunchBosuBall => 'Side bend (cable, crunch, bosu ball)';
+
+	/// en: 'Side crunch (cable)'
+	String get sideCrunchCable => 'Side crunch (cable)';
+
+	/// en: 'Crunch (cable, standing)'
+	String get crunchCableStanding => 'Crunch (cable, standing)';
+
+	/// en: 'Crunch (cable, standing, rope)'
+	String get crunchCableStandingRope => 'Crunch (cable, standing, rope)';
+
+	/// en: 'Low-to-high cable woodchop'
+	String get lowToHighCableWoodchop => 'Low-to-high cable woodchop';
+
+	/// en: 'Reverse crunch (cable, tuck)'
+	String get reverseCrunchCableTuck => 'Reverse crunch (cable, tuck)';
+
+	/// en: 'Twist (cable)'
+	String get twistCable => 'Twist (cable)';
+
+	/// en: 'Crab-position toe touches'
+	String get crabPositionToeTouches => 'Crab-position toe touches';
+
+	/// en: 'Crunch (cross body)'
+	String get crunchCrossBody => 'Crunch (cross body)';
+
+	/// en: 'Crunch (hands overhead)'
+	String get crunchHandsOverhead => 'Crunch (hands overhead)';
+
+	/// en: 'Crunch (stability ball)'
+	String get crunchStabilityBall => 'Crunch (stability ball)';
+
+	/// en: 'Crunch (stability ball, straight arm)'
+	String get crunchStabilityBallStraightArm => 'Crunch (stability ball, straight arm)';
+
+	/// en: 'Crunch (decline)'
+	String get crunchDecline => 'Crunch (decline)';
+
+	/// en: 'Sit-up (decline)'
+	String get sitUpDecline => 'Sit-up (decline)';
+
+	/// en: 'Side bend (dumbbell)'
+	String get sideBendDumbbell => 'Side bend (dumbbell)';
+
+	/// en: 'Alternating elbow-to-knee crunch'
+	String get alternatingElbowToKneeCrunch => 'Alternating elbow-to-knee crunch';
+
+	/// en: 'Human flag hold'
+	String get humanFlagHold => 'Human flag hold';
+
+	/// en: 'Sit-up (flexion leg, bent knee)'
+	String get sitUpFlexionLegBentKnee => 'Sit-up (flexion leg, bent knee)';
+
+	/// en: 'Sit-up (flexion leg, straight arm)'
+	String get sitUpFlexionLegStraightArm => 'Sit-up (flexion leg, straight arm)';
+
+	/// en: 'Crunch (frog)'
+	String get crunchFrog => 'Crunch (frog)';
+
+	/// en: 'Plank trunk rotations'
+	String get plankTrunkRotations => 'Plank trunk rotations';
+
+	/// en: 'Chin-up with knee tuck'
+	String get chinUpWithKneeTuck => 'Chin-up with knee tuck';
+
+	/// en: 'Sit-up (half)'
+	String get sitUpHalf => 'Sit-up (half)';
+
+	/// en: 'Leg hip raise (hanging)'
+	String get legHipRaiseHanging => 'Leg hip raise (hanging)';
+
+	/// en: 'Leg raise (hanging)'
+	String get legRaiseHanging => 'Leg raise (hanging)';
+
+	/// en: 'Knee raise (hanging, oblique)'
+	String get kneeRaiseHangingOblique => 'Knee raise (hanging, oblique)';
+
+	/// en: 'Hanging pike raise'
+	String get hangingPikeRaise => 'Hanging pike raise';
+
+	/// en: 'Leg hip raise (hanging, straight leg, twisting)'
+	String get legHipRaiseHangingStraightLegTwisting => 'Leg hip raise (hanging, straight leg, twisting)';
+
+	/// en: 'Inchworm'
+	String get inchworm => 'Inchworm';
+
+	/// en: 'Leg hip raise (incline, straight leg)'
+	String get legHipRaiseInclineStraightLeg => 'Leg hip raise (incline, straight leg)';
+
+	/// en: 'Sit-up (incline, twisting)'
+	String get sitUpInclineTwisting => 'Sit-up (incline, twisting)';
+
+	/// en: 'Jackknife sit-up'
+	String get jackknifeSitUp => 'Jackknife sit-up';
+
+	/// en: 'Sit-up (janda)'
+	String get sitUpJanda => 'Sit-up (janda)';
+
+	/// en: 'Windmill (kettlebell, advanced)'
+	String get windmillKettlebellAdvanced => 'Windmill (kettlebell, advanced)';
+
+	/// en: 'Press (kettlebell, bent)'
+	String get pressKettlebellBent => 'Press (kettlebell, bent)';
+
+	/// en: 'Windmill (kettlebell, double)'
+	String get windmillKettlebellDouble => 'Windmill (kettlebell, double)';
+
+	/// en: 'Kettlebell figure-eight pass'
+	String get kettlebellFigureEightPass => 'Kettlebell figure-eight pass';
+
+	/// en: 'Windmill (kettlebell)'
+	String get windmillKettlebell => 'Windmill (kettlebell)';
+
+	/// en: 'Seated knee tucks on bench'
+	String get seatedKneeTucksOnBench => 'Seated knee tucks on bench';
+
+	/// en: 'Crunch (knee touch)'
+	String get crunchKneeTouch => 'Crunch (knee touch)';
+
+	/// en: 'Kneeling plank shoulder taps'
+	String get kneelingPlankShoulderTaps => 'Kneeling plank shoulder taps';
+
+	/// en: 'L-sit (floor)'
+	String get lSitFloor => 'L-sit (floor)';
+
+	/// en: 'Landmine trunk rotations'
+	String get landmineTrunkRotations => 'Landmine trunk rotations';
+
+	/// en: 'Bench knee tucks'
+	String get benchKneeTucks => 'Bench knee tucks';
+
+	/// en: 'Twist (lever, kneeling)'
+	String get twistLeverKneeling => 'Twist (lever, kneeling)';
+
+	/// en: 'Crunch (lever, seated, chest pad)'
+	String get crunchLeverSeatedChestPad => 'Crunch (lever, seated, chest pad)';
+
+	/// en: 'Leg raise (lever, seated, crunch)'
+	String get legRaiseLeverSeatedCrunch => 'Leg raise (lever, seated, crunch)';
+
+	/// en: 'Lunge (twist)'
+	String get lungeTwist => 'Lunge (twist)';
+
+	/// en: 'Leg hip raise (lying)'
+	String get legHipRaiseLying => 'Leg hip raise (lying)';
+
+	/// en: 'Crunch (negative)'
+	String get crunchNegative => 'Crunch (negative)';
+
+	/// en: 'Single-arm medicine-ball slam'
+	String get singleArmMedicineBallSlam => 'Single-arm medicine-ball slam';
+
+	/// en: 'Supine pelvic tilts'
+	String get supinePelvicTilts => 'Supine pelvic tilts';
+
+	/// en: 'Reverse step with overhead reach'
+	String get reverseStepWithOverheadReach => 'Reverse step with overhead reach';
+
+	/// en: 'Squat (potty)'
+	String get squatPotty => 'Squat (potty)';
+
+	/// en: 'Plank with opposite arm and leg reach'
+	String get plankWithOppositeArmAndLegReach => 'Plank with opposite arm and leg reach';
+
+	/// en: 'Sit-up (prisoner, half)'
+	String get sitUpPrisonerHalf => 'Sit-up (prisoner, half)';
+
+	/// en: 'Twist (prone, stability ball)'
+	String get twistProneStabilityBall => 'Twist (prone, stability ball)';
+
+	/// en: 'Stability-ball knee tuck'
+	String get stabilityBallKneeTuck => 'Stability-ball knee tuck';
+
+	/// en: 'Sit-up (quarter)'
+	String get sitUpQuarter => 'Sit-up (quarter)';
+
+	/// en: 'Reverse plank with alternating leg raises'
+	String get reversePlankWithAlternatingLegRaises => 'Reverse plank with alternating leg raises';
+
+	/// en: 'Body saw (roller)'
+	String get bodySawRoller => 'Body saw (roller)';
+
+	/// en: 'Reverse crunch (roller)'
+	String get reverseCrunchRoller => 'Reverse crunch (roller)';
+
+	/// en: 'Russian twist'
+	String get russianTwistBodyweight => 'Russian twist';
+
+	/// en: 'Leg raise (seated)'
+	String get legRaiseSeated => 'Leg raise (seated)';
+
+	/// en: 'Side crunch (seated, wall)'
+	String get sideCrunchSeatedWall => 'Side crunch (seated, wall)';
+
+	/// en: 'Shoulder tap'
+	String get shoulderTap => 'Shoulder tap';
+
+	/// en: 'Side-bridge hip lifts'
+	String get sideBridgeHipLifts => 'Side-bridge hip lifts';
+
+	/// en: 'Lateral leg raises on parallel bars'
+	String get lateralLegRaisesOnParallelBars => 'Lateral leg raises on parallel bars';
+
+	/// en: 'Alternating cross-body toe touches'
+	String get alternatingCrossBodyToeTouches => 'Alternating cross-body toe touches';
+
+	/// en: 'Sit-up'
+	String get sitUp => 'Sit-up';
+
+	/// en: 'Sit-up (arms chest)'
+	String get sitUpArmsChest => 'Sit-up (arms chest)';
+
+	/// en: 'Sledgehammer tire strikes'
+	String get sledgehammerTireStrikes => 'Sledgehammer tire strikes';
+
+	/// en: 'Diagonal dumbbell trunk rotations'
+	String get diagonalDumbbellTrunkRotations => 'Diagonal dumbbell trunk rotations';
+
+	/// en: 'Twist (spine)'
+	String get twistSpine => 'Twist (spine)';
+
+	/// en: 'Crunch (stability ball, hands behind head, full)'
+	String get crunchStabilityBallHandsBehindHeadFull => 'Crunch (stability ball, hands behind head, full)';
+
+	/// en: 'Rollout (standing, wheel)'
+	String get rolloutStandingWheel => 'Rollout (standing, wheel)';
+
+	/// en: 'Suspension-strap abdominal rollout'
+	String get suspensionStrapAbdominalRollout => 'Suspension-strap abdominal rollout';
+
+	/// en: 'Reverse crunch (suspended)'
+	String get reverseCrunchSuspended => 'Reverse crunch (suspended)';
+
+	/// en: 'Leg raise (twisted)'
+	String get legRaiseTwisted => 'Leg raise (twisted)';
+
+	/// en: 'V-sit (floor)'
+	String get vSitFloor => 'V-sit (floor)';
+
+	/// en: 'Crunch (weighted)'
+	String get crunchWeighted => 'Crunch (weighted)';
+
+	/// en: 'Sit-up (weighted, decline)'
+	String get sitUpWeightedDecline => 'Sit-up (weighted, decline)';
+
+	/// en: 'Plank (weighted, front)'
+	String get plankWeightedFront => 'Plank (weighted, front)';
+
+	/// en: 'Leg hip raise (weighted, hanging)'
+	String get legHipRaiseWeightedHanging => 'Leg hip raise (weighted, hanging)';
+
+	/// en: 'Crunch (weighted, overhead, stability ball)'
+	String get crunchWeightedOverheadStabilityBall => 'Crunch (weighted, overhead, stability ball)';
+
+	/// en: 'Russian twist (weighted, legs up)'
+	String get russianTwistWeightedLegsUp => 'Russian twist (weighted, legs up)';
+
+	/// en: 'Twist (weighted, seated, stability ball)'
+	String get twistWeightedSeatedStabilityBall => 'Twist (weighted, seated, stability ball)';
+
+	/// en: 'Side bend (weighted, stability ball)'
+	String get sideBendWeightedStabilityBall => 'Side bend (weighted, stability ball)';
 }
 
 // Path: library.calves.exercises
@@ -7156,6 +8341,147 @@ class Translations$library$calves$exercises$en {
 
 	/// en: 'Calf press on leg press machine'
 	String get calfPressLegPressMachine => 'Calf press on leg press machine';
+
+	/// en: 'Ankle rotations'
+	String get ankleRotations => 'Ankle rotations';
+
+	/// en: 'Calves stretch (assisted, lying)'
+	String get calvesStretchAssistedLying => 'Calves stretch (assisted, lying)';
+
+	/// en: 'Calf raise (band, one leg)'
+	String get calfRaiseBandOneLeg => 'Calf raise (band, one leg)';
+
+	/// en: 'Reverse calf raise (band, one leg)'
+	String get reverseCalfRaiseBandOneLeg => 'Reverse calf raise (band, one leg)';
+
+	/// en: 'Calf raise (band, standing)'
+	String get calfRaiseBandStanding => 'Calf raise (band, standing)';
+
+	/// en: 'Calf raise (barbell, floor)'
+	String get calfRaiseBarbellFloor => 'Calf raise (barbell, floor)';
+
+	/// en: 'Calf raise (barbell, seated)'
+	String get calfRaiseBarbellSeated => 'Calf raise (barbell, seated)';
+
+	/// en: 'Calf raise (barbell, standing)'
+	String get calfRaiseBarbellStanding => 'Calf raise (barbell, standing)';
+
+	/// en: 'Calf raise (barbell, standing, rocking leg)'
+	String get calfRaiseBarbellStandingRockingLeg => 'Calf raise (barbell, standing, rocking leg)';
+
+	/// en: 'Standing bodyweight calf raise'
+	String get standingBodyweightCalfRaise => 'Standing bodyweight calf raise';
+
+	/// en: 'Box drop with single-leg landing'
+	String get boxDropWithSingleLegLanding => 'Box drop with single-leg landing';
+
+	/// en: 'Calf raise (cable, standing)'
+	String get calfRaiseCableStanding => 'Calf raise (cable, standing)';
+
+	/// en: 'Calf raise (cable, standing, one leg)'
+	String get calfRaiseCableStandingOneLeg => 'Calf raise (cable, standing, one leg)';
+
+	/// en: 'Wall calf stretch'
+	String get wallCalfStretch => 'Wall calf stretch';
+
+	/// en: 'Calf stretch (rope)'
+	String get calfStretchRope => 'Calf stretch (rope)';
+
+	/// en: 'Knee circles'
+	String get kneeCircles => 'Knee circles';
+
+	/// en: 'Calf raise (donkey)'
+	String get calfRaiseDonkey => 'Calf raise (donkey)';
+
+	/// en: 'Calf raise (dumbbell, seated)'
+	String get calfRaiseDumbbellSeated => 'Calf raise (dumbbell, seated)';
+
+	/// en: 'Calf raise (dumbbell, seated, one leg)'
+	String get calfRaiseDumbbellSeatedOneLeg => 'Calf raise (dumbbell, seated, one leg)';
+
+	/// en: 'Calf raise (dumbbell, seated, one leg, hammer grip)'
+	String get calfRaiseDumbbellSeatedOneLegHammerGrip => 'Calf raise (dumbbell, seated, one leg, hammer grip)';
+
+	/// en: 'Calf raise (dumbbell, seated, one leg, palm up)'
+	String get calfRaiseDumbbellSeatedOneLegPalmUp => 'Calf raise (dumbbell, seated, one leg, palm up)';
+
+	/// en: 'Calf raise (dumbbell, one leg)'
+	String get calfRaiseDumbbellOneLeg => 'Calf raise (dumbbell, one leg)';
+
+	/// en: 'Calf raise (dumbbell, standing)'
+	String get calfRaiseDumbbellStanding => 'Calf raise (dumbbell, standing)';
+
+	/// en: 'Calf raise (exercise ball, wall)'
+	String get calfRaiseExerciseBallWall => 'Calf raise (exercise ball, wall)';
+
+	/// en: 'Wall-ball calf raise, ball between ankles'
+	String get wallBallCalfRaiseBallBetweenAnkles => 'Wall-ball calf raise, ball between ankles';
+
+	/// en: 'Wall-ball calf raise, ball between knees'
+	String get wallBallCalfRaiseBallBetweenKnees => 'Wall-ball calf raise, ball between knees';
+
+	/// en: 'Calf raise (hack)'
+	String get calfRaiseHack => 'Calf raise (hack)';
+
+	/// en: 'Calf raise (hack, one leg)'
+	String get calfRaiseHackOneLeg => 'Calf raise (hack, one leg)';
+
+	/// en: 'Calf press (lever)'
+	String get calfPressLever => 'Calf press (lever)';
+
+	/// en: 'Calf raise (lever, donkey)'
+	String get calfRaiseLeverDonkey => 'Calf raise (lever, donkey)';
+
+	/// en: 'Rotary calf machine press'
+	String get rotaryCalfMachinePress => 'Rotary calf machine press';
+
+	/// en: 'Calf press (lever, seated)'
+	String get calfPressLeverSeated => 'Calf press (lever, seated)';
+
+	/// en: 'Seated squat calf raise on leg press'
+	String get seatedSquatCalfRaiseOnLegPress => 'Seated squat calf raise on leg press';
+
+	/// en: 'Calf raise (lever, standing)'
+	String get calfRaiseLeverStanding => 'Calf raise (lever, standing)';
+
+	/// en: 'Calf raise (one leg, donkey)'
+	String get calfRaiseOneLegDonkey => 'Calf raise (one leg, donkey)';
+
+	/// en: 'Calf raise (one leg, floor)'
+	String get calfRaiseOneLegFloor => 'Calf raise (one leg, floor)';
+
+	/// en: 'Peroneals stretch'
+	String get peronealsStretch => 'Peroneals stretch';
+
+	/// en: 'Posterior tibialis stretch'
+	String get posteriorTibialisStretch => 'Posterior tibialis stretch';
+
+	/// en: 'Calf stretch (seated)'
+	String get calfStretchSeated => 'Calf stretch (seated)';
+
+	/// en: 'Calf raise (sled, forward, angled)'
+	String get calfRaiseSledForwardAngled => 'Calf raise (sled, forward, angled)';
+
+	/// en: 'Calf press (sled, one leg)'
+	String get calfPressSledOneLeg => 'Calf press (sled, one leg)';
+
+	/// en: 'Calf raise (smith, one leg, floor)'
+	String get calfRaiseSmithOneLegFloor => 'Calf raise (smith, one leg, floor)';
+
+	/// en: 'Toe raise (smith)'
+	String get toeRaiseSmith => 'Toe raise (smith)';
+
+	/// en: 'Calf raise (smith, seated, one leg)'
+	String get calfRaiseSmithSeatedOneLeg => 'Calf raise (smith, seated, one leg)';
+
+	/// en: 'Calf raise (standing, staircase)'
+	String get calfRaiseStandingStaircase => 'Calf raise (standing, staircase)';
+
+	/// en: 'Calf stretch (standing)'
+	String get calfStretchStanding => 'Calf stretch (standing)';
+
+	/// en: 'Calf raise (weighted, donkey)'
+	String get calfRaiseWeightedDonkey => 'Calf raise (weighted, donkey)';
 }
 
 // Path: library.quadriceps.exercises
@@ -7219,6 +8545,261 @@ class Translations$library$quadriceps$exercises$en {
 
 	/// en: 'Hack squats'
 	String get hackSquats => 'Hack squats';
+
+	/// en: 'Quadriceps stretch (quadruped)'
+	String get quadricepsStretchQuadruped => 'Quadriceps stretch (quadruped)';
+
+	/// en: 'Quadriceps stretch (assisted, prone)'
+	String get quadricepsStretchAssistedProne => 'Quadriceps stretch (assisted, prone)';
+
+	/// en: 'Backward jump'
+	String get backwardJump => 'Backward jump';
+
+	/// en: 'Balance-board stance'
+	String get balanceBoardStance => 'Balance-board stance';
+
+	/// en: 'Split squat (band, one arm, one leg)'
+	String get splitSquatBandOneArmOneLeg => 'Split squat (band, one arm, one leg)';
+
+	/// en: 'Split squat (band, one leg)'
+	String get splitSquatBandOneLeg => 'Split squat (band, one leg)';
+
+	/// en: 'Squat (band)'
+	String get squatBand => 'Squat (band)';
+
+	/// en: 'Squat row (band)'
+	String get squatRowBand => 'Squat row (band)';
+
+	/// en: 'Step-up (band)'
+	String get stepUpBand => 'Step-up (band)';
+
+	/// en: 'Front squat (barbell, bench)'
+	String get frontSquatBarbellBench => 'Front squat (barbell, bench)';
+
+	/// en: 'Squat (barbell, bench)'
+	String get squatBarbellBench => 'Squat (barbell, bench)';
+
+	/// en: 'Clean and press (barbell)'
+	String get cleanAndPressBarbell => 'Clean and press (barbell)';
+
+	/// en: 'Zercher squat (barbell, full)'
+	String get zercherSquatBarbellFull => 'Zercher squat (barbell, full)';
+
+	/// en: 'Hack squat (barbell)'
+	String get hackSquatBarbell => 'Hack squat (barbell)';
+
+	/// en: 'Squat (barbell, high bar)'
+	String get squatBarbellHighBar => 'Squat (barbell, high bar)';
+
+	/// en: 'Jefferson squat (barbell)'
+	String get jeffersonSquatBarbell => 'Jefferson squat (barbell)';
+
+	/// en: 'Jump squat (barbell)'
+	String get jumpSquatBarbell => 'Jump squat (barbell)';
+
+	/// en: 'Lateral lunge (barbell)'
+	String get lateralLungeBarbell => 'Lateral lunge (barbell)';
+
+	/// en: 'Squat (barbell, low bar)'
+	String get squatBarbellLowBar => 'Squat (barbell, low bar)';
+
+	/// en: 'Lunge (barbell)'
+	String get lungeBarbell => 'Lunge (barbell)';
+
+	/// en: 'Squat (barbell, narrow stance)'
+	String get squatBarbellNarrowStance => 'Squat (barbell, narrow stance)';
+
+	/// en: 'Squat (barbell, one leg)'
+	String get squatBarbellOneLeg => 'Squat (barbell, one leg)';
+
+	/// en: 'Squat (barbell, overhead)'
+	String get squatBarbellOverhead => 'Squat (barbell, overhead)';
+
+	/// en: 'Rear lunge (barbell)'
+	String get rearLungeBarbell => 'Rear lunge (barbell)';
+
+	/// en: 'Split squat (barbell, side)'
+	String get splitSquatBarbellSide => 'Split squat (barbell, side)';
+
+	/// en: 'Split squat (barbell, one leg)'
+	String get splitSquatBarbellOneLeg => 'Split squat (barbell, one leg)';
+
+	/// en: 'Squat (barbell, speed)'
+	String get squatBarbellSpeed => 'Squat (barbell, speed)';
+
+	/// en: 'Split squat (barbell)'
+	String get splitSquatBarbell => 'Split squat (barbell)';
+
+	/// en: 'Squat (barbell, knee)'
+	String get squatBarbellKnee => 'Squat (barbell, knee)';
+
+	/// en: 'Barbell squat jump into reverse lunge'
+	String get barbellSquatJumpIntoReverseLunge => 'Barbell squat jump into reverse lunge';
+
+	/// en: 'Step-up (barbell)'
+	String get stepUpBarbell => 'Step-up (barbell)';
+
+	/// en: 'Squat (barbell, wide)'
+	String get squatBarbellWide => 'Squat (barbell, wide)';
+
+	/// en: 'Zercher squat (barbell)'
+	String get zercherSquatBarbell => 'Zercher squat (barbell)';
+
+	/// en: 'Jump squat (bodyweight, drop)'
+	String get jumpSquatBodyweightDrop => 'Jump squat (bodyweight, drop)';
+
+	/// en: 'Chair-supported quadriceps stretch'
+	String get chairSupportedQuadricepsStretch => 'Chair-supported quadriceps stretch';
+
+	/// en: 'Curtsy squat'
+	String get curtsySquat => 'Curtsy squat';
+
+	/// en: 'Squat (dumbbell, bench)'
+	String get squatDumbbellBench => 'Squat (dumbbell, bench)';
+
+	/// en: 'Lunge (dumbbell, contralateral forward)'
+	String get lungeDumbbellContralateralForward => 'Lunge (dumbbell, contralateral forward)';
+
+	/// en: 'Squat (dumbbell, plyo)'
+	String get squatDumbbellPlyo => 'Squat (dumbbell, plyo)';
+
+	/// en: 'Squat (dumbbell, pistol)'
+	String get squatDumbbellPistol => 'Squat (dumbbell, pistol)';
+
+	/// en: 'Squat (dumbbell)'
+	String get squatDumbbell => 'Squat (dumbbell)';
+
+	/// en: 'Step up lunge (dumbbell)'
+	String get stepUpLungeDumbbell => 'Step up lunge (dumbbell)';
+
+	/// en: 'Step up split squat (dumbbell)'
+	String get stepUpSplitSquatDumbbell => 'Step up split squat (dumbbell)';
+
+	/// en: 'Squat (dumbbell, supported)'
+	String get squatDumbbellSupported => 'Squat (dumbbell, supported)';
+
+	/// en: 'Farmers walk'
+	String get farmersWalk => 'Farmers walk';
+
+	/// en: 'Forward jump'
+	String get forwardJump => 'Forward jump';
+
+	/// en: 'Lunge (forward)'
+	String get lungeForward => 'Lunge (forward)';
+
+	/// en: 'Squat (frankenstein)'
+	String get squatFrankenstein => 'Squat (frankenstein)';
+
+	/// en: 'Kneeling hip-flexor and quadriceps stretch'
+	String get kneelingHipFlexorAndQuadricepsStretch => 'Kneeling hip-flexor and quadriceps stretch';
+
+	/// en: 'Front squat (kettlebell)'
+	String get frontSquatKettlebell => 'Front squat (kettlebell)';
+
+	/// en: 'Squat (kettlebell, goblet)'
+	String get squatKettlebellGoblet => 'Squat (kettlebell, goblet)';
+
+	/// en: 'Lunge (kettlebell, pass through)'
+	String get lungeKettlebellPassThrough => 'Lunge (kettlebell, pass through)';
+
+	/// en: 'Squat (kettlebell, pistol)'
+	String get squatKettlebellPistol => 'Squat (kettlebell, pistol)';
+
+	/// en: 'Kettlebell Turkish get-up through squat'
+	String get kettlebellTurkishGetUpThroughSquat => 'Kettlebell Turkish get-up through squat';
+
+	/// en: 'Jump squat (kneeling)'
+	String get jumpSquatKneeling => 'Jump squat (kneeling)';
+
+	/// en: 'Lunge (jump)'
+	String get lungeJump => 'Lunge (jump)';
+
+	/// en: 'Quads stretch (lying, side)'
+	String get quadsStretchLyingSide => 'Quads stretch (lying, side)';
+
+	/// en: 'Squat (one leg)'
+	String get squatOneLeg => 'Squat (one leg)';
+
+	/// en: 'Squat (potty, support)'
+	String get squatPottySupport => 'Squat (potty, support)';
+
+	/// en: 'Rapid alternating foot taps'
+	String get rapidAlternatingFootTaps => 'Rapid alternating foot taps';
+
+	/// en: 'Leg extension (resistance band)'
+	String get legExtensionResistanceBand => 'Leg extension (resistance band)';
+
+	/// en: 'Squat (pistol)'
+	String get squatPistol => 'Squat (pistol)';
+
+	/// en: 'Sissy squat'
+	String get sissySquat => 'Sissy squat';
+
+	/// en: 'Hack squat (sled, closer)'
+	String get hackSquatSledCloser => 'Hack squat (sled, closer)';
+
+	/// en: 'Squat (sled, lying)'
+	String get squatSledLying => 'Squat (sled, lying)';
+
+	/// en: 'Squat (smith, chair)'
+	String get squatSmithChair => 'Squat (smith, chair)';
+
+	/// en: 'Front squat (smith, clean grip)'
+	String get frontSquatSmithCleanGrip => 'Front squat (smith, clean grip)';
+
+	/// en: 'Hack squat (smith)'
+	String get hackSquatSmith => 'Hack squat (smith)';
+
+	/// en: 'Squat (smith, low bar)'
+	String get squatSmithLowBar => 'Squat (smith, low bar)';
+
+	/// en: 'Split squat (smith, one leg)'
+	String get splitSquatSmithOneLeg => 'Split squat (smith, one leg)';
+
+	/// en: 'Lunge (smith, sprint)'
+	String get lungeSmithSprint => 'Lunge (smith, sprint)';
+
+	/// en: 'Squat (smith, sumo)'
+	String get squatSmithSumo => 'Squat (smith, sumo)';
+
+	/// en: 'Snatch pull'
+	String get snatchPull => 'Snatch pull';
+
+	/// en: 'Split squat'
+	String get splitSquat => 'Split squat';
+
+	/// en: 'Squat jerk'
+	String get squatJerk => 'Squat jerk';
+
+	/// en: 'Squat (bosu ball)'
+	String get squatBosuBall => 'Squat (bosu ball)';
+
+	/// en: 'Squat (to overhead reach)'
+	String get squatToOverheadReach => 'Squat (to overhead reach)';
+
+	/// en: 'Squat (to overhead reach twist)'
+	String get squatToOverheadReachTwist => 'Squat (to overhead reach twist)';
+
+	/// en: 'Split squat (suspended)'
+	String get splitSquatSuspended => 'Split squat (suspended)';
+
+	/// en: 'Lunge (walking)'
+	String get lungeWalking => 'Lunge (walking)';
+
+	/// en: 'Squat (weighted, cossack)'
+	String get squatWeightedCossack => 'Squat (weighted, cossack)';
+
+	/// en: 'Weighted lunge with arm swing'
+	String get weightedLungeWithArmSwing => 'Weighted lunge with arm swing';
+
+	/// en: 'Sissy squat (weighted)'
+	String get sissySquatWeighted => 'Sissy squat (weighted)';
+
+	/// en: 'Squat (weighted)'
+	String get squatWeighted => 'Squat (weighted)';
+
+	/// en: 'Lunge (weighted)'
+	String get lungeWeighted => 'Lunge (weighted)';
 }
 
 // Path: library.hamstrings.exercises
@@ -7249,6 +8830,84 @@ class Translations$library$hamstrings$exercises$en {
 
 	/// en: 'Romanian deadlift (dumbbells)'
 	String get romanianDeadliftDumbbell => 'Romanian deadlift (dumbbells)';
+
+	/// en: 'Hamstring stretch (assisted, prone)'
+	String get hamstringStretchAssistedProne => 'Hamstring stretch (assisted, prone)';
+
+	/// en: 'Straight leg deadlift (band)'
+	String get straightLegDeadliftBand => 'Straight leg deadlift (band)';
+
+	/// en: 'Good morning (barbell)'
+	String get goodMorningBarbell => 'Good morning (barbell)';
+
+	/// en: 'Good morning (barbell, seated)'
+	String get goodMorningBarbellSeated => 'Good morning (barbell, seated)';
+
+	/// en: 'Good morning (barbell, straight leg)'
+	String get goodMorningBarbellStraightLeg => 'Good morning (barbell, straight leg)';
+
+	/// en: 'Straight leg deadlift (barbell)'
+	String get straightLegDeadliftBarbell => 'Straight leg deadlift (barbell)';
+
+	/// en: 'Leg curl (cable, assisted, inverse)'
+	String get legCurlCableAssistedInverse => 'Leg curl (cable, assisted, inverse)';
+
+	/// en: 'Leg curl (dumbbell, lying)'
+	String get legCurlDumbbellLying => 'Leg curl (dumbbell, lying)';
+
+	/// en: 'Straight leg deadlift (dumbbell)'
+	String get straightLegDeadliftDumbbell => 'Straight leg deadlift (dumbbell)';
+
+	/// en: 'Hamstring stretch (exercise ball, seated)'
+	String get hamstringStretchExerciseBallSeated => 'Hamstring stretch (exercise ball, seated)';
+
+	/// en: 'Glute-ham raise on bench'
+	String get gluteHamRaiseOnBench => 'Glute-ham raise on bench';
+
+	/// en: 'Hamstring stretch'
+	String get hamstringStretch => 'Hamstring stretch';
+
+	/// en: 'Hang clean (kettlebell)'
+	String get hangCleanKettlebell => 'Hang clean (kettlebell)';
+
+	/// en: 'Elevated-leg hamstring stretch'
+	String get elevatedLegHamstringStretch => 'Elevated-leg hamstring stretch';
+
+	/// en: 'Leg curl (lever, kneeling)'
+	String get legCurlLeverKneeling => 'Leg curl (lever, kneeling)';
+
+	/// en: 'Leg curl (lever, lying, two one)'
+	String get legCurlLeverLyingTwoOne => 'Leg curl (lever, lying, two one)';
+
+	/// en: 'Good morning (lever, seated)'
+	String get goodMorningLeverSeated => 'Good morning (lever, seated)';
+
+	/// en: 'Clean (power)'
+	String get cleanPower => 'Clean (power)';
+
+	/// en: 'Supine strap-assisted hamstring stretch'
+	String get supineStrapAssistedHamstringStretch => 'Supine strap-assisted hamstring stretch';
+
+	/// en: 'Runner’s hamstring stretch'
+	String get runnerSHamstringStretch => 'Runner’s hamstring stretch';
+
+	/// en: 'Seated wide-leg forward-fold sequence'
+	String get seatedWideLegForwardFoldSequence => 'Seated wide-leg forward-fold sequence';
+
+	/// en: 'Single-leg sliding curl'
+	String get singleLegSlidingCurl => 'Single-leg sliding curl';
+
+	/// en: 'Good morning (smith, bent knee)'
+	String get goodMorningSmithBentKnee => 'Good morning (smith, bent knee)';
+
+	/// en: 'Strap-assisted hamstring and calf stretch'
+	String get strapAssistedHamstringAndCalfStretch => 'Strap-assisted hamstring and calf stretch';
+
+	/// en: 'Leg curl (standing)'
+	String get legCurlStandingBodyweight => 'Leg curl (standing)';
+
+	/// en: 'Lunge stretch with thoracic rotation'
+	String get lungeStretchWithThoracicRotation => 'Lunge stretch with thoracic rotation';
 }
 
 // Path: library.shoulders.exercises
@@ -7324,6 +8983,399 @@ class Translations$library$shoulders$exercises$en {
 
 	/// en: 'Barbell military press'
 	String get militaryPressBarbell => 'Barbell military press';
+
+	/// en: 'Front lateral raise (band)'
+	String get frontLateralRaiseBand => 'Front lateral raise (band)';
+
+	/// en: 'Front raise (band)'
+	String get frontRaiseBand => 'Front raise (band)';
+
+	/// en: 'Reverse fly (band)'
+	String get reverseFlyBand => 'Reverse fly (band)';
+
+	/// en: 'Shoulder press (band)'
+	String get shoulderPressBand => 'Shoulder press (band)';
+
+	/// en: 'Shrug (band)'
+	String get shrugBand => 'Shrug (band)';
+
+	/// en: 'Rear delt row (band, standing)'
+	String get rearDeltRowBandStanding => 'Rear delt row (band, standing)';
+
+	/// en: 'Overhead press (band, twisting)'
+	String get overheadPressBandTwisting => 'Overhead press (band, twisting)';
+
+	/// en: 'Y raise (band)'
+	String get yRaiseBand => 'Y raise (band)';
+
+	/// en: 'Front raise (barbell)'
+	String get frontRaiseBarbell => 'Front raise (barbell)';
+
+	/// en: 'Front raise and pullover (barbell)'
+	String get frontRaiseAndPulloverBarbell => 'Front raise and pullover (barbell)';
+
+	/// en: 'Shoulder press (barbell, incline)'
+	String get shoulderPressBarbellIncline => 'Shoulder press (barbell, incline)';
+
+	/// en: 'Snatch (barbell, one arm)'
+	String get snatchBarbellOneArm => 'Snatch (barbell, one arm)';
+
+	/// en: 'Rear delt raise (barbell)'
+	String get rearDeltRaiseBarbell => 'Rear delt raise (barbell)';
+
+	/// en: 'Rear delt row (barbell)'
+	String get rearDeltRowBarbell => 'Rear delt row (barbell)';
+
+	/// en: 'Military press (barbell, seated, behind head)'
+	String get militaryPressBarbellSeatedBehindHead => 'Military press (barbell, seated, behind head)';
+
+	/// en: 'Bradford press (barbell, seated)'
+	String get bradfordPressBarbellSeated => 'Bradford press (barbell, seated)';
+
+	/// en: 'Barbell ski-style high pull'
+	String get barbellSkiStyleHighPull => 'Barbell ski-style high pull';
+
+	/// en: 'Bradford press (barbell, standing)'
+	String get bradfordPressBarbellStanding => 'Bradford press (barbell, standing)';
+
+	/// en: 'Military press (barbell, standing, close grip)'
+	String get militaryPressBarbellStandingCloseGrip => 'Military press (barbell, standing, close grip)';
+
+	/// en: 'Front raise (barbell, standing, over head)'
+	String get frontRaiseBarbellStandingOverHead => 'Front raise (barbell, standing, over head)';
+
+	/// en: 'Military press (barbell, standing, wide)'
+	String get militaryPressBarbellStandingWide => 'Military press (barbell, standing, wide)';
+
+	/// en: 'Thruster (barbell)'
+	String get thrusterBarbell => 'Thruster (barbell)';
+
+	/// en: 'Upright row (barbell, wide grip)'
+	String get uprightRowBarbellWideGrip => 'Upright row (barbell, wide grip)';
+
+	/// en: 'Battling ropes'
+	String get battlingRopes => 'Battling ropes';
+
+	/// en: 'Shoulder press (cable, alternate)'
+	String get shoulderPressCableAlternate => 'Shoulder press (cable, alternate)';
+
+	/// en: 'Rear delt row (cable, kneeling, rope)'
+	String get rearDeltRowCableKneelingRope => 'Rear delt row (cable, kneeling, rope)';
+
+	/// en: 'Reverse fly (cable, one arm, bent over)'
+	String get reverseFlyCableOneArmBentOver => 'Reverse fly (cable, one arm, bent over)';
+
+	/// en: 'Rear delt row (cable, stirrups)'
+	String get rearDeltRowCableStirrups => 'Rear delt row (cable, stirrups)';
+
+	/// en: 'Rear delt row (cable, rope)'
+	String get rearDeltRowCableRope => 'Rear delt row (cable, rope)';
+
+	/// en: 'Rear lateral raise (cable, seated)'
+	String get rearLateralRaiseCableSeated => 'Rear lateral raise (cable, seated)';
+
+	/// en: 'Shoulder internal rotation (cable, seated)'
+	String get shoulderInternalRotationCableSeated => 'Shoulder internal rotation (cable, seated)';
+
+	/// en: 'Shoulder press (cable)'
+	String get shoulderPressCable => 'Shoulder press (cable)';
+
+	/// en: 'Shrug (cable)'
+	String get shrugCable => 'Shrug (cable)';
+
+	/// en: 'Rear delt row (cable, standing, rope)'
+	String get rearDeltRowCableStandingRope => 'Rear delt row (cable, standing, rope)';
+
+	/// en: 'Shoulder external rotation (cable, standing)'
+	String get shoulderExternalRotationCableStanding => 'Shoulder external rotation (cable, standing)';
+
+	/// en: 'Reverse fly (cable, supine)'
+	String get reverseFlyCableSupine => 'Reverse fly (cable, supine)';
+
+	/// en: 'Upright row (cable)'
+	String get uprightRowCable => 'Upright row (cable)';
+
+	/// en: 'Press (dumbbell, alternate, side)'
+	String get pressDumbbellAlternateSide => 'Press (dumbbell, alternate, side)';
+
+	/// en: 'Cuban press (dumbbell)'
+	String get cubanPressDumbbell => 'Cuban press (dumbbell)';
+
+	/// en: 'Shrug (dumbbell, decline)'
+	String get shrugDumbbellDecline => 'Shrug (dumbbell, decline)';
+
+	/// en: 'Lateral raise (dumbbell, full can)'
+	String get lateralRaiseDumbbellFullCan => 'Lateral raise (dumbbell, full can)';
+
+	/// en: 'Shoulder press (dumbbell, incline)'
+	String get shoulderPressDumbbellIncline => 'Shoulder press (dumbbell, incline)';
+
+	/// en: 'Shrug (dumbbell, incline)'
+	String get shrugDumbbellIncline => 'Shrug (dumbbell, incline)';
+
+	/// en: 'T raise (dumbbell, incline)'
+	String get tRaiseDumbbellIncline => 'T raise (dumbbell, incline)';
+
+	/// en: 'Lateral to front raise (dumbbell)'
+	String get lateralToFrontRaiseDumbbell => 'Lateral to front raise (dumbbell)';
+
+	/// en: 'External shoulder rotation (dumbbell, lying)'
+	String get externalShoulderRotationDumbbellLying => 'External shoulder rotation (dumbbell, lying)';
+
+	/// en: 'Rear delt raise (dumbbell, lying, floor)'
+	String get rearDeltRaiseDumbbellLyingFloor => 'Rear delt raise (dumbbell, lying, floor)';
+
+	/// en: 'Rear delt raise (dumbbell, lying, one arm)'
+	String get rearDeltRaiseDumbbellLyingOneArm => 'Rear delt raise (dumbbell, lying, one arm)';
+
+	/// en: 'Reverse fly (dumbbell, lying, one arm)'
+	String get reverseFlyDumbbellLyingOneArm => 'Reverse fly (dumbbell, lying, one arm)';
+
+	/// en: 'Rear delt row (dumbbell, lying)'
+	String get rearDeltRowDumbbellLying => 'Rear delt row (dumbbell, lying)';
+
+	/// en: 'Reverse fly (dumbbell, lying)'
+	String get reverseFlyDumbbellLying => 'Reverse fly (dumbbell, lying)';
+
+	/// en: 'Lateral raise (dumbbell, one arm)'
+	String get lateralRaiseDumbbellOneArm => 'Lateral raise (dumbbell, one arm)';
+
+	/// en: 'Lateral raise (dumbbell, one arm, support)'
+	String get lateralRaiseDumbbellOneArmSupport => 'Lateral raise (dumbbell, one arm, support)';
+
+	/// en: 'Reverse fly (dumbbell, one arm, support)'
+	String get reverseFlyDumbbellOneArmSupport => 'Reverse fly (dumbbell, one arm, support)';
+
+	/// en: 'Shoulder press (dumbbell, one arm)'
+	String get shoulderPressDumbbellOneArm => 'Shoulder press (dumbbell, one arm)';
+
+	/// en: 'Upright row (dumbbell, one arm)'
+	String get uprightRowDumbbellOneArm => 'Upright row (dumbbell, one arm)';
+
+	/// en: 'Push press (dumbbell)'
+	String get pushPressDumbbell => 'Push press (dumbbell)';
+
+	/// en: 'Reverse fly (dumbbell, bent over)'
+	String get reverseFlyDumbbellBentOver => 'Reverse fly (dumbbell, bent over)';
+
+	/// en: 'Rear delt row (dumbbell)'
+	String get rearDeltRowDumbbell => 'Rear delt row (dumbbell)';
+
+	/// en: 'Rear lateral raise (dumbbell, support head)'
+	String get rearLateralRaiseDumbbellSupportHead => 'Rear lateral raise (dumbbell, support head)';
+
+	/// en: 'Reverse fly (dumbbell, rotation)'
+	String get reverseFlyDumbbellRotation => 'Reverse fly (dumbbell, rotation)';
+
+	/// en: 'Scott press (dumbbell)'
+	String get scottPressDumbbell => 'Scott press (dumbbell)';
+
+	/// en: 'Front raise (dumbbell, seated, alternate)'
+	String get frontRaiseDumbbellSeatedAlternate => 'Front raise (dumbbell, seated, alternate)';
+
+	/// en: 'Shoulder press (dumbbell, seated, alternate)'
+	String get shoulderPressDumbbellSeatedAlternate => 'Shoulder press (dumbbell, seated, alternate)';
+
+	/// en: 'Lateral raise (dumbbell, seated, bent arm)'
+	String get lateralRaiseDumbbellSeatedBentArm => 'Lateral raise (dumbbell, seated, bent arm)';
+
+	/// en: 'Biceps curl to shoulder press (dumbbell, seated)'
+	String get bicepsCurlToShoulderPressDumbbellSeated => 'Biceps curl to shoulder press (dumbbell, seated)';
+
+	/// en: 'Front raise (dumbbell, seated)'
+	String get frontRaiseDumbbellSeated => 'Front raise (dumbbell, seated)';
+
+	/// en: 'Lateral raise (dumbbell, seated)'
+	String get lateralRaiseDumbbellSeated => 'Lateral raise (dumbbell, seated)';
+
+	/// en: 'Shoulder press (dumbbell, seated, neutral grip)'
+	String get shoulderPressDumbbellSeatedNeutralGrip => 'Shoulder press (dumbbell, seated, neutral grip)';
+
+	/// en: 'Lateral raise (dumbbell, side lying, one arm)'
+	String get lateralRaiseDumbbellSideLyingOneArm => 'Lateral raise (dumbbell, side lying, one arm)';
+
+	/// en: 'Reverse fly (dumbbell, side plank)'
+	String get reverseFlyDumbbellSidePlank => 'Reverse fly (dumbbell, side plank)';
+
+	/// en: 'Single-arm overhead dumbbell carry'
+	String get singleArmOverheadDumbbellCarry => 'Single-arm overhead dumbbell carry';
+
+	/// en: 'Overhead press (dumbbell, standing, alternate)'
+	String get overheadPressDumbbellStandingAlternate => 'Overhead press (dumbbell, standing, alternate)';
+
+	/// en: 'Lateral raise (dumbbell, standing, alternate)'
+	String get lateralRaiseDumbbellStandingAlternate => 'Lateral raise (dumbbell, standing, alternate)';
+
+	/// en: 'Standing dumbbell arm circles'
+	String get standingDumbbellArmCircles => 'Standing dumbbell arm circles';
+
+	/// en: 'Front raise (dumbbell, standing, above head)'
+	String get frontRaiseDumbbellStandingAboveHead => 'Front raise (dumbbell, standing, above head)';
+
+	/// en: 'Press (dumbbell, standing, one arm, neutral grip)'
+	String get pressDumbbellStandingOneArmNeutralGrip => 'Press (dumbbell, standing, one arm, neutral grip)';
+
+	/// en: 'Overhead press (dumbbell, standing)'
+	String get overheadPressDumbbellStanding => 'Overhead press (dumbbell, standing)';
+
+	/// en: 'Press (dumbbell, standing, neutral grip)'
+	String get pressDumbbellStandingNeutralGrip => 'Press (dumbbell, standing, neutral grip)';
+
+	/// en: 'Upright row (dumbbell)'
+	String get uprightRowDumbbell => 'Upright row (dumbbell)';
+
+	/// en: 'Shoulder external rotation (dumbbell, upright)'
+	String get shoulderExternalRotationDumbbellUpright => 'Shoulder external rotation (dumbbell, upright)';
+
+	/// en: 'W press (dumbbell)'
+	String get wPressDumbbell => 'W press (dumbbell)';
+
+	/// en: 'Front raise (dumbbell, seated, alternate, exercise ball)'
+	String get frontRaiseDumbbellSeatedAlternateExerciseBall => 'Front raise (dumbbell, seated, alternate, exercise ball)';
+
+	/// en: 'Shoulder press (ez barbell)'
+	String get shoulderPressEzBarbell => 'Shoulder press (ez barbell)';
+
+	/// en: 'Frog stand'
+	String get frogStand => 'Frog stand';
+
+	/// en: 'Full Maltese hold'
+	String get fullMalteseHold => 'Full Maltese hold';
+
+	/// en: 'Full planche hold'
+	String get fullPlancheHold => 'Full planche hold';
+
+	/// en: 'Push-up (full, planche)'
+	String get pushUpFullPlanche => 'Push-up (full, planche)';
+
+	/// en: 'Handstand'
+	String get handstand => 'Handstand';
+
+	/// en: 'Press (kettlebell, alternate)'
+	String get pressKettlebellAlternate => 'Press (kettlebell, alternate)';
+
+	/// en: 'Arnold press (kettlebell)'
+	String get arnoldPressKettlebell => 'Arnold press (kettlebell)';
+
+	/// en: 'Jerk (kettlebell, double)'
+	String get jerkKettlebellDouble => 'Jerk (kettlebell, double)';
+
+	/// en: 'Push press (kettlebell, double)'
+	String get pushPressKettlebellDouble => 'Push press (kettlebell, double)';
+
+	/// en: 'Snatch (kettlebell, double)'
+	String get snatchKettlebellDouble => 'Snatch (kettlebell, double)';
+
+	/// en: 'Clean and jerk (kettlebell, one arm)'
+	String get cleanAndJerkKettlebellOneArm => 'Clean and jerk (kettlebell, one arm)';
+
+	/// en: 'Jerk (kettlebell, one arm)'
+	String get jerkKettlebellOneArm => 'Jerk (kettlebell, one arm)';
+
+	/// en: 'Military press (kettlebell, one arm, to side)'
+	String get militaryPressKettlebellOneArmToSide => 'Military press (kettlebell, one arm, to side)';
+
+	/// en: 'Push press (kettlebell, one arm)'
+	String get pushPressKettlebellOneArm => 'Push press (kettlebell, one arm)';
+
+	/// en: 'Snatch (kettlebell, one arm)'
+	String get snatchKettlebellOneArm => 'Snatch (kettlebell, one arm)';
+
+	/// en: 'Clean and press (kettlebell, one arm)'
+	String get cleanAndPressKettlebellOneArm => 'Clean and press (kettlebell, one arm)';
+
+	/// en: 'Press (kettlebell, seated)'
+	String get pressKettlebellSeated => 'Press (kettlebell, seated)';
+
+	/// en: 'Military press (kettlebell, seated, two arm)'
+	String get militaryPressKettlebellSeatedTwoArm => 'Military press (kettlebell, seated, two arm)';
+
+	/// en: 'Press (kettlebell, seesaw)'
+	String get pressKettlebellSeesaw => 'Press (kettlebell, seesaw)';
+
+	/// en: 'Sumo high pull (kettlebell)'
+	String get sumoHighPullKettlebell => 'Sumo high pull (kettlebell)';
+
+	/// en: 'Thruster (kettlebell)'
+	String get thrusterKettlebell => 'Thruster (kettlebell)';
+
+	/// en: 'Clean (kettlebell, two arm)'
+	String get cleanKettlebellTwoArm => 'Clean (kettlebell, two arm)';
+
+	/// en: 'Military press (kettlebell, two arm)'
+	String get militaryPressKettlebellTwoArm => 'Military press (kettlebell, two arm)';
+
+	/// en: 'Lateral raise (landmine)'
+	String get lateralRaiseLandmine => 'Lateral raise (landmine)';
+
+	/// en: 'Planche (lean)'
+	String get plancheLean => 'Planche (lean)';
+
+	/// en: 'Boxing left hook'
+	String get boxingLeftHook => 'Boxing left hook';
+
+	/// en: 'Shrug (lever, gripless)'
+	String get shrugLeverGripless => 'Shrug (lever, gripless)';
+
+	/// en: 'Shoulder press (lever, one arm)'
+	String get shoulderPressLeverOneArm => 'Shoulder press (lever, one arm)';
+
+	/// en: 'Reverse fly (lever, seated, neutral grip)'
+	String get reverseFlyLeverSeatedNeutralGrip => 'Reverse fly (lever, seated, neutral grip)';
+
+	/// en: 'Shrug (lever)'
+	String get shrugLever => 'Shrug (lever)';
+
+	/// en: 'Rear deltoid stretch'
+	String get rearDeltoidStretch => 'Rear deltoid stretch';
+
+	/// en: 'Shoulder press (resistance band, seated)'
+	String get shoulderPressResistanceBandSeated => 'Shoulder press (resistance band, seated)';
+
+	/// en: 'Scapular dips'
+	String get scapularDips => 'Scapular dips';
+
+	/// en: 'Scapular pull up'
+	String get scapularPullUp => 'Scapular pull up';
+
+	/// en: 'Shrug (smith, back)'
+	String get shrugSmithBack => 'Shrug (smith, back)';
+
+	/// en: 'Press (smith, behind neck)'
+	String get pressSmithBehindNeck => 'Press (smith, behind neck)';
+
+	/// en: 'Rear delt row (smith)'
+	String get rearDeltRowSmith => 'Rear delt row (smith)';
+
+	/// en: 'Shoulder press (smith, seated)'
+	String get shoulderPressSmithSeated => 'Shoulder press (smith, seated)';
+
+	/// en: 'Shoulder press (smith)'
+	String get shoulderPressSmith => 'Shoulder press (smith)';
+
+	/// en: 'Shrug (smith)'
+	String get shrugSmith => 'Shrug (smith)';
+
+	/// en: 'Military press (smith, standing, behind head)'
+	String get militaryPressSmithStandingBehindHead => 'Military press (smith, standing, behind head)';
+
+	/// en: 'Upright row (smith)'
+	String get uprightRowSmith => 'Upright row (smith)';
+
+	/// en: 'Press (standing, behind neck)'
+	String get pressStandingBehindNeck => 'Press (standing, behind neck)';
+
+	/// en: 'Straddle Maltese hold'
+	String get straddleMalteseHold => 'Straddle Maltese hold';
+
+	/// en: 'Straddle planche hold'
+	String get straddlePlancheHold => 'Straddle planche hold';
+
+	/// en: 'Front raise (weighted)'
+	String get frontRaiseWeighted => 'Front raise (weighted)';
+
+	/// en: 'Weighted kneeling step and swing'
+	String get weightedKneelingStepAndSwing => 'Weighted kneeling step and swing';
 }
 
 // Path: library.back.exercises
@@ -7399,6 +9451,477 @@ class Translations$library$back$exercises$en {
 
 	/// en: 'Chin-ups'
 	String get chinUps => 'Chin-ups';
+
+	/// en: 'Pulldown (cable, alternate)'
+	String get pulldownCableAlternate => 'Pulldown (cable, alternate)';
+
+	/// en: 'Pull-up (archer)'
+	String get pullUpArcher => 'Pull-up (archer)';
+
+	/// en: 'Pull-up (assisted, parallel, close grip)'
+	String get pullUpAssistedParallelCloseGrip => 'Pull-up (assisted, parallel, close grip)';
+
+	/// en: 'Chin-up (assisted, standing)'
+	String get chinUpAssistedStanding => 'Chin-up (assisted, standing)';
+
+	/// en: 'Pull-up (assisted, standing)'
+	String get pullUpAssistedStanding => 'Pull-up (assisted, standing)';
+
+	/// en: 'Back extension (exercise ball)'
+	String get backExtensionExerciseBall => 'Back extension (exercise ball)';
+
+	/// en: 'Back lever'
+	String get backLever => 'Back lever';
+
+	/// en: 'Chest stretch with arms behind the back'
+	String get chestStretchWithArmsBehindTheBack => 'Chest stretch with arms behind the back';
+
+	/// en: 'Pull-up (band, assisted)'
+	String get pullUpBandAssisted => 'Pull-up (band, assisted)';
+
+	/// en: 'Pulldown (band, close grip)'
+	String get pulldownBandCloseGrip => 'Pulldown (band, close grip)';
+
+	/// en: 'Pulldown (band, fixed back, close grip)'
+	String get pulldownBandFixedBackCloseGrip => 'Pulldown (band, fixed back, close grip)';
+
+	/// en: 'Pulldown (band, fixed back, underhand)'
+	String get pulldownBandFixedBackUnderhand => 'Pulldown (band, fixed back, underhand)';
+
+	/// en: 'Pulldown (band, kneeling, one arm)'
+	String get pulldownBandKneelingOneArm => 'Pulldown (band, kneeling, one arm)';
+
+	/// en: 'Row (band, one arm, standing, low)'
+	String get rowBandOneArmStandingLow => 'Row (band, one arm, standing, low)';
+
+	/// en: 'Row (band, one arm, twisting, seated)'
+	String get rowBandOneArmTwistingSeated => 'Row (band, one arm, twisting, seated)';
+
+	/// en: 'Pulldown (band, underhand)'
+	String get pulldownBandUnderhand => 'Pulldown (band, underhand)';
+
+	/// en: 'Pullover (barbell, bent arm)'
+	String get pulloverBarbellBentArm => 'Pullover (barbell, bent arm)';
+
+	/// en: 'Pullover (barbell, decline, bent arm)'
+	String get pulloverBarbellDeclineBentArm => 'Pullover (barbell, decline, bent arm)';
+
+	/// en: 'Pullover (barbell, decline, wide grip)'
+	String get pulloverBarbellDeclineWideGrip => 'Pullover (barbell, decline, wide grip)';
+
+	/// en: 'Row (barbell, incline)'
+	String get rowBarbellIncline => 'Row (barbell, incline)';
+
+	/// en: 'Bent over row (barbell, one arm)'
+	String get bentOverRowBarbellOneArm => 'Bent over row (barbell, one arm)';
+
+	/// en: 'Pendlay row (barbell)'
+	String get pendlayRowBarbell => 'Pendlay row (barbell)';
+
+	/// en: 'Pullover (barbell)'
+	String get pulloverBarbell => 'Pullover (barbell)';
+
+	/// en: 'Pullover to press (barbell)'
+	String get pulloverToPressBarbell => 'Pullover to press (barbell)';
+
+	/// en: 'Bent over row (barbell, reverse grip)'
+	String get bentOverRowBarbellReverseGrip => 'Bent over row (barbell, reverse grip)';
+
+	/// en: 'Bench row (barbell, reverse grip, incline)'
+	String get benchRowBarbellReverseGripIncline => 'Bench row (barbell, reverse grip, incline)';
+
+	/// en: 'Bench-supported pull-up'
+	String get benchSupportedPullUp => 'Bench-supported pull-up';
+
+	/// en: 'Row (bodyweight, squatting)'
+	String get rowBodyweightSquatting => 'Row (bodyweight, squatting)';
+
+	/// en: 'Row (bodyweight, squatting, towel)'
+	String get rowBodyweightSquattingTowel => 'Row (bodyweight, squatting, towel)';
+
+	/// en: 'Row (bodyweight, standing, close grip, one arm)'
+	String get rowBodyweightStandingCloseGripOneArm => 'Row (bodyweight, standing, close grip, one arm)';
+
+	/// en: 'Row (bodyweight, standing, close grip)'
+	String get rowBodyweightStandingCloseGrip => 'Row (bodyweight, standing, close grip)';
+
+	/// en: 'Row (bodyweight, standing, one arm)'
+	String get rowBodyweightStandingOneArm => 'Row (bodyweight, standing, one arm)';
+
+	/// en: 'Row (bodyweight, standing, one arm, towel)'
+	String get rowBodyweightStandingOneArmTowel => 'Row (bodyweight, standing, one arm, towel)';
+
+	/// en: 'Row (bodyweight, standing)'
+	String get rowBodyweightStanding => 'Row (bodyweight, standing)';
+
+	/// en: 'Row (bodyweight, standing, towel)'
+	String get rowBodyweightStandingTowel => 'Row (bodyweight, standing, towel)';
+
+	/// en: 'Lat pulldown (cable, crossover)'
+	String get latPulldownCableCrossover => 'Lat pulldown (cable, crossover)';
+
+	/// en: 'Row (cable, decline, seated, wide grip)'
+	String get rowCableDeclineSeatedWideGrip => 'Row (cable, decline, seated, wide grip)';
+
+	/// en: 'Row (cable, floor, seated, wide grip)'
+	String get rowCableFloorSeatedWideGrip => 'Row (cable, floor, seated, wide grip)';
+
+	/// en: 'Row (cable, high, kneeling)'
+	String get rowCableHighKneeling => 'Row (cable, high, kneeling)';
+
+	/// en: 'Bench row (cable, incline)'
+	String get benchRowCableIncline => 'Bench row (cable, incline)';
+
+	/// en: 'Lat pulldown (cable, rope)'
+	String get latPulldownCableRope => 'Lat pulldown (cable, rope)';
+
+	/// en: 'Row (cable, seated)'
+	String get rowCableSeated => 'Row (cable, seated)';
+
+	/// en: 'Pullover (cable, lying, rope)'
+	String get pulloverCableLyingRope => 'Pullover (cable, lying, rope)';
+
+	/// en: 'Pulldown (cable, one arm)'
+	String get pulldownCableOneArm => 'Pulldown (cable, one arm)';
+
+	/// en: 'Row (cable, one arm, straight back, high, kneeling)'
+	String get rowCableOneArmStraightBackHighKneeling => 'Row (cable, one arm, straight back, high, kneeling)';
+
+	/// en: 'Row (cable, palm rotational)'
+	String get rowCablePalmRotational => 'Row (cable, palm rotational)';
+
+	/// en: 'Lat pulldown with curved bar'
+	String get latPulldownWithCurvedBar => 'Lat pulldown with curved bar';
+
+	/// en: 'Pulldown (cable, rear)'
+	String get pulldownCableRear => 'Pulldown (cable, rear)';
+
+	/// en: 'Row (cable, reverse grip, straight back, seated, high)'
+	String get rowCableReverseGripStraightBackSeatedHigh => 'Row (cable, reverse grip, straight back, seated, high)';
+
+	/// en: 'Row (cable, rope, crossover, seated)'
+	String get rowCableRopeCrossoverSeated => 'Row (cable, rope, crossover, seated)';
+
+	/// en: 'Row (cable, rope, elevated, seated)'
+	String get rowCableRopeElevatedSeated => 'Row (cable, rope, elevated, seated)';
+
+	/// en: 'Bench row (cable, rope, extension, incline)'
+	String get benchRowCableRopeExtensionIncline => 'Bench row (cable, rope, extension, incline)';
+
+	/// en: 'Row (cable, rope, seated)'
+	String get rowCableRopeSeated => 'Row (cable, rope, seated)';
+
+	/// en: 'Row (cable, seated, one arm, alternate)'
+	String get rowCableSeatedOneArmAlternate => 'Row (cable, seated, one arm, alternate)';
+
+	/// en: 'Row (cable, seated, wide grip)'
+	String get rowCableSeatedWideGrip => 'Row (cable, seated, wide grip)';
+
+	/// en: 'Squat row (cable, rope)'
+	String get squatRowCableRope => 'Squat row (cable, rope)';
+
+	/// en: 'Row (cable, standing, v bar)'
+	String get rowCableStandingVBar => 'Row (cable, standing, v bar)';
+
+	/// en: 'Twist row (cable, standing, v bar)'
+	String get twistRowCableStandingVBar => 'Twist row (cable, standing, v bar)';
+
+	/// en: 'Cable kayak row'
+	String get cableKayakRow => 'Cable kayak row';
+
+	/// en: 'Twist row (cable, one arm)'
+	String get twistRowCableOneArm => 'Twist row (cable, one arm)';
+
+	/// en: 'Row (cable, upper)'
+	String get rowCableUpper => 'Row (cable, upper)';
+
+	/// en: 'Pulldown (cable, wide grip, rear, behind neck)'
+	String get pulldownCableWideGripRearBehindNeck => 'Pulldown (cable, wide grip, rear, behind neck)';
+
+	/// en: 'Row (cambered bar, lying)'
+	String get rowCamberedBarLying => 'Row (cambered bar, lying)';
+
+	/// en: 'Close neutral-grip pull-up'
+	String get closeNeutralGripPullUp => 'Close neutral-grip pull-up';
+
+	/// en: 'Bent over row (dumbbell)'
+	String get bentOverRowDumbbell => 'Bent over row (dumbbell)';
+
+	/// en: 'Y raise (dumbbell, incline)'
+	String get yRaiseDumbbellIncline => 'Y raise (dumbbell, incline)';
+
+	/// en: 'Bent over row (dumbbell, palm rotational)'
+	String get bentOverRowDumbbellPalmRotational => 'Bent over row (dumbbell, palm rotational)';
+
+	/// en: 'Row (dumbbell, reverse grip, incline bench, one arm)'
+	String get rowDumbbellReverseGripInclineBenchOneArm => 'Row (dumbbell, reverse grip, incline bench, one arm)';
+
+	/// en: 'Row (dumbbell, reverse grip, incline bench, two arm)'
+	String get rowDumbbellReverseGripInclineBenchTwoArm => 'Row (dumbbell, reverse grip, incline bench, two arm)';
+
+	/// en: 'Row (dumbbell, reverse grip)'
+	String get rowDumbbellReverseGrip => 'Row (dumbbell, reverse grip)';
+
+	/// en: 'Bodyweight hip hinge'
+	String get bodyweightHipHinge => 'Bodyweight hip hinge';
+
+	/// en: 'Back extension (exercise ball, straight arm)'
+	String get backExtensionExerciseBallStraightArm => 'Back extension (exercise ball, straight arm)';
+
+	/// en: 'Back extension (exercise ball, hands behind head)'
+	String get backExtensionExerciseBallHandsBehindHead => 'Back extension (exercise ball, hands behind head)';
+
+	/// en: 'Back extension (exercise ball, knee off ground)'
+	String get backExtensionExerciseBallKneeOffGround => 'Back extension (exercise ball, knee off ground)';
+
+	/// en: 'Back extension (exercise ball, rotation)'
+	String get backExtensionExerciseBallRotation => 'Back extension (exercise ball, rotation)';
+
+	/// en: 'Seated back stretch hugging a ball'
+	String get seatedBackStretchHuggingABall => 'Seated back stretch hugging a ball';
+
+	/// en: 'Lat stretch (exercise ball)'
+	String get latStretchExerciseBall => 'Lat stretch (exercise ball)';
+
+	/// en: 'Pyramid-position back stretch on ball'
+	String get pyramidPositionBackStretchOnBall => 'Pyramid-position back stretch on ball';
+
+	/// en: 'Lat stretch (exercise ball, lying, side)'
+	String get latStretchExerciseBallLyingSide => 'Lat stretch (exercise ball, lying, side)';
+
+	/// en: 'Leg raise (exercise ball, prone)'
+	String get legRaiseExerciseBallProne => 'Leg raise (exercise ball, prone)';
+
+	/// en: 'Pullover (ez bar, lying, bent arm)'
+	String get pulloverEzBarLyingBentArm => 'Pullover (ez bar, lying, bent arm)';
+
+	/// en: 'Bent over row (ez bar, reverse grip)'
+	String get bentOverRowEzBarReverseGrip => 'Bent over row (ez bar, reverse grip)';
+
+	/// en: 'Front lever'
+	String get frontLever => 'Front lever';
+
+	/// en: 'Front lever (reps)'
+	String get frontLeverReps => 'Front lever (reps)';
+
+	/// en: 'Sternum-to-bar chin-up'
+	String get sternumToBarChinUp => 'Sternum-to-bar chin-up';
+
+	/// en: 'Inverted row'
+	String get invertedRow => 'Inverted row';
+
+	/// en: 'Inverted row (bent knee)'
+	String get invertedRowBentKnee => 'Inverted row (bent knee)';
+
+	/// en: 'Inverted row (bench)'
+	String get invertedRowBench => 'Inverted row (bench)';
+
+	/// en: 'Renegade row (kettlebell, alternate)'
+	String get renegadeRowKettlebellAlternate => 'Renegade row (kettlebell, alternate)';
+
+	/// en: 'Row (kettlebell, alternate)'
+	String get rowKettlebellAlternate => 'Row (kettlebell, alternate)';
+
+	/// en: 'Row (kettlebell, one arm)'
+	String get rowKettlebellOneArm => 'Row (kettlebell, one arm)';
+
+	/// en: 'Row (kettlebell, two arm)'
+	String get rowKettlebellTwoArm => 'Row (kettlebell, two arm)';
+
+	/// en: 'Muscle up (kipping)'
+	String get muscleUpKipping => 'Muscle up (kipping)';
+
+	/// en: 'Lat stretch (kneeling)'
+	String get latStretchKneeling => 'Lat stretch (kneeling)';
+
+	/// en: 'Pull-up (l)'
+	String get pullUpL => 'Pull-up (l)';
+
+	/// en: 'Row (lever, alternate, narrow grip, seated)'
+	String get rowLeverAlternateNarrowGripSeated => 'Row (lever, alternate, narrow grip, seated)';
+
+	/// en: 'Chin-up (lever, assisted)'
+	String get chinUpLeverAssisted => 'Chin-up (lever, assisted)';
+
+	/// en: 'Back extension (lever)'
+	String get backExtensionLever => 'Back extension (lever)';
+
+	/// en: 'Bent over row (lever)'
+	String get bentOverRowLever => 'Bent over row (lever)';
+
+	/// en: 'Bent over row (lever, v bar)'
+	String get bentOverRowLeverVBar => 'Bent over row (lever, v bar)';
+
+	/// en: 'Pulldown (lever, front)'
+	String get pulldownLeverFront => 'Pulldown (lever, front)';
+
+	/// en: 'Row (lever, high)'
+	String get rowLeverHigh => 'Row (lever, high)';
+
+	/// en: 'Bent over row (lever, one arm)'
+	String get bentOverRowLeverOneArm => 'Bent over row (lever, one arm)';
+
+	/// en: 'Row (lever, one arm, lateral, high)'
+	String get rowLeverOneArmLateralHigh => 'Row (lever, one arm, lateral, high)';
+
+	/// en: 'Pulldown (lever, one arm, lateral, wide)'
+	String get pulldownLeverOneArmLateralWide => 'Pulldown (lever, one arm, lateral, wide)';
+
+	/// en: 'Pullover (lever)'
+	String get pulloverLever => 'Pullover (lever)';
+
+	/// en: 'Lat pulldown (lever, reverse grip)'
+	String get latPulldownLeverReverseGrip => 'Lat pulldown (lever, reverse grip)';
+
+	/// en: 'Row (lever, reverse grip, vertical)'
+	String get rowLeverReverseGripVertical => 'Row (lever, reverse grip, vertical)';
+
+	/// en: 'Row (lever, reverse, t bar)'
+	String get rowLeverReverseTBar => 'Row (lever, reverse, t bar)';
+
+	/// en: 'Row (lever, t bar)'
+	String get rowLeverTBar => 'Row (lever, t bar)';
+
+	/// en: 'Row (lever, t bar, reverse grip)'
+	String get rowLeverTBarReverseGrip => 'Row (lever, t bar, reverse grip)';
+
+	/// en: 'Row (lever, one arm)'
+	String get rowLeverOneArm => 'Row (lever, one arm)';
+
+	/// en: 'Standing anchored-rope row'
+	String get standingAnchoredRopeRow => 'Standing anchored-rope row';
+
+	/// en: 'Seated spinal flexion'
+	String get seatedSpinalFlexion => 'Seated spinal flexion';
+
+	/// en: 'Medicine-ball catch and overhead toss'
+	String get medicineBallCatchAndOverheadToss => 'Medicine-ball catch and overhead toss';
+
+	/// en: 'Overhead medicine-ball slam'
+	String get overheadMedicineBallSlam => 'Overhead medicine-ball slam';
+
+	/// en: 'Chin-up (mixed grip)'
+	String get chinUpMixedGrip => 'Chin-up (mixed grip)';
+
+	/// en: 'Muscle up'
+	String get muscleUp => 'Muscle up';
+
+	/// en: 'Muscle up (vertical, bar)'
+	String get muscleUpVerticalBar => 'Muscle up (vertical, bar)';
+
+	/// en: 'Neck stretch (side)'
+	String get neckStretchSide => 'Neck stretch (side)';
+
+	/// en: 'Single-arm wall lat stretch'
+	String get singleArmWallLatStretch => 'Single-arm wall lat stretch';
+
+	/// en: 'Chin-up (one arm)'
+	String get chinUpOneArm => 'Chin-up (one arm)';
+
+	/// en: 'Row (one arm, towel)'
+	String get rowOneArmTowel => 'Row (one arm, towel)';
+
+	/// en: 'Pull-up (neutral grip)'
+	String get pullUpNeutralGrip => 'Pull-up (neutral grip)';
+
+	/// en: 'Pull-up (rear)'
+	String get pullUpRear => 'Pull-up (rear)';
+
+	/// en: 'Row (resistance band, seated, straight back)'
+	String get rowResistanceBandSeatedStraightBack => 'Row (resistance band, seated, straight back)';
+
+	/// en: 'Pulldown (lever, reverse grip)'
+	String get pulldownLeverReverseGrip => 'Pulldown (lever, reverse grip)';
+
+	/// en: 'Alternating front-and-back pull-up'
+	String get alternatingFrontAndBackPullUp => 'Alternating front-and-back pull-up';
+
+	/// en: 'Back stretch (roller)'
+	String get backStretchRoller => 'Back stretch (roller)';
+
+	/// en: 'Lat stretch (roller, side)'
+	String get latStretchRollerSide => 'Lat stretch (roller, side)';
+
+	/// en: 'Rope climbing'
+	String get ropeClimbing => 'Rope climbing';
+
+	/// en: 'Lower back stretch (seated)'
+	String get lowerBackStretchSeated => 'Lower back stretch (seated)';
+
+	/// en: 'Lat stretch (side lying, floor)'
+	String get latStretchSideLyingFloor => 'Lat stretch (side lying, floor)';
+
+	/// en: 'Neck stretch (side, push)'
+	String get neckStretchSidePush => 'Neck stretch (side, push)';
+
+	/// en: 'Side-to-side chin-up'
+	String get sideToSideChinUp => 'Side-to-side chin-up';
+
+	/// en: 'Skin-the-cat rotation'
+	String get skinTheCatRotation => 'Skin-the-cat rotation';
+
+	/// en: 'Bent over row (smith)'
+	String get bentOverRowSmith => 'Bent over row (smith)';
+
+	/// en: 'Row (smith, narrow)'
+	String get rowSmithNarrow => 'Row (smith, narrow)';
+
+	/// en: 'Row (smith, one arm)'
+	String get rowSmithOneArm => 'Row (smith, one arm)';
+
+	/// en: 'Bent over row (smith, reverse grip)'
+	String get bentOverRowSmithReverseGrip => 'Bent over row (smith, reverse grip)';
+
+	/// en: 'Prone sphinx stretch'
+	String get proneSphinxStretch => 'Prone sphinx stretch';
+
+	/// en: 'Spine stretch'
+	String get spineStretch => 'Spine stretch';
+
+	/// en: 'Standing archer pull'
+	String get standingArcherPull => 'Standing archer pull';
+
+	/// en: 'Lat stretch (standing, lateral)'
+	String get latStretchStandingLateral => 'Lat stretch (standing, lateral)';
+
+	/// en: 'Pelvic tilt (standing)'
+	String get pelvicTiltStanding => 'Pelvic tilt (standing)';
+
+	/// en: 'Pulldown (cable, neutral grip)'
+	String get pulldownCableNeutralGrip => 'Pulldown (cable, neutral grip)';
+
+	/// en: 'Forward fold reaching both toes'
+	String get forwardFoldReachingBothToes => 'Forward fold reaching both toes';
+
+	/// en: 'Upper back stretch'
+	String get upperBackStretch => 'Upper back stretch';
+
+	/// en: 'Upward-facing dog stretch'
+	String get upwardFacingDogStretch => 'Upward-facing dog stretch';
+
+	/// en: 'Chin-up (weighted, close grip, dip cage)'
+	String get chinUpWeightedCloseGripDipCage => 'Chin-up (weighted, close grip, dip cage)';
+
+	/// en: 'Hyperextension (weighted, stability ball)'
+	String get hyperextensionWeightedStabilityBall => 'Hyperextension (weighted, stability ball)';
+
+	/// en: 'Muscle up (weighted)'
+	String get muscleUpWeighted => 'Muscle up (weighted)';
+
+	/// en: 'Muscle up (weighted, bar)'
+	String get muscleUpWeightedBar => 'Muscle up (weighted, bar)';
+
+	/// en: 'Pull-up (weighted, one arm)'
+	String get pullUpWeightedOneArm => 'Pull-up (weighted, one arm)';
+
+	/// en: 'Pull-up (weighted)'
+	String get pullUpWeighted => 'Pull-up (weighted)';
+
+	/// en: 'Pull-up (wide grip)'
+	String get pullUpWideGrip => 'Pull-up (wide grip)';
+
+	/// en: 'Pull-up (wide grip, rear)'
+	String get pullUpWideGripRear => 'Pull-up (wide grip, rear)';
 }
 
 // Path: library.back.exercise
@@ -7459,6 +9982,309 @@ class Translations$library$triceps$exercises$en {
 
 	/// en: 'Dumbbell overhead triceps extension'
 	String get overheadTricepExtension => 'Dumbbell overhead triceps extension';
+
+	/// en: 'Triceps extension (assisted, standing, towel)'
+	String get tricepsExtensionAssistedStandingTowel => 'Triceps extension (assisted, standing, towel)';
+
+	/// en: 'Push-up (band, close grip)'
+	String get pushUpBandCloseGrip => 'Push-up (band, close grip)';
+
+	/// en: 'Triceps extension (band, side)'
+	String get tricepsExtensionBandSide => 'Triceps extension (band, side)';
+
+	/// en: 'Bench press (barbell, close grip)'
+	String get benchPressBarbellCloseGrip => 'Bench press (barbell, close grip)';
+
+	/// en: 'Decline close-grip press into skull crusher'
+	String get declineCloseGripPressIntoSkullCrusher => 'Decline close-grip press into skull crusher';
+
+	/// en: 'Bench press (barbell, incline, close grip)'
+	String get benchPressBarbellInclineCloseGrip => 'Bench press (barbell, incline, close grip)';
+
+	/// en: 'Press (barbell, incline, reverse grip)'
+	String get pressBarbellInclineReverseGrip => 'Press (barbell, incline, reverse grip)';
+
+	/// en: 'Triceps extension (barbell, lying, back of head)'
+	String get tricepsExtensionBarbellLyingBackOfHead => 'Triceps extension (barbell, lying, back of head)';
+
+	/// en: 'Floor press (barbell, one arm)'
+	String get floorPressBarbellOneArm => 'Floor press (barbell, one arm)';
+
+	/// en: 'Pin presses (barbell)'
+	String get pinPressesBarbell => 'Pin presses (barbell)';
+
+	/// en: 'Bench press (barbell, reverse, close grip)'
+	String get benchPressBarbellReverseCloseGrip => 'Bench press (barbell, reverse, close grip)';
+
+	/// en: 'Skullcrusher (barbell, reverse grip)'
+	String get skullcrusherBarbellReverseGrip => 'Skullcrusher (barbell, reverse grip)';
+
+	/// en: 'Triceps extension (barbell, seated, close grip, behind neck)'
+	String get tricepsExtensionBarbellSeatedCloseGripBehindNeck => 'Triceps extension (barbell, seated, close grip, behind neck)';
+
+	/// en: 'Triceps extension (barbell, seated, overhead)'
+	String get tricepsExtensionBarbellSeatedOverhead => 'Triceps extension (barbell, seated, overhead)';
+
+	/// en: 'Triceps extension (barbell, standing, overhead)'
+	String get tricepsExtensionBarbellStandingOverhead => 'Triceps extension (barbell, standing, overhead)';
+
+	/// en: 'Triceps extension (bodyweight, kneeling)'
+	String get tricepsExtensionBodyweightKneeling => 'Triceps extension (bodyweight, kneeling)';
+
+	/// en: 'Triceps extension (cable, alternate)'
+	String get tricepsExtensionCableAlternate => 'Triceps extension (cable, alternate)';
+
+	/// en: 'Extension (cable, concentration, knee)'
+	String get extensionCableConcentrationKnee => 'Extension (cable, concentration, knee)';
+
+	/// en: 'Triceps extension (cable, high pulley, overhead)'
+	String get tricepsExtensionCableHighPulleyOverhead => 'Triceps extension (cable, high pulley, overhead)';
+
+	/// en: 'Triceps extension (cable, incline)'
+	String get tricepsExtensionCableIncline => 'Triceps extension (cable, incline)';
+
+	/// en: 'Kickback (cable)'
+	String get kickbackCable => 'Kickback (cable)';
+
+	/// en: 'Triceps extension (cable, kneeling)'
+	String get tricepsExtensionCableKneeling => 'Triceps extension (cable, kneeling)';
+
+	/// en: 'Triceps extension (cable, lying)'
+	String get tricepsExtensionCableLying => 'Triceps extension (cable, lying)';
+
+	/// en: 'Cable rearward triceps drive'
+	String get cableRearwardTricepsDrive => 'Cable rearward triceps drive';
+
+	/// en: 'Triceps pushdown (cable, reverse grip, sz bar, arm blaster)'
+	String get tricepsPushdownCableReverseGripSzBarArmBlaster => 'Triceps pushdown (cable, reverse grip, sz bar, arm blaster)';
+
+	/// en: 'Pushdown (cable, reverse grip)'
+	String get pushdownCableReverseGrip => 'Pushdown (cable, reverse grip)';
+
+	/// en: 'Triceps extension (cable, rope, incline)'
+	String get tricepsExtensionCableRopeIncline => 'Triceps extension (cable, rope, incline)';
+
+	/// en: 'Triceps extension (cable, rope, lying, floor)'
+	String get tricepsExtensionCableRopeLyingFloor => 'Triceps extension (cable, rope, lying, floor)';
+
+	/// en: 'Triceps extension (cable, standing, one arm)'
+	String get tricepsExtensionCableStandingOneArm => 'Triceps extension (cable, standing, one arm)';
+
+	/// en: 'Triceps extension (cable, standing, reverse grip, one arm, overhead)'
+	String get tricepsExtensionCableStandingReverseGripOneArmOverhead => 'Triceps extension (cable, standing, reverse grip, one arm, overhead)';
+
+	/// en: 'Triceps pushdown (cable, v bar)'
+	String get tricepsPushdownCableVBar => 'Triceps pushdown (cable, v bar)';
+
+	/// en: 'Triceps pushdown (cable, v bar, arm blaster)'
+	String get tricepsPushdownCableVBarArmBlaster => 'Triceps pushdown (cable, v bar, arm blaster)';
+
+	/// en: 'Triceps kickback (cable, two arm)'
+	String get tricepsKickbackCableTwoArm => 'Triceps kickback (cable, two arm)';
+
+	/// en: 'Push-up (close grip)'
+	String get pushUpCloseGrip => 'Push-up (close grip)';
+
+	/// en: 'Push-up (close grip, knee)'
+	String get pushUpCloseGripKnee => 'Push-up (close grip, knee)';
+
+	/// en: 'Press (dumbbell, close grip)'
+	String get pressDumbbellCloseGrip => 'Press (dumbbell, close grip)';
+
+	/// en: 'Press (dumbbell, decline, one arm, neutral grip)'
+	String get pressDumbbellDeclineOneArmNeutralGrip => 'Press (dumbbell, decline, one arm, neutral grip)';
+
+	/// en: 'Triceps extension (dumbbell, decline)'
+	String get tricepsExtensionDumbbellDecline => 'Triceps extension (dumbbell, decline)';
+
+	/// en: 'Forward lunge triceps extension (dumbbell)'
+	String get forwardLungeTricepsExtensionDumbbell => 'Forward lunge triceps extension (dumbbell)';
+
+	/// en: 'Press (dumbbell, incline, neutral grip, exercise ball)'
+	String get pressDumbbellInclineNeutralGripExerciseBall => 'Press (dumbbell, incline, neutral grip, exercise ball)';
+
+	/// en: 'Press (dumbbell, incline, one arm, neutral grip)'
+	String get pressDumbbellInclineOneArmNeutralGrip => 'Press (dumbbell, incline, one arm, neutral grip)';
+
+	/// en: 'Press (dumbbell, incline, one arm, neutral grip, exercise ball)'
+	String get pressDumbbellInclineOneArmNeutralGripExerciseBall => 'Press (dumbbell, incline, one arm, neutral grip, exercise ball)';
+
+	/// en: 'Triceps extension (dumbbell, incline)'
+	String get tricepsExtensionDumbbellIncline => 'Triceps extension (dumbbell, incline)';
+
+	/// en: 'Triceps extension (dumbbell, incline, two arm)'
+	String get tricepsExtensionDumbbellInclineTwoArm => 'Triceps extension (dumbbell, incline, two arm)';
+
+	/// en: 'Kickback (dumbbell, exercise ball)'
+	String get kickbackDumbbellExerciseBall => 'Kickback (dumbbell, exercise ball)';
+
+	/// en: 'Triceps extension (dumbbell, lying, across face)'
+	String get tricepsExtensionDumbbellLyingAcrossFace => 'Triceps extension (dumbbell, lying, across face)';
+
+	/// en: 'Extension (dumbbell, lying, alternate)'
+	String get extensionDumbbellLyingAlternate => 'Extension (dumbbell, lying, alternate)';
+
+	/// en: 'Triceps extension (dumbbell, lying)'
+	String get tricepsExtensionDumbbellLying => 'Triceps extension (dumbbell, lying)';
+
+	/// en: 'Triceps extension (dumbbell, lying, one arm, pronated)'
+	String get tricepsExtensionDumbbellLyingOneArmPronated => 'Triceps extension (dumbbell, lying, one arm, pronated)';
+
+	/// en: 'Triceps extension (dumbbell, lying, one arm, supinated)'
+	String get tricepsExtensionDumbbellLyingOneArmSupinated => 'Triceps extension (dumbbell, lying, one arm, supinated)';
+
+	/// en: 'Triceps extension (dumbbell, lying, one arm)'
+	String get tricepsExtensionDumbbellLyingOneArm => 'Triceps extension (dumbbell, lying, one arm)';
+
+	/// en: 'French press (dumbbell, one arm, exercise ball)'
+	String get frenchPressDumbbellOneArmExerciseBall => 'French press (dumbbell, one arm, exercise ball)';
+
+	/// en: 'Press (dumbbell, one arm, neutral grip, exercise ball)'
+	String get pressDumbbellOneArmNeutralGripExerciseBall => 'Press (dumbbell, one arm, neutral grip, exercise ball)';
+
+	/// en: 'Triceps extension (dumbbell, one arm, bench)'
+	String get tricepsExtensionDumbbellOneArmBench => 'Triceps extension (dumbbell, one arm, bench)';
+
+	/// en: 'Triceps extension (dumbbell, pronate grip)'
+	String get tricepsExtensionDumbbellPronateGrip => 'Triceps extension (dumbbell, pronate grip)';
+
+	/// en: 'Extension (dumbbell, seated, bench)'
+	String get extensionDumbbellSeatedBench => 'Extension (dumbbell, seated, bench)';
+
+	/// en: 'Kickback (dumbbell, seated, bent over, alternate)'
+	String get kickbackDumbbellSeatedBentOverAlternate => 'Kickback (dumbbell, seated, bent over, alternate)';
+
+	/// en: 'Kickback (dumbbell, seated)'
+	String get kickbackDumbbellSeated => 'Kickback (dumbbell, seated)';
+
+	/// en: 'Kickback (dumbbell, seated, one arm)'
+	String get kickbackDumbbellSeatedOneArm => 'Kickback (dumbbell, seated, one arm)';
+
+	/// en: 'Triceps extension (dumbbell, seated, reverse grip, one arm, overhead)'
+	String get tricepsExtensionDumbbellSeatedReverseGripOneArmOverhead => 'Triceps extension (dumbbell, seated, reverse grip, one arm, overhead)';
+
+	/// en: 'Triceps kickback (dumbbell, standing, alternate)'
+	String get tricepsKickbackDumbbellStandingAlternate => 'Triceps kickback (dumbbell, standing, alternate)';
+
+	/// en: 'Triceps extension (dumbbell, standing, bent over, one arm)'
+	String get tricepsExtensionDumbbellStandingBentOverOneArm => 'Triceps extension (dumbbell, standing, bent over, one arm)';
+
+	/// en: 'Kickback (dumbbell, standing)'
+	String get kickbackDumbbellStanding => 'Kickback (dumbbell, standing)';
+
+	/// en: 'Extension (dumbbell, standing, one arm)'
+	String get extensionDumbbellStandingOneArm => 'Extension (dumbbell, standing, one arm)';
+
+	/// en: 'Tate press (dumbbell)'
+	String get tatePressDumbbell => 'Tate press (dumbbell)';
+
+	/// en: 'Triceps kickback (dumbbell, stork stance)'
+	String get tricepsKickbackDumbbellStorkStance => 'Triceps kickback (dumbbell, stork stance)';
+
+	/// en: 'Elbow-supported dips'
+	String get elbowSupportedDips => 'Elbow-supported dips';
+
+	/// en: 'Dip (exercise ball)'
+	String get dipExerciseBall => 'Dip (exercise ball)';
+
+	/// en: 'Triceps stretch (exercise ball, seated)'
+	String get tricepsStretchExerciseBallSeated => 'Triceps stretch (exercise ball, seated)';
+
+	/// en: 'Triceps extension (exercise ball, supine)'
+	String get tricepsExtensionExerciseBallSupine => 'Triceps extension (exercise ball, supine)';
+
+	/// en: 'French press (ez bar, exercise ball)'
+	String get frenchPressEzBarExerciseBall => 'French press (ez bar, exercise ball)';
+
+	/// en: 'Triceps extension (ez bar, lying, close grip, behind head)'
+	String get tricepsExtensionEzBarLyingCloseGripBehindHead => 'Triceps extension (ez bar, lying, close grip, behind head)';
+
+	/// en: 'French press (ez bar, standing)'
+	String get frenchPressEzBarStanding => 'French press (ez bar, standing)';
+
+	/// en: 'Decline EZ-bar face press'
+	String get declineEZBarFacePress => 'Decline EZ-bar face press';
+
+	/// en: 'Triceps extension (ez barbell, decline)'
+	String get tricepsExtensionEzBarbellDecline => 'Triceps extension (ez barbell, decline)';
+
+	/// en: 'Triceps extension (ez barbell, incline)'
+	String get tricepsExtensionEzBarbellIncline => 'Triceps extension (ez barbell, incline)';
+
+	/// en: 'Triceps extension (ez barbell, seated)'
+	String get tricepsExtensionEzBarbellSeated => 'Triceps extension (ez barbell, seated)';
+
+	/// en: 'Bench press (ez bar, close grip)'
+	String get benchPressEzBarCloseGrip => 'Bench press (ez bar, close grip)';
+
+	/// en: 'Forearm-transition dips'
+	String get forearmTransitionDips => 'Forearm-transition dips';
+
+	/// en: 'Push-up (incline, close grip)'
+	String get pushUpInclineCloseGrip => 'Push-up (incline, close grip)';
+
+	/// en: 'Triceps dip (lever, overhand)'
+	String get tricepsDipLeverOverhand => 'Triceps dip (lever, overhand)';
+
+	/// en: 'Dip (lever, seated)'
+	String get dipLeverSeated => 'Dip (lever, seated)';
+
+	/// en: 'Push-up (medicine ball, close grip)'
+	String get pushUpMedicineBallCloseGrip => 'Push-up (medicine ball, close grip)';
+
+	/// en: 'Supine medicine-ball chest throw'
+	String get supineMedicineBallChestThrow => 'Supine medicine-ball chest throw';
+
+	/// en: 'Triceps extension (olympic barbell)'
+	String get tricepsExtensionOlympicBarbell => 'Triceps extension (olympic barbell)';
+
+	/// en: 'Dip (one arm)'
+	String get dipOneArm => 'Dip (one arm)';
+
+	/// en: 'Triceps stretch (overhead)'
+	String get tricepsStretchOverhead => 'Triceps stretch (overhead)';
+
+	/// en: 'Push-up (close grip, off, dumbbell)'
+	String get pushUpCloseGripOffDumbbell => 'Push-up (close grip, off, dumbbell)';
+
+	/// en: 'Dip (reverse)'
+	String get dipReverse => 'Dip (reverse)';
+
+	/// en: 'Dip (ring)'
+	String get dipRing => 'Dip (ring)';
+
+	/// en: 'Bench press (smith, close grip)'
+	String get benchPressSmithCloseGrip => 'Bench press (smith, close grip)';
+
+	/// en: 'Bench press (smith machine, decline, close grip)'
+	String get benchPressSmithMachineDeclineCloseGrip => 'Bench press (smith machine, decline, close grip)';
+
+	/// en: 'Triceps extension (smith machine, incline)'
+	String get tricepsExtensionSmithMachineIncline => 'Triceps extension (smith machine, incline)';
+
+	/// en: 'Stalder press to handstand'
+	String get stalderPressToHandstand => 'Stalder press to handstand';
+
+	/// en: 'Dip (three, bench)'
+	String get dipThreeBench => 'Dip (three, bench)';
+
+	/// en: 'Triceps dip (floor)'
+	String get tricepsDipFloor => 'Triceps dip (floor)';
+
+	/// en: 'Dip (weighted, bench)'
+	String get dipWeightedBench => 'Dip (weighted, bench)';
+
+	/// en: 'Dip (weighted, three, bench)'
+	String get dipWeightedThreeBench => 'Dip (weighted, three, bench)';
+
+	/// en: 'Triceps dip (weighted)'
+	String get tricepsDipWeighted => 'Triceps dip (weighted)';
+
+	/// en: 'JM press (barbell)'
+	String get jmPressBarbell => 'JM press (barbell)';
+
+	/// en: 'JM press (ez barbell)'
+	String get jmPressEzBarbell => 'JM press (ez barbell)';
 }
 
 // Path: library.hips.exercises
@@ -7471,6 +10297,18 @@ class Translations$library$hips$exercises$en {
 
 	/// en: 'Machine hip adduction'
 	String get hipAdduction => 'Machine hip adduction';
+
+	/// en: 'Adductor stretch (assisted, side lying)'
+	String get adductorStretchAssistedSideLying => 'Adductor stretch (assisted, side lying)';
+
+	/// en: 'Hip adduction (cable)'
+	String get hipAdductionCable => 'Hip adduction (cable)';
+
+	/// en: 'Hip adduction (side lying)'
+	String get hipAdductionSideLying => 'Hip adduction (side lying)';
+
+	/// en: 'Hip adduction (side plank)'
+	String get hipAdductionSidePlank => 'Hip adduction (side plank)';
 }
 
 // Path: library.forearms.exercises
@@ -7513,6 +10351,90 @@ class Translations$library$forearms$exercises$en {
 
 	/// en: 'Single-arm cable reverse curl'
 	String get singleArmCableReverseCurl => 'Single-arm cable reverse curl';
+
+	/// en: 'Reverse wrist curl (band)'
+	String get reverseWristCurlBand => 'Reverse wrist curl (band)';
+
+	/// en: 'Wrist curl (band)'
+	String get wristCurlBand => 'Wrist curl (band)';
+
+	/// en: 'Wrist curl (barbell, standing, back)'
+	String get wristCurlBarbellStandingBack => 'Wrist curl (barbell, standing, back)';
+
+	/// en: 'Reverse wrist curl (cable)'
+	String get reverseWristCurlCable => 'Reverse wrist curl (cable)';
+
+	/// en: 'Wrist curl (cable, standing, back)'
+	String get wristCurlCableStandingBack => 'Wrist curl (cable, standing, back)';
+
+	/// en: 'Wrist curl (cable)'
+	String get wristCurlCable => 'Wrist curl (cable)';
+
+	/// en: 'Dumbbell finger flexion'
+	String get dumbbellFingerFlexion => 'Dumbbell finger flexion';
+
+	/// en: 'Pronation (dumbbell, lying)'
+	String get pronationDumbbellLying => 'Pronation (dumbbell, lying)';
+
+	/// en: 'Pronation (dumbbell, lying, floor)'
+	String get pronationDumbbellLyingFloor => 'Pronation (dumbbell, lying, floor)';
+
+	/// en: 'Supination (dumbbell, lying)'
+	String get supinationDumbbellLying => 'Supination (dumbbell, lying)';
+
+	/// en: 'Supination (dumbbell, lying, floor)'
+	String get supinationDumbbellLyingFloor => 'Supination (dumbbell, lying, floor)';
+
+	/// en: 'Reverse wrist curl (dumbbell, one arm)'
+	String get reverseWristCurlDumbbellOneArm => 'Reverse wrist curl (dumbbell, one arm)';
+
+	/// en: 'Neutral wrist curl (dumbbell, one arm, seated)'
+	String get neutralWristCurlDumbbellOneArmSeated => 'Neutral wrist curl (dumbbell, one arm, seated)';
+
+	/// en: 'Wrist curl (dumbbell, one arm)'
+	String get wristCurlDumbbellOneArm => 'Wrist curl (dumbbell, one arm)';
+
+	/// en: 'Bench-supported dumbbell radial deviation'
+	String get benchSupportedDumbbellRadialDeviation => 'Bench-supported dumbbell radial deviation';
+
+	/// en: 'Neutral wrist curl (dumbbell, bench, one arm)'
+	String get neutralWristCurlDumbbellBenchOneArm => 'Neutral wrist curl (dumbbell, bench, one arm)';
+
+	/// en: 'Reverse wrist curl (dumbbell, bench, one arm)'
+	String get reverseWristCurlDumbbellBenchOneArm => 'Reverse wrist curl (dumbbell, bench, one arm)';
+
+	/// en: 'Wrist curl (dumbbell, bench, one arm)'
+	String get wristCurlDumbbellBenchOneArm => 'Wrist curl (dumbbell, bench, one arm)';
+
+	/// en: 'Seated dumbbell radial deviation'
+	String get seatedDumbbellRadialDeviation => 'Seated dumbbell radial deviation';
+
+	/// en: 'Shoulder external rotation (dumbbell, seated, one arm)'
+	String get shoulderExternalRotationDumbbellSeatedOneArm => 'Shoulder external rotation (dumbbell, seated, one arm)';
+
+	/// en: 'Finger flexion curls'
+	String get fingerFlexionCurls => 'Finger flexion curls';
+
+	/// en: 'Hang clean (kettlebell, alternate)'
+	String get hangCleanKettlebellAlternate => 'Hang clean (kettlebell, alternate)';
+
+	/// en: 'Machine hand-grip squeeze'
+	String get machineHandGripSqueeze => 'Machine hand-grip squeeze';
+
+	/// en: 'Wrist stretch with side pull'
+	String get wristStretchWithSidePull => 'Wrist stretch with side pull';
+
+	/// en: 'Wrist curl (smith, seated)'
+	String get wristCurlSmithSeated => 'Wrist curl (smith, seated)';
+
+	/// en: 'Wrist curl (smith, standing, back)'
+	String get wristCurlSmithStandingBack => 'Wrist curl (smith, standing, back)';
+
+	/// en: 'Weighted hand-grip squeeze'
+	String get weightedHandGripSqueeze => 'Weighted hand-grip squeeze';
+
+	/// en: 'Wrist circles'
+	String get wristCircles => 'Wrist circles';
 }
 
 // Path: library.obliques.exercises
@@ -7591,6 +10513,192 @@ class Translations$library$glutes$exercises$en {
 
 	/// en: 'Hip thrust (barbell)'
 	String get hipThrustBarbell => 'Hip thrust (barbell)';
+
+	/// en: 'Standing toe-touch circles, arms open'
+	String get standingToeTouchCirclesArmsOpen => 'Standing toe-touch circles, arms open';
+
+	/// en: 'Assisted supine glute stretch'
+	String get assistedSupineGluteStretch => 'Assisted supine glute stretch';
+
+	/// en: 'Assisted glute and piriformis stretch'
+	String get assistedGluteAndPiriformisStretch => 'Assisted glute and piriformis stretch';
+
+	/// en: 'Hip extension (band, bent over)'
+	String get hipExtensionBandBentOver => 'Hip extension (band, bent over)';
+
+	/// en: 'Glute bridge (band)'
+	String get gluteBridgeBand => 'Glute bridge (band)';
+
+	/// en: 'Hip internal rotation (band, lying)'
+	String get hipInternalRotationBandLying => 'Hip internal rotation (band, lying)';
+
+	/// en: 'Pull through (band)'
+	String get pullThroughBand => 'Pull through (band)';
+
+	/// en: 'Hip internal rotation (band, seated)'
+	String get hipInternalRotationBandSeated => 'Hip internal rotation (band, seated)';
+
+	/// en: 'Glute bridge (barbell)'
+	String get gluteBridgeBarbell => 'Glute bridge (barbell)';
+
+	/// en: 'Glute bridge (barbell, bench)'
+	String get gluteBridgeBarbellBench => 'Glute bridge (barbell, bench)';
+
+	/// en: 'Deadlift (barbell, one arm, side)'
+	String get deadliftBarbellOneArmSide => 'Deadlift (barbell, one arm, side)';
+
+	/// en: 'Rack pull (barbell)'
+	String get rackPullBarbell => 'Rack pull (barbell)';
+
+	/// en: 'Deadlift (barbell, one leg)'
+	String get deadliftBarbellOneLeg => 'Deadlift (barbell, one leg)';
+
+	/// en: 'Deadlift (barbell, sumo)'
+	String get deadliftBarbellSumo => 'Deadlift (barbell, sumo)';
+
+	/// en: 'Standing forward fold to toes'
+	String get standingForwardFoldToToes => 'Standing forward fold to toes';
+
+	/// en: 'Hip extension (bench)'
+	String get hipExtensionBench => 'Hip extension (bench)';
+
+	/// en: 'Twist (bent knee, lying)'
+	String get twistBentKneeLying => 'Twist (bent knee, lying)';
+
+	/// en: 'Deadlift (cable)'
+	String get deadliftCable => 'Deadlift (cable)';
+
+	/// en: 'Pull through (cable, rope)'
+	String get pullThroughCableRope => 'Pull through (cable, rope)';
+
+	/// en: 'Hip extension (cable, standing)'
+	String get hipExtensionCableStanding => 'Hip extension (cable, standing)';
+
+	/// en: 'Clean (dumbbell)'
+	String get cleanDumbbell => 'Clean (dumbbell)';
+
+	/// en: 'Deadlift (dumbbell)'
+	String get deadliftDumbbell => 'Deadlift (dumbbell)';
+
+	/// en: 'Snatch (dumbbell, one arm)'
+	String get snatchDumbbellOneArm => 'Snatch (dumbbell, one arm)';
+
+	/// en: 'Deadlift (dumbbell, one leg, stepbox support)'
+	String get deadliftDumbbellOneLegStepboxSupport => 'Deadlift (dumbbell, one leg, stepbox support)';
+
+	/// en: 'Pull through (dumbbell, sumo)'
+	String get pullThroughDumbbellSumo => 'Pull through (dumbbell, sumo)';
+
+	/// en: 'Hip flexor stretch (exercise ball)'
+	String get hipFlexorStretchExerciseBall => 'Hip flexor stretch (exercise ball)';
+
+	/// en: 'Prone single-leg hip rotation on ball'
+	String get proneSingleLegHipRotationOnBall => 'Prone single-leg hip rotation on ball';
+
+	/// en: 'Ball-supported diagonal kick and leg curl'
+	String get ballSupportedDiagonalKickAndLegCurl => 'Ball-supported diagonal kick and leg curl';
+
+	/// en: 'Flutter kicks'
+	String get flutterKicks => 'Flutter kicks';
+
+	/// en: 'Glute bridge (march)'
+	String get gluteBridgeMarch => 'Glute bridge (march)';
+
+	/// en: 'Glute bridge (two leg, bench)'
+	String get gluteBridgeTwoLegBench => 'Glute bridge (two leg, bench)';
+
+	/// en: 'Toe-touch circles with hands clasped'
+	String get toeTouchCirclesWithHandsClasped => 'Toe-touch circles with hands clasped';
+
+	/// en: 'Toe-touch circles with reversed hand clasp'
+	String get toeTouchCirclesWithReversedHandClasp => 'Toe-touch circles with reversed hand clasp';
+
+	/// en: 'Supine knees-to-chest stretch'
+	String get supineKneesToChestStretch => 'Supine knees-to-chest stretch';
+
+	/// en: 'Supine cross-body rotation stretch'
+	String get supineCrossBodyRotationStretch => 'Supine cross-body rotation stretch';
+
+	/// en: 'Deadlift (lever)'
+	String get deadliftLever => 'Deadlift (lever)';
+
+	/// en: 'Hip extension (lever)'
+	String get hipExtensionLever => 'Hip extension (lever)';
+
+	/// en: 'Leg press (lever, horizontal, one leg)'
+	String get legPressLeverHorizontalOneLeg => 'Leg press (lever, horizontal, one leg)';
+
+	/// en: 'Reverse hyperextension (lever)'
+	String get reverseHyperextensionLever => 'Reverse hyperextension (lever)';
+
+	/// en: 'Wall sit with alternating knee lifts'
+	String get wallSitWithAlternatingKneeLifts => 'Wall sit with alternating knee lifts';
+
+	/// en: 'Pelvic tilt into glute bridge'
+	String get pelvicTiltIntoGluteBridge => 'Pelvic tilt into glute bridge';
+
+	/// en: 'Push-up (pike to cobra)'
+	String get pushUpPikeToCobra => 'Push-up (pike to cobra)';
+
+	/// en: 'Elevated reverse bridge'
+	String get elevatedReverseBridge => 'Elevated reverse bridge';
+
+	/// en: 'Hip thrusts (resistance band, knee)'
+	String get hipThrustsResistanceBandKnee => 'Hip thrusts (resistance band, knee)';
+
+	/// en: 'Hip abduction (resistance band, seated)'
+	String get hipAbductionResistanceBandSeated => 'Hip abduction (resistance band, seated)';
+
+	/// en: 'Reverse hyperextension (stability ball)'
+	String get reverseHyperextensionStabilityBall => 'Reverse hyperextension (stability ball)';
+
+	/// en: 'Reverse hyperextension (flat bench)'
+	String get reverseHyperextensionFlatBench => 'Reverse hyperextension (flat bench)';
+
+	/// en: 'Rocking frog adductor stretch'
+	String get rockingFrogAdductorStretch => 'Rocking frog adductor stretch';
+
+	/// en: 'Lat stretch (roller, hip)'
+	String get latStretchRollerHip => 'Lat stretch (roller, hip)';
+
+	/// en: 'Hip stretch (roller)'
+	String get hipStretchRoller => 'Hip stretch (roller)';
+
+	/// en: 'Glute stretch (seated)'
+	String get gluteStretchSeated => 'Glute stretch (seated)';
+
+	/// en: 'Piriformis stretch (seated)'
+	String get piriformisStretchSeated => 'Piriformis stretch (seated)';
+
+	/// en: 'Hip abduction (side bridge)'
+	String get hipAbductionSideBridge => 'Hip abduction (side bridge)';
+
+	/// en: 'Hip abduction (side)'
+	String get hipAbductionSide => 'Hip abduction (side)';
+
+	/// en: 'Leg press (sled, 45°, wide stance)'
+	String get legPressSled45WideStance => 'Leg press (sled, 45°, wide stance)';
+
+	/// en: 'Deadlift (smith)'
+	String get deadliftSmith => 'Deadlift (smith)';
+
+	/// en: 'Leg press (smith)'
+	String get legPressSmith => 'Leg press (smith)';
+
+	/// en: 'Side-lying straight-leg hip abduction'
+	String get sideLyingStraightLegHipAbduction => 'Side-lying straight-leg hip abduction';
+
+	/// en: 'Swimmer kicks'
+	String get swimmerKicks => 'Swimmer kicks';
+
+	/// en: 'Tire turnover'
+	String get tireTurnover => 'Tire turnover';
+
+	/// en: 'Trap-bar deadlift'
+	String get trapBarDeadlift => 'Trap-bar deadlift';
+
+	/// en: 'Hip lift with rotation'
+	String get hipLiftWithRotation => 'Hip lift with rotation';
 }
 
 // Path: historyEditor.finish.fields
@@ -10374,7 +13482,7 @@ extension on Translations {
 			'ongoingWorkout.updateRoutine.differences.added' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises added', one: '1 exercise added', two: '${n} exercises added', few: '${n} exercises added', many: '${n} exercises added', other: '${n} exercises added', ), 
 			'ongoingWorkout.updateRoutine.differences.removed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises removed', one: '1 exercise removed', two: '${n} exercises removed', few: '${n} exercises removed', many: '${n} exercises removed', other: '${n} exercises removed', ), 
 			'ongoingWorkout.updateRoutine.differences.changed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises changed', one: '1 exercise changed', two: '${n} exercises changed', few: '${n} exercises changed', many: '${n} exercises changed', other: '${n} exercises changed', ), 
-			'ongoingWorkout.updateRoutine.differences.reordered' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises reordered', one: '1 exercise reordered', two: '${n} exercises reordered', few: '${n} exercises reordered', many: '${n} exercises reordered', other: '${n} exercises reordered', ),
+			'ongoingWorkout.updateRoutine.differences.reordered' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises reordered', one: '1 exercise reordered', two: '${n} exercises reordered', few: '${n} exercises reordered', many: '${n} exercises reordered', other: '${n} exercises reordered', ), 
 			'ongoingWorkout.updateRoutine.differences.metadata' => 'Routine name or notes changed',
 			'ongoingWorkout.goodJob.title' => 'Good job!',
 			'ongoingWorkout.goodJob.body' => 'Here\'s some statistics about the workout you\'ve just finished.',
@@ -10499,6 +13607,29 @@ extension on Translations {
 			'library.cardio.exercises.rowingMachine' => 'Rowing machine',
 			'library.cardio.exercises.bicycleCrunchesCardio' => 'Bicycle crunches (timed)',
 			'library.cardio.exercises.crunchesTimed' => 'Crunches (timed)',
+			'library.cardio.exercises.straddleJumps' => 'Straddle jumps',
+			'library.cardio.exercises.forwardAndBackwardSteps' => 'Forward and backward steps',
+			'library.cardio.exercises.bearCrawl' => 'Bear crawl',
+			'library.cardio.exercises.ellipticalCycling' => 'Elliptical cycling',
+			'library.cardio.exercises.burpeeDumbbell' => 'Burpee (dumbbell)',
+			'library.cardio.exercises.partialKneeBends' => 'Partial knee bends',
+			'library.cardio.exercises.armCycleErgometer' => 'Arm-cycle ergometer',
+			'library.cardio.exercises.wallSupportedHighKnees' => 'Wall-supported high knees',
+			'library.cardio.exercises.burpeeWithJumpingJack' => 'Burpee with jumping jack',
+			'library.cardio.exercises.jumpingJackHops' => 'Jumping-jack hops',
+			'library.cardio.exercises.pushUpIntoRunningStart' => 'Push-up into running start',
+			'library.cardio.exercises.scissorJumps' => 'Scissor jumps',
+			'library.cardio.exercises.squatSemiJump' => 'Squat (semi, jump)',
+			'library.cardio.exercises.shortStrideRunning' => 'Short-stride running',
+			'library.cardio.exercises.skiergDoublePolePull' => 'SkiErg double-pole pull',
+			'library.cardio.exercises.alternatingSkiSteps' => 'Alternating ski steps',
+			'library.cardio.exercises.explosiveStarJumps' => 'Explosive star jumps',
+			'library.cardio.exercises.kettlebellCircularSwing' => 'Kettlebell circular swing',
+			'library.cardio.exercises.ellipticalTrainerWalking' => 'Elliptical trainer walking',
+			'library.cardio.exercises.lungeWalkingHighKnee' => 'Lunge (walking, high knee)',
+			'library.cardio.exercises.inclineTreadmillWalking' => 'Incline treadmill walking',
+			'library.cardio.exercises.stairClimberStepping' => 'Stair-climber stepping',
+			'library.cardio.exercises.repeatedSprintIntervals' => 'Repeated sprint intervals',
 			'library.chest.name' => 'Chest',
 			'library.chest.exercises.inclineMachineChestPress' => 'Incline machine chest press',
 			'library.chest.exercises.midHeightCableFly' => 'Chest-height cable fly',
@@ -10507,6 +13638,8 @@ extension on Translations {
 			'library.chest.exercises.barbellBenchPressDecline' => 'Bench press (barbell, decline)',
 			'library.chest.exercises.dumbbellBenchPressFlat' => 'Bench press (dumbbell)',
 			'library.chest.exercises.dumbbellBenchPressIncline' => 'Bench press (dumbbell, incline)',
+			_ => null,
+		} ?? switch (path) {
 			'library.chest.exercises.dumbbellBenchPressDecline' => 'Bench press (dumbbell, decline)',
 			'library.chest.exercises.smithMachineBenchPressFlat' => 'Bench press (Smith machine)',
 			'library.chest.exercises.smithMachineBenchPressIncline' => 'Bench press (Smith machine, incline)',
@@ -10529,9 +13662,132 @@ extension on Translations {
 			'library.chest.exercises.tBarPress' => 'Landmine press',
 			'library.chest.exercises.inclineBenchFlys' => 'Incline bench flyes',
 			'library.chest.exercises.benchFlys' => 'Bench flyes',
+			'library.chest.exercises.pushUpArcher' => 'Push-up (archer)',
+			'library.chest.exercises.chestDipAssistedKneeling' => 'Chest dip (assisted, kneeling)',
+			'library.chest.exercises.pectoralisMajorStretchAssistedSeatedStabilityBall' => 'Pectoralis major stretch (assisted, seated, stability ball)',
+			'library.chest.exercises.chestDipAssistedWideGripKneeling' => 'Chest dip (assisted, wide grip, kneeling)',
+			'library.chest.exercises.benchPressBand' => 'Bench press (band)',
+			'library.chest.exercises.chestPressBandOneArmTwisting' => 'Chest press (band, one arm, twisting)',
+			'library.chest.exercises.pulloverBarbellDecline' => 'Pullover (barbell, decline)',
+			'library.chest.exercises.pressBarbellDeclineWideGrip' => 'Press (barbell, decline, wide grip)',
+			'library.chest.exercises.benchPressBarbellGuillotine' => 'Bench press (barbell, guillotine)',
+			'library.chest.exercises.benchPressBarbellReverseGripDecline' => 'Bench press (barbell, reverse grip, decline)',
+			'library.chest.exercises.benchPressBarbellReverseGripIncline' => 'Bench press (barbell, reverse grip, incline)',
+			'library.chest.exercises.benchPressBarbellWide' => 'Bench press (barbell, wide)',
+			'library.chest.exercises.benchPressBarbellWideReverseGrip' => 'Bench press (barbell, wide, reverse grip)',
+			'library.chest.exercises.chestStretchBehindHead' => 'Chest stretch (behind head)',
+			'library.chest.exercises.seatedButterflyStretch' => 'Seated butterfly stretch',
+			'library.chest.exercises.pressCableDeclineOneArm' => 'Press (cable, decline, one arm)',
+			'library.chest.exercises.flyCableIncline' => 'Fly (cable, incline)',
+			'library.chest.exercises.flyCableInclineStabilityBall' => 'Fly (cable, incline, stability ball)',
+			'library.chest.exercises.flyCableLying' => 'Fly (cable, lying)',
+			'library.chest.exercises.chestFlyCableOneArmDecline' => 'Chest fly (cable, one arm, decline)',
+			'library.chest.exercises.flyCableOneArmExerciseBall' => 'Fly (cable, one arm, exercise ball)',
+			'library.chest.exercises.flyCableOneArmInclineExerciseBall' => 'Fly (cable, one arm, incline, exercise ball)',
+			'library.chest.exercises.pressCableOneArmIncline' => 'Press (cable, one arm, incline)',
+			'library.chest.exercises.pressCableOneArmInclineExerciseBall' => 'Press (cable, one arm, incline, exercise ball)',
+			'library.chest.exercises.pressCableOneArmExerciseBall' => 'Press (cable, one arm, exercise ball)',
+			'library.chest.exercises.pressCableExerciseBall' => 'Press (cable, exercise ball)',
+			'library.chest.exercises.chestAndAnteriorShoulderStretch' => 'Chest and anterior shoulder stretch',
+			'library.chest.exercises.chestDip' => 'Chest dip',
+			'library.chest.exercises.chestDipStraightBar' => 'Chest dip (straight bar)',
+			'library.chest.exercises.chestStretchExerciseBall' => 'Chest stretch (exercise ball)',
+			'library.chest.exercises.pushUpChestTap' => 'Push-up (chest tap)',
+			'library.chest.exercises.pushUpClap' => 'Push-up (clap)',
+			'library.chest.exercises.pushUpWithAlternatingSideReach' => 'Push-up with alternating side reach',
+			'library.chest.exercises.pushUpDeep' => 'Push-up (deep)',
+			'library.chest.exercises.pushUpDrop' => 'Push-up (drop)',
+			'library.chest.exercises.flyDumbbellDecline' => 'Fly (dumbbell, decline)',
+			'library.chest.exercises.benchPressDumbbellDeclineNeutralGrip' => 'Bench press (dumbbell, decline, neutral grip)',
+			'library.chest.exercises.flyDumbbellDeclineOneArm' => 'Fly (dumbbell, decline, one arm)',
+			'library.chest.exercises.flyDumbbellDeclineTwisting' => 'Fly (dumbbell, decline, twisting)',
+			'library.chest.exercises.flyDumbbellExerciseBall' => 'Fly (dumbbell, exercise ball)',
+			'library.chest.exercises.benchPressDumbbellInclineAlternate' => 'Bench press (dumbbell, incline, alternate)',
+			'library.chest.exercises.flyDumbbellInclineExerciseBall' => 'Fly (dumbbell, incline, exercise ball)',
+			'library.chest.exercises.benchPressDumbbellInclineNeutralGrip' => 'Bench press (dumbbell, incline, neutral grip)',
+			'library.chest.exercises.flyDumbbellInclineOneArm' => 'Fly (dumbbell, incline, one arm)',
+			'library.chest.exercises.flyDumbbellInclineOneArmExerciseBall' => 'Fly (dumbbell, incline, one arm, exercise ball)',
+			'library.chest.exercises.pressDumbbellInclineOneArm' => 'Press (dumbbell, incline, one arm)',
+			'library.chest.exercises.pressDumbbellInclineOneArmExerciseBall' => 'Press (dumbbell, incline, one arm, exercise ball)',
+			'library.chest.exercises.pressDumbbellInclineExerciseBall' => 'Press (dumbbell, incline, exercise ball)',
+			'library.chest.exercises.shoulderRaiseDumbbellIncline' => 'Shoulder raise (dumbbell, incline)',
+			'library.chest.exercises.flyDumbbellInclineTwisting' => 'Fly (dumbbell, incline, twisting)',
+			'library.chest.exercises.pressDumbbellLyingNeutralGrip' => 'Press (dumbbell, lying, neutral grip)',
+			'library.chest.exercises.pressDumbbellLyingOneArm' => 'Press (dumbbell, lying, one arm)',
+			'library.chest.exercises.pulloverDumbbellExerciseBall' => 'Pullover (dumbbell, exercise ball)',
+			'library.chest.exercises.benchPressDumbbellNeutralGrip' => 'Bench press (dumbbell, neutral grip)',
+			'library.chest.exercises.flyDumbbellOneArmBench' => 'Fly (dumbbell, one arm, bench)',
+			'library.chest.exercises.chestFlyDumbbellOneArmExerciseBall' => 'Chest fly (dumbbell, one arm, exercise ball)',
+			'library.chest.exercises.chestPressDumbbellOneArmDecline' => 'Chest press (dumbbell, one arm, decline)',
+			'library.chest.exercises.chestPressDumbbellOneArmIncline' => 'Chest press (dumbbell, one arm, incline)',
+			'library.chest.exercises.pressDumbbellOneArmExerciseBall' => 'Press (dumbbell, one arm, exercise ball)',
+			'library.chest.exercises.pulloverDumbbellOneArmExerciseBall' => 'Pullover (dumbbell, one arm, exercise ball)',
+			'library.chest.exercises.pressDumbbellOneArmReverseGrip' => 'Press (dumbbell, one arm, reverse grip)',
+			'library.chest.exercises.flyDumbbellOneLegExerciseBall' => 'Fly (dumbbell, one leg, exercise ball)',
+			'library.chest.exercises.pressDumbbellExerciseBall' => 'Press (dumbbell, exercise ball)',
+			'library.chest.exercises.benchPressDumbbellReverse' => 'Bench press (dumbbell, reverse)',
+			'library.chest.exercises.benchPressDumbbellTwisting' => 'Bench press (dumbbell, twisting)',
+			'library.chest.exercises.dynamicPectoralStretch' => 'Dynamic pectoral stretch',
+			'library.chest.exercises.supineElbowPressUp' => 'Supine elbow press-up',
+			'library.chest.exercises.pikePushUpExerciseBall' => 'Pike push up (exercise ball)',
+			'library.chest.exercises.flyFloorBarbell' => 'Fly (floor, barbell)',
+			'library.chest.exercises.flyHyghtDumbbell' => 'Fly (hyght, dumbbell)',
+			'library.chest.exercises.pushUpInclineDepthJump' => 'Push-up (incline, depth jump)',
+			'library.chest.exercises.pushUpInclineReverseGrip' => 'Push-up (incline, reverse grip)',
+			'library.chest.exercises.pushUpInclineScapula' => 'Push-up (incline, scapula)',
+			'library.chest.exercises.isometricPalmToPalmChestSqueeze' => 'Isometric palm-to-palm chest squeeze',
+			'library.chest.exercises.isometricPushUpWithSideShifts' => 'Isometric push-up with side shifts',
+			'library.chest.exercises.pressKettlebellAlternateFloor' => 'Press (kettlebell, alternate, floor)',
+			'library.chest.exercises.pressKettlebellExtendedRangeOneArmFloor' => 'Press (kettlebell, extended range, one arm, floor)',
+			'library.chest.exercises.floorPressKettlebellOneArm' => 'Floor press (kettlebell, one arm)',
+			'library.chest.exercises.pushUpKettlebellPlyo' => 'Push-up (kettlebell, plyo)',
+			'library.chest.exercises.pushUpKneeling' => 'Push-up (kneeling)',
+			'library.chest.exercises.rearBarDips' => 'Rear-bar dips',
+			'library.chest.exercises.chestPressLeverDecline' => 'Chest press (lever, decline)',
+			'library.chest.exercises.chestPressLeverStanding' => 'Chest press (lever, standing)',
+			'library.chest.exercises.machineChestSqueezePress' => 'Machine chest squeeze press',
+			'library.chest.exercises.medicineBallChestPass' => 'Medicine-ball chest pass',
+			'library.chest.exercises.medicineBallChestThrowFromThreePointStart' => 'Medicine-ball chest throw from three-point start',
+			'library.chest.exercises.repeatedMedicineBallChestPasses' => 'Repeated medicine-ball chest passes',
+			'library.chest.exercises.singleMedicineBallChestThrow' => 'Single medicine-ball chest throw',
+			'library.chest.exercises.medicineBallChestThrowWithRunOut' => 'Medicine-ball chest throw with run-out',
+			'library.chest.exercises.pushUpModifiedHindu' => 'Push-up (modified hindu)',
+			'library.chest.exercises.kneelingPushUpToForearms' => 'Kneeling push-up to forearms',
+			'library.chest.exercises.pushUpNarrowExerciseBall' => 'Push-up (narrow, exercise ball)',
+			'library.chest.exercises.pushUpOutsideLegKick' => 'Push-up (outside leg kick)',
+			'library.chest.exercises.pushUpPlyo' => 'Push-up (plyo)',
+			'library.chest.exercises.bodyweightPushAndPull' => 'Bodyweight push-and-pull',
+			'library.chest.exercises.pushUpBosuBall' => 'Push-up (bosu ball)',
+			'library.chest.exercises.pushUpStabilityBall' => 'Push-up (stability ball)',
+			'library.chest.exercises.pushUpWall' => 'Push-up (wall)',
+			'library.chest.exercises.pushUpInsideLegKick' => 'Push-up (inside leg kick)',
+			'library.chest.exercises.pushUpMedicineBall' => 'Push-up (medicine ball)',
+			'library.chest.exercises.pushUpLowerArms' => 'Push-up (lower arms)',
+			'library.chest.exercises.pushUpPlus' => 'Push-up (plus)',
+			'library.chest.exercises.pushUpIntoSidePlank' => 'Push-up into side plank',
+			'library.chest.exercises.chestPressResistanceBandSeated' => 'Chest press (resistance band, seated)',
+			'library.chest.exercises.seatedRollerReachForward' => 'Seated roller reach-forward',
+			'library.chest.exercises.seatedStraightArmRollerRaise' => 'Seated straight-arm roller raise',
+			'library.chest.exercises.pushUpScapula' => 'Push-up (scapula)',
+			'library.chest.exercises.pushUpWithShoulderTaps' => 'Push-up with shoulder taps',
+			'library.chest.exercises.pushUpSide' => 'Push-up (side)',
+			'library.chest.exercises.pushUpOneArm' => 'Push-up (one arm)',
+			'library.chest.exercises.pressSmithDeclineReverseGrip' => 'Press (smith, decline, reverse grip)',
+			'library.chest.exercises.pressSmithInclineReverseGrip' => 'Press (smith, incline, reverse grip)',
+			'library.chest.exercises.inclineSmithMachineHighPull' => 'Incline Smith-machine high pull',
+			'library.chest.exercises.benchPressSmithMachineReverseDeclineCloseGrip' => 'Bench press (smith machine, reverse, decline, close grip)',
+			'library.chest.exercises.pressSmithReverseGrip' => 'Press (smith, reverse grip)',
+			'library.chest.exercises.benchPressSmithWideGrip' => 'Bench press (smith, wide grip)',
+			'library.chest.exercises.benchPressSmithWideGripDecline' => 'Bench press (smith, wide grip, decline)',
+			'library.chest.exercises.pushUpSpiderCrawl' => 'Push-up (spider crawl)',
+			'library.chest.exercises.pushUpSuperman' => 'Push-up (superman)',
+			'library.chest.exercises.pushUpSuspended' => 'Push-up (suspended)',
+			'library.chest.exercises.pushUpWeightedDrop' => 'Push-up (weighted, drop)',
+			'library.chest.exercises.dipWeightedStraightBar' => 'Dip (weighted, straight bar)',
+			'library.chest.exercises.svendPressWeighted' => 'Svend press (weighted)',
+			'library.chest.exercises.pushUpWideHand' => 'Push-up (wide, hand)',
+			'library.chest.exercises.chestDipWideGripHighParallelBars' => 'Chest dip (wide grip, high, parallel bars)',
 			'library.biceps.name' => 'Biceps',
-			_ => null,
-		} ?? switch (path) {
 			'library.biceps.exercises.behindBodyCableCurl' => 'Behind-the-body cable curl',
 			'library.biceps.exercises.ropeHammerCurl' => 'Cable rope hammer curl',
 			'library.biceps.exercises.inclineDumbbellCurl' => 'Incline dumbbell curl',
@@ -10545,6 +13801,124 @@ extension on Translations {
 			'library.biceps.exercises.concentrationCurl' => 'Concentration curls',
 			'library.biceps.exercises.scottCurl' => 'Preacher curl',
 			'library.biceps.exercises.dualCableHighCurl' => 'Dual-cable high curls',
+			'library.biceps.exercises.bicepsCurlBandAlternate' => 'Biceps curl (band, alternate)',
+			'library.biceps.exercises.concentrationCurlBand' => 'Concentration curl (band)',
+			'library.biceps.exercises.bicepsCurlBandOneArmOverhead' => 'Biceps curl (band, one arm, overhead)',
+			'library.biceps.exercises.bicepsCurlBarbellAlternate' => 'Biceps curl (barbell, alternate)',
+			'library.biceps.exercises.bicepsCurlBarbellArmBlaster' => 'Biceps curl (barbell, arm blaster)',
+			'library.biceps.exercises.dragCurlBarbell' => 'Drag curl (barbell)',
+			'library.biceps.exercises.preacherCurlBarbellLying' => 'Preacher curl (barbell, lying)',
+			'library.biceps.exercises.preacherCurlBarbell' => 'Preacher curl (barbell)',
+			'library.biceps.exercises.reversePreacherCurlBarbell' => 'Reverse preacher curl (barbell)',
+			'library.biceps.exercises.concentrationCurlBarbellSeatedCloseGrip' => 'Concentration curl (barbell, seated, close grip)',
+			'library.biceps.exercises.curlBarbellStandingCloseGrip' => 'Curl (barbell, standing, close grip)',
+			'library.biceps.exercises.concentrationCurlBarbellStanding' => 'Concentration curl (barbell, standing)',
+			'library.biceps.exercises.bicepsCurlBarbellStandingWideGrip' => 'Biceps curl (barbell, standing, wide grip)',
+			'library.biceps.exercises.legResistedConcentrationCurl' => 'Leg-resisted concentration curl',
+			'library.biceps.exercises.chinUpCloseGrip' => 'Chin-up (close grip)',
+			'library.biceps.exercises.bicepsCurlBodyweightSideLying' => 'Biceps curl (bodyweight, side lying)',
+			'library.biceps.exercises.curlCableCloseGrip' => 'Curl (cable, close grip)',
+			'library.biceps.exercises.concentrationCurlCable' => 'Concentration curl (cable)',
+			'library.biceps.exercises.dragCurlCable' => 'Drag curl (cable)',
+			'library.biceps.exercises.bicepsCurlCableLying' => 'Biceps curl (cable, lying)',
+			'library.biceps.exercises.curlCableLyingCloseGrip' => 'Curl (cable, lying, close grip)',
+			'library.biceps.exercises.curlCableOneArm' => 'Curl (cable, one arm)',
+			'library.biceps.exercises.preacherCurlCableOneArm' => 'Preacher curl (cable, one arm)',
+			'library.biceps.exercises.reversePreacherCurlCableOneArm' => 'Reverse preacher curl (cable, one arm)',
+			'library.biceps.exercises.curlCableOverheadExerciseBall' => 'Curl (cable, overhead, exercise ball)',
+			'library.biceps.exercises.preacherCurlCable' => 'Preacher curl (cable)',
+			'library.biceps.exercises.bicepsCurlCablePulldown' => 'Biceps curl (cable, pulldown)',
+			'library.biceps.exercises.reverseCurlCable' => 'Reverse curl (cable)',
+			'library.biceps.exercises.reversePreacherCurlCable' => 'Reverse preacher curl (cable)',
+			'library.biceps.exercises.hammerPreacherCurlCableRope' => 'Hammer preacher curl (cable, rope)',
+			'library.biceps.exercises.hammerPreacherCurlCableRopeOneArm' => 'Hammer preacher curl (cable, rope, one arm)',
+			'library.biceps.exercises.curlCableSeated' => 'Curl (cable, seated)',
+			'library.biceps.exercises.concentrationCurlCableSeatedOneArm' => 'Concentration curl (cable, seated, one arm)',
+			'library.biceps.exercises.curlCableSeatedOverhead' => 'Curl (cable, seated, overhead)',
+			'library.biceps.exercises.curlCableSquatting' => 'Curl (cable, squatting)',
+			'library.biceps.exercises.curlCableStandingInner' => 'Curl (cable, standing, inner)',
+			'library.biceps.exercises.bicepsCurlCableRopeStanding' => 'Biceps curl (cable, rope, standing)',
+			'library.biceps.exercises.curlCableTwoArmInclineBench' => 'Curl (cable, two arm, incline bench)',
+			'library.biceps.exercises.bicepsCurlDumbbellAlternate' => 'Biceps curl (dumbbell, alternate)',
+			'library.biceps.exercises.bicepsCurlDumbbellAlternateArmBlaster' => 'Biceps curl (dumbbell, alternate, arm blaster)',
+			'library.biceps.exercises.hammerPreacherCurlDumbbellAlternate' => 'Hammer preacher curl (dumbbell, alternate)',
+			'library.biceps.exercises.preacherCurlDumbbellAlternate' => 'Preacher curl (dumbbell, alternate)',
+			'library.biceps.exercises.hammerCurlDumbbellAlternateSeated' => 'Hammer curl (dumbbell, alternate, seated)',
+			'library.biceps.exercises.bicepsCurlDumbbellAlternateLegRaisedExerciseBall' => 'Biceps curl (dumbbell, alternate, leg raised, exercise ball)',
+			'library.biceps.exercises.bicepsCurlDumbbellAlternateSeatedExerciseBall' => 'Biceps curl (dumbbell, alternate, seated, exercise ball)',
+			'library.biceps.exercises.dumbbellCurlWithBowlingLunge' => 'Dumbbell curl with bowling lunge',
+			'library.biceps.exercises.bicepsCurlDumbbellExerciseBallLegRaised' => 'Biceps curl (dumbbell, exercise ball, leg raised)',
+			'library.biceps.exercises.bicepsCurlDumbbellStorkStance' => 'Biceps curl (dumbbell, stork stance)',
+			'library.biceps.exercises.bicepsCurlDumbbellArmBlaster' => 'Biceps curl (dumbbell, arm blaster)',
+			'library.biceps.exercises.bicepsCurlSquatDumbbell' => 'Biceps curl squat (dumbbell)',
+			'library.biceps.exercises.bicepsCurlDumbbellVSitBosuBall' => 'Biceps curl (dumbbell, v sit, bosu ball)',
+			'library.biceps.exercises.hammerCurlDumbbellCrossBody' => 'Hammer curl (dumbbell, cross body)',
+			'library.biceps.exercises.hammerCurlDumbbellExerciseBall' => 'Hammer curl (dumbbell, exercise ball)',
+			'library.biceps.exercises.hammerCurlDumbbellArmBlaster' => 'Hammer curl (dumbbell, arm blaster)',
+			'library.biceps.exercises.highCurlDumbbell' => 'High curl (dumbbell)',
+			'library.biceps.exercises.preacherCurlDumbbellIncline' => 'Preacher curl (dumbbell, incline)',
+			'library.biceps.exercises.hammerCurlDumbbellIncline' => 'Hammer curl (dumbbell, incline)',
+			'library.biceps.exercises.innerBicepsCurlDumbbellIncline' => 'Inner biceps curl (dumbbell, incline)',
+			'library.biceps.exercises.bicepsCurlDumbbellKneelingExerciseBall' => 'Biceps curl (dumbbell, kneeling, exercise ball)',
+			'library.biceps.exercises.lungeBicepsCurlDumbbell' => 'Lunge biceps curl (dumbbell)',
+			'library.biceps.exercises.bicepsCurlDumbbellLyingSupine' => 'Biceps curl (dumbbell, lying, supine)',
+			'library.biceps.exercises.bicepsCurlDumbbellLying' => 'Biceps curl (dumbbell, lying)',
+			'library.biceps.exercises.curlDumbbellLyingWide' => 'Curl (dumbbell, lying, wide)',
+			'library.biceps.exercises.concentrationCurlDumbbellOneArmStabilityBall' => 'Concentration curl (dumbbell, one arm, stability ball)',
+			'library.biceps.exercises.hammerPreacherCurlDumbbellOneArm' => 'Hammer preacher curl (dumbbell, one arm)',
+			'library.biceps.exercises.curlDumbbellOneArmProne' => 'Curl (dumbbell, one arm, prone)',
+			'library.biceps.exercises.hammerCurlDumbbellOneArmProne' => 'Hammer curl (dumbbell, one arm, prone)',
+			'library.biceps.exercises.reversePreacherCurlDumbbellOneArm' => 'Reverse preacher curl (dumbbell, one arm)',
+			'library.biceps.exercises.reverseSpiderCurlDumbbellOneArm' => 'Reverse spider curl (dumbbell, one arm)',
+			'library.biceps.exercises.bicepsCurlDumbbellOneArmSeatedExerciseBall' => 'Biceps curl (dumbbell, one arm, seated, exercise ball)',
+			'library.biceps.exercises.hammerCurlDumbbellOneArmSeated' => 'Hammer curl (dumbbell, one arm, seated)',
+			'library.biceps.exercises.curlDumbbellOneArmStanding' => 'Curl (dumbbell, one arm, standing)',
+			'library.biceps.exercises.hammerCurlDumbbellOneArmStanding' => 'Hammer curl (dumbbell, one arm, standing)',
+			'library.biceps.exercises.zottmanPreacherCurlDumbbellOneArm' => 'Zottman preacher curl (dumbbell, one arm)',
+			'library.biceps.exercises.hammerPreacherCurlDumbbell' => 'Hammer preacher curl (dumbbell)',
+			'library.biceps.exercises.preacherCurlDumbbellExerciseBall' => 'Preacher curl (dumbbell, exercise ball)',
+			'library.biceps.exercises.curlDumbbellProneIncline' => 'Curl (dumbbell, prone, incline)',
+			'library.biceps.exercises.hammerCurlDumbbellProneIncline' => 'Hammer curl (dumbbell, prone, incline)',
+			'library.biceps.exercises.reversePreacherCurlDumbbell' => 'Reverse preacher curl (dumbbell)',
+			'library.biceps.exercises.reverseSpiderCurlDumbbell' => 'Reverse spider curl (dumbbell)',
+			'library.biceps.exercises.hammerCurlDumbbellSeatedAlternateExerciseBall' => 'Hammer curl (dumbbell, seated, alternate, exercise ball)',
+			'library.biceps.exercises.bicepsCurlDumbbellSeated' => 'Biceps curl (dumbbell, seated)',
+			'library.biceps.exercises.bicepsCurlDumbbellSeatedExerciseBall' => 'Biceps curl (dumbbell, seated, exercise ball)',
+			'library.biceps.exercises.hammerCurlDumbbellSeated' => 'Hammer curl (dumbbell, seated)',
+			'library.biceps.exercises.innerBicepsCurlDumbbellSeated' => 'Inner biceps curl (dumbbell, seated)',
+			'library.biceps.exercises.bicepsCurlDumbbellSeatedOneArmExerciseBallLegRaised' => 'Biceps curl (dumbbell, seated, one arm, exercise ball, leg raised)',
+			'library.biceps.exercises.preacherCurlDumbbellSeated' => 'Preacher curl (dumbbell, seated)',
+			'library.biceps.exercises.concentrationCurlDumbbellSeatedReverse' => 'Concentration curl (dumbbell, seated, reverse)',
+			'library.biceps.exercises.hammerCurlAndPressDumbbellStandingAlternate' => 'Hammer curl and press (dumbbell, standing, alternate)',
+			'library.biceps.exercises.concentrationCurlDumbbellStanding' => 'Concentration curl (dumbbell, standing)',
+			'library.biceps.exercises.innerBicepsCurlDumbbellStanding' => 'Inner biceps curl (dumbbell, standing)',
+			'library.biceps.exercises.concentrationCurlDumbbellStandingOneArm' => 'Concentration curl (dumbbell, standing, one arm)',
+			'library.biceps.exercises.curlDumbbellStandingOneArmInclineBench' => 'Curl (dumbbell, standing, one arm, incline bench)',
+			'library.biceps.exercises.preacherCurlDumbbellStanding' => 'Preacher curl (dumbbell, standing)',
+			'library.biceps.exercises.zottmanPreacherCurlDumbbellStanding' => 'Zottman preacher curl (dumbbell, standing)',
+			'library.biceps.exercises.stepUpWithBalanceAndDumbbellCurl' => 'Step-up with balance and dumbbell curl',
+			'library.biceps.exercises.bicepsCurlDumbbellWaiter' => 'Biceps curl (dumbbell, waiter)',
+			'library.biceps.exercises.zottmanCurlDumbbell' => 'Zottman curl (dumbbell)',
+			'library.biceps.exercises.zottmanPreacherCurlDumbbell' => 'Zottman preacher curl (dumbbell)',
+			'library.biceps.exercises.concentrationCurlEzBarSeatedCloseGrip' => 'Concentration curl (ez bar, seated, close grip)',
+			'library.biceps.exercises.preacherCurlEzBarbellCloseGrip' => 'Preacher curl (ez barbell, close grip)',
+			'library.biceps.exercises.curlEzBarbellCloseGrip' => 'Curl (ez barbell, close grip)',
+			'library.biceps.exercises.curlEzBarbell' => 'Curl (ez barbell)',
+			'library.biceps.exercises.reverseCurlEzBarbell' => 'Reverse curl (ez barbell)',
+			'library.biceps.exercises.reversePreacherCurlEzBarbell' => 'Reverse preacher curl (ez barbell)',
+			'library.biceps.exercises.curlEzBarbellSeated' => 'Curl (ez barbell, seated)',
+			'library.biceps.exercises.spiderCurlEzBarbell' => 'Spider curl (ez barbell)',
+			'library.biceps.exercises.bicepsCurlEzBarArmBlaster' => 'Biceps curl (ez bar, arm blaster)',
+			'library.biceps.exercises.bicepsCurlEzBarbellStandingWideGrip' => 'Biceps curl (ez barbell, standing, wide grip)',
+			'library.biceps.exercises.cleanKettlebellBottomsUpFromHangPosition' => 'Clean (kettlebell, bottoms up, from hang position)',
+			'library.biceps.exercises.hangCleanKettlebellDoubleAlternate' => 'Hang clean (kettlebell, double, alternate)',
+			'library.biceps.exercises.preacherCurlLeverHammerGrip' => 'Preacher curl (lever, hammer grip)',
+			'library.biceps.exercises.preacherCurlLever' => 'Preacher curl (lever)',
+			'library.biceps.exercises.reversePreacherCurlLever' => 'Reverse preacher curl (lever)',
+			'library.biceps.exercises.hammerCurlOlympicBarbell' => 'Hammer curl (olympic barbell)',
+			'library.biceps.exercises.bicepsCurlResistanceBandSeated' => 'Biceps curl (resistance band, seated)',
+			'library.biceps.exercises.bicepsCurlSmithMachine' => 'Biceps curl (smith machine)',
+			'library.biceps.exercises.bicepsCurlWeightedSeatedStabilityBall' => 'Biceps curl (weighted, seated, stability ball)',
 			'library.abs.name' => 'Abs',
 			'library.abs.exercises.abWheelRollout' => 'Ab wheel rollout',
 			'library.abs.exercises.hangingKneeRaise' => 'Hanging knee raise',
@@ -10573,11 +13947,187 @@ extension on Translations {
 			'library.abs.exercises.obliqueCrunches' => 'Oblique crunches',
 			'library.abs.exercises.legRaiseParallelBars' => 'Leg raise (parallel bars)',
 			'library.abs.exercises.lateralHyperextensions' => 'Lateral hyperextensions',
+			'library.abs.exercises.sitUp34' => 'Sit-up (3/4)',
+			'library.abs.exercises.sideBendOnA45Bench' => 'Side bend on a 45° bench',
+			'library.abs.exercises.legRaiseHangingStraps' => 'Leg raise (hanging, straps)',
+			'library.abs.exercises.sitUpArmsOverheadFull' => 'Sit-up (arms overhead, full)',
+			'library.abs.exercises.kneeRaiseAssistedHanging' => 'Knee raise (assisted, hanging)',
+			'library.abs.exercises.kneeRaiseAssistedHangingThrowDown' => 'Knee raise (assisted, hanging, throw down)',
+			'library.abs.exercises.legRaiseAssistedLyingLateralThrowDown' => 'Leg raise (assisted, lying, lateral, throw down)',
+			'library.abs.exercises.legRaiseAssistedLyingThrowDown' => 'Leg raise (assisted, lying, throw down)',
+			'library.abs.exercises.russianTwistAssistedMotion' => 'Russian twist (assisted, motion)',
+			'library.abs.exercises.sitUpAssisted' => 'Sit-up (assisted)',
+			'library.abs.exercises.vUpBandAlternate' => 'V-up (band, alternate)',
+			'library.abs.exercises.rolloutBandAssistedWheel' => 'Rollout (band, assisted, wheel)',
+			'library.abs.exercises.bicycleCrunchBand' => 'Bicycle crunch (band)',
+			'library.abs.exercises.pallofPressBandHorizontal' => 'Pallof press (band, horizontal)',
+			'library.abs.exercises.jackknifeSitUpBand' => 'Jackknife sit-up (band)',
+			'library.abs.exercises.crunchBandKneelingTwisting' => 'Crunch (band, kneeling, twisting)',
+			'library.abs.exercises.legRaiseBandLyingStraightLeg' => 'Leg raise (band, lying, straight leg)',
+			'library.abs.exercises.sitUpBandPush' => 'Sit-up (band, push)',
+			'library.abs.exercises.twistBandSeated' => 'Twist (band, seated)',
+			'library.abs.exercises.crunchBandStanding' => 'Crunch (band, standing)',
+			'library.abs.exercises.crunchBandStandingTwisting' => 'Crunch (band, standing, twisting)',
+			'library.abs.exercises.vUpBand' => 'V-up (band)',
+			'library.abs.exercises.pallofPressBandVertical' => 'Pallof press (band, vertical)',
+			'library.abs.exercises.sitUpBarbellPress' => 'Sit-up (barbell, press)',
+			'library.abs.exercises.rolloutBarbell' => 'Rollout (barbell)',
+			'library.abs.exercises.rolloutBarbellFromBench' => 'Rollout (barbell, from bench)',
+			'library.abs.exercises.twistBarbellSeated' => 'Twist (barbell, seated)',
+			'library.abs.exercises.sideBendBarbell' => 'Side bend (barbell)',
+			'library.abs.exercises.legRaiseBarbellSeatedAlternate' => 'Leg raise (barbell, seated, alternate)',
+			'library.abs.exercises.abRolloutBarbellStanding' => 'Ab rollout (barbell, standing)',
+			'library.abs.exercises.twistBarbellStanding' => 'Twist (barbell, standing)',
+			'library.abs.exercises.sidePlankBodyweightIncline' => 'Side plank (bodyweight, incline)',
+			'library.abs.exercises.reverseCrunchWithVerticalHipLift' => 'Reverse crunch with vertical hip lift',
+			'library.abs.exercises.crossBodyMountainClimber' => 'Cross-body mountain climber',
+			'library.abs.exercises.plankHipLifts' => 'Plank hip lifts',
+			'library.abs.exercises.cableRotationalShoulderThrow' => 'Cable rotational shoulder throw',
+			'library.abs.exercises.reverseCrunchCable' => 'Reverse crunch (cable)',
+			'library.abs.exercises.russianTwistCableStabilityBall' => 'Russian twist (cable, stability ball)',
+			'library.abs.exercises.crunchCableSeated' => 'Crunch (cable, seated)',
+			'library.abs.exercises.twistCableSeated' => 'Twist (cable, seated)',
+			'library.abs.exercises.sideBendCable' => 'Side bend (cable)',
+			'library.abs.exercises.sideBendCableCrunchBosuBall' => 'Side bend (cable, crunch, bosu ball)',
+			'library.abs.exercises.sideCrunchCable' => 'Side crunch (cable)',
+			'library.abs.exercises.crunchCableStanding' => 'Crunch (cable, standing)',
+			'library.abs.exercises.crunchCableStandingRope' => 'Crunch (cable, standing, rope)',
+			'library.abs.exercises.lowToHighCableWoodchop' => 'Low-to-high cable woodchop',
+			'library.abs.exercises.reverseCrunchCableTuck' => 'Reverse crunch (cable, tuck)',
+			'library.abs.exercises.twistCable' => 'Twist (cable)',
+			'library.abs.exercises.crabPositionToeTouches' => 'Crab-position toe touches',
+			'library.abs.exercises.crunchCrossBody' => 'Crunch (cross body)',
+			'library.abs.exercises.crunchHandsOverhead' => 'Crunch (hands overhead)',
+			'library.abs.exercises.crunchStabilityBall' => 'Crunch (stability ball)',
+			'library.abs.exercises.crunchStabilityBallStraightArm' => 'Crunch (stability ball, straight arm)',
+			'library.abs.exercises.crunchDecline' => 'Crunch (decline)',
+			'library.abs.exercises.sitUpDecline' => 'Sit-up (decline)',
+			'library.abs.exercises.sideBendDumbbell' => 'Side bend (dumbbell)',
+			'library.abs.exercises.alternatingElbowToKneeCrunch' => 'Alternating elbow-to-knee crunch',
+			'library.abs.exercises.humanFlagHold' => 'Human flag hold',
+			'library.abs.exercises.sitUpFlexionLegBentKnee' => 'Sit-up (flexion leg, bent knee)',
+			'library.abs.exercises.sitUpFlexionLegStraightArm' => 'Sit-up (flexion leg, straight arm)',
+			'library.abs.exercises.crunchFrog' => 'Crunch (frog)',
+			'library.abs.exercises.plankTrunkRotations' => 'Plank trunk rotations',
+			'library.abs.exercises.chinUpWithKneeTuck' => 'Chin-up with knee tuck',
+			'library.abs.exercises.sitUpHalf' => 'Sit-up (half)',
+			'library.abs.exercises.legHipRaiseHanging' => 'Leg hip raise (hanging)',
+			'library.abs.exercises.legRaiseHanging' => 'Leg raise (hanging)',
+			'library.abs.exercises.kneeRaiseHangingOblique' => 'Knee raise (hanging, oblique)',
+			'library.abs.exercises.hangingPikeRaise' => 'Hanging pike raise',
+			'library.abs.exercises.legHipRaiseHangingStraightLegTwisting' => 'Leg hip raise (hanging, straight leg, twisting)',
+			'library.abs.exercises.inchworm' => 'Inchworm',
+			'library.abs.exercises.legHipRaiseInclineStraightLeg' => 'Leg hip raise (incline, straight leg)',
+			'library.abs.exercises.sitUpInclineTwisting' => 'Sit-up (incline, twisting)',
+			'library.abs.exercises.jackknifeSitUp' => 'Jackknife sit-up',
+			'library.abs.exercises.sitUpJanda' => 'Sit-up (janda)',
+			'library.abs.exercises.windmillKettlebellAdvanced' => 'Windmill (kettlebell, advanced)',
+			'library.abs.exercises.pressKettlebellBent' => 'Press (kettlebell, bent)',
+			'library.abs.exercises.windmillKettlebellDouble' => 'Windmill (kettlebell, double)',
+			'library.abs.exercises.kettlebellFigureEightPass' => 'Kettlebell figure-eight pass',
+			'library.abs.exercises.windmillKettlebell' => 'Windmill (kettlebell)',
+			'library.abs.exercises.seatedKneeTucksOnBench' => 'Seated knee tucks on bench',
+			'library.abs.exercises.crunchKneeTouch' => 'Crunch (knee touch)',
+			'library.abs.exercises.kneelingPlankShoulderTaps' => 'Kneeling plank shoulder taps',
+			'library.abs.exercises.lSitFloor' => 'L-sit (floor)',
+			'library.abs.exercises.landmineTrunkRotations' => 'Landmine trunk rotations',
+			'library.abs.exercises.benchKneeTucks' => 'Bench knee tucks',
+			'library.abs.exercises.twistLeverKneeling' => 'Twist (lever, kneeling)',
+			'library.abs.exercises.crunchLeverSeatedChestPad' => 'Crunch (lever, seated, chest pad)',
+			'library.abs.exercises.legRaiseLeverSeatedCrunch' => 'Leg raise (lever, seated, crunch)',
+			'library.abs.exercises.lungeTwist' => 'Lunge (twist)',
+			'library.abs.exercises.legHipRaiseLying' => 'Leg hip raise (lying)',
+			'library.abs.exercises.crunchNegative' => 'Crunch (negative)',
+			'library.abs.exercises.singleArmMedicineBallSlam' => 'Single-arm medicine-ball slam',
+			'library.abs.exercises.supinePelvicTilts' => 'Supine pelvic tilts',
+			'library.abs.exercises.reverseStepWithOverheadReach' => 'Reverse step with overhead reach',
+			'library.abs.exercises.squatPotty' => 'Squat (potty)',
+			'library.abs.exercises.plankWithOppositeArmAndLegReach' => 'Plank with opposite arm and leg reach',
+			'library.abs.exercises.sitUpPrisonerHalf' => 'Sit-up (prisoner, half)',
+			'library.abs.exercises.twistProneStabilityBall' => 'Twist (prone, stability ball)',
+			'library.abs.exercises.stabilityBallKneeTuck' => 'Stability-ball knee tuck',
+			'library.abs.exercises.sitUpQuarter' => 'Sit-up (quarter)',
+			'library.abs.exercises.reversePlankWithAlternatingLegRaises' => 'Reverse plank with alternating leg raises',
+			'library.abs.exercises.bodySawRoller' => 'Body saw (roller)',
+			'library.abs.exercises.reverseCrunchRoller' => 'Reverse crunch (roller)',
+			'library.abs.exercises.russianTwistBodyweight' => 'Russian twist',
+			'library.abs.exercises.legRaiseSeated' => 'Leg raise (seated)',
+			'library.abs.exercises.sideCrunchSeatedWall' => 'Side crunch (seated, wall)',
+			'library.abs.exercises.shoulderTap' => 'Shoulder tap',
+			'library.abs.exercises.sideBridgeHipLifts' => 'Side-bridge hip lifts',
+			'library.abs.exercises.lateralLegRaisesOnParallelBars' => 'Lateral leg raises on parallel bars',
+			'library.abs.exercises.alternatingCrossBodyToeTouches' => 'Alternating cross-body toe touches',
+			'library.abs.exercises.sitUp' => 'Sit-up',
+			'library.abs.exercises.sitUpArmsChest' => 'Sit-up (arms chest)',
+			'library.abs.exercises.sledgehammerTireStrikes' => 'Sledgehammer tire strikes',
+			'library.abs.exercises.diagonalDumbbellTrunkRotations' => 'Diagonal dumbbell trunk rotations',
+			'library.abs.exercises.twistSpine' => 'Twist (spine)',
+			'library.abs.exercises.crunchStabilityBallHandsBehindHeadFull' => 'Crunch (stability ball, hands behind head, full)',
+			'library.abs.exercises.rolloutStandingWheel' => 'Rollout (standing, wheel)',
+			'library.abs.exercises.suspensionStrapAbdominalRollout' => 'Suspension-strap abdominal rollout',
+			'library.abs.exercises.reverseCrunchSuspended' => 'Reverse crunch (suspended)',
+			'library.abs.exercises.legRaiseTwisted' => 'Leg raise (twisted)',
+			'library.abs.exercises.vSitFloor' => 'V-sit (floor)',
+			'library.abs.exercises.crunchWeighted' => 'Crunch (weighted)',
+			'library.abs.exercises.sitUpWeightedDecline' => 'Sit-up (weighted, decline)',
+			'library.abs.exercises.plankWeightedFront' => 'Plank (weighted, front)',
+			'library.abs.exercises.legHipRaiseWeightedHanging' => 'Leg hip raise (weighted, hanging)',
+			'library.abs.exercises.crunchWeightedOverheadStabilityBall' => 'Crunch (weighted, overhead, stability ball)',
+			'library.abs.exercises.russianTwistWeightedLegsUp' => 'Russian twist (weighted, legs up)',
+			'library.abs.exercises.twistWeightedSeatedStabilityBall' => 'Twist (weighted, seated, stability ball)',
+			'library.abs.exercises.sideBendWeightedStabilityBall' => 'Side bend (weighted, stability ball)',
 			'library.calves.name' => 'Calves',
 			'library.calves.exercises.smithMachineCalfRaise' => 'Smith machine calf raise',
 			'library.calves.exercises.calfRaiseStanding' => 'Calf raise (standing)',
 			'library.calves.exercises.calfRaiseSeated' => 'Calf raise (seated)',
 			'library.calves.exercises.calfPressLegPressMachine' => 'Calf press on leg press machine',
+			'library.calves.exercises.ankleRotations' => 'Ankle rotations',
+			'library.calves.exercises.calvesStretchAssistedLying' => 'Calves stretch (assisted, lying)',
+			'library.calves.exercises.calfRaiseBandOneLeg' => 'Calf raise (band, one leg)',
+			'library.calves.exercises.reverseCalfRaiseBandOneLeg' => 'Reverse calf raise (band, one leg)',
+			'library.calves.exercises.calfRaiseBandStanding' => 'Calf raise (band, standing)',
+			'library.calves.exercises.calfRaiseBarbellFloor' => 'Calf raise (barbell, floor)',
+			'library.calves.exercises.calfRaiseBarbellSeated' => 'Calf raise (barbell, seated)',
+			'library.calves.exercises.calfRaiseBarbellStanding' => 'Calf raise (barbell, standing)',
+			'library.calves.exercises.calfRaiseBarbellStandingRockingLeg' => 'Calf raise (barbell, standing, rocking leg)',
+			'library.calves.exercises.standingBodyweightCalfRaise' => 'Standing bodyweight calf raise',
+			'library.calves.exercises.boxDropWithSingleLegLanding' => 'Box drop with single-leg landing',
+			'library.calves.exercises.calfRaiseCableStanding' => 'Calf raise (cable, standing)',
+			'library.calves.exercises.calfRaiseCableStandingOneLeg' => 'Calf raise (cable, standing, one leg)',
+			'library.calves.exercises.wallCalfStretch' => 'Wall calf stretch',
+			'library.calves.exercises.calfStretchRope' => 'Calf stretch (rope)',
+			'library.calves.exercises.kneeCircles' => 'Knee circles',
+			'library.calves.exercises.calfRaiseDonkey' => 'Calf raise (donkey)',
+			'library.calves.exercises.calfRaiseDumbbellSeated' => 'Calf raise (dumbbell, seated)',
+			'library.calves.exercises.calfRaiseDumbbellSeatedOneLeg' => 'Calf raise (dumbbell, seated, one leg)',
+			'library.calves.exercises.calfRaiseDumbbellSeatedOneLegHammerGrip' => 'Calf raise (dumbbell, seated, one leg, hammer grip)',
+			'library.calves.exercises.calfRaiseDumbbellSeatedOneLegPalmUp' => 'Calf raise (dumbbell, seated, one leg, palm up)',
+			'library.calves.exercises.calfRaiseDumbbellOneLeg' => 'Calf raise (dumbbell, one leg)',
+			'library.calves.exercises.calfRaiseDumbbellStanding' => 'Calf raise (dumbbell, standing)',
+			'library.calves.exercises.calfRaiseExerciseBallWall' => 'Calf raise (exercise ball, wall)',
+			'library.calves.exercises.wallBallCalfRaiseBallBetweenAnkles' => 'Wall-ball calf raise, ball between ankles',
+			'library.calves.exercises.wallBallCalfRaiseBallBetweenKnees' => 'Wall-ball calf raise, ball between knees',
+			'library.calves.exercises.calfRaiseHack' => 'Calf raise (hack)',
+			'library.calves.exercises.calfRaiseHackOneLeg' => 'Calf raise (hack, one leg)',
+			'library.calves.exercises.calfPressLever' => 'Calf press (lever)',
+			'library.calves.exercises.calfRaiseLeverDonkey' => 'Calf raise (lever, donkey)',
+			'library.calves.exercises.rotaryCalfMachinePress' => 'Rotary calf machine press',
+			'library.calves.exercises.calfPressLeverSeated' => 'Calf press (lever, seated)',
+			'library.calves.exercises.seatedSquatCalfRaiseOnLegPress' => 'Seated squat calf raise on leg press',
+			'library.calves.exercises.calfRaiseLeverStanding' => 'Calf raise (lever, standing)',
+			'library.calves.exercises.calfRaiseOneLegDonkey' => 'Calf raise (one leg, donkey)',
+			'library.calves.exercises.calfRaiseOneLegFloor' => 'Calf raise (one leg, floor)',
+			'library.calves.exercises.peronealsStretch' => 'Peroneals stretch',
+			'library.calves.exercises.posteriorTibialisStretch' => 'Posterior tibialis stretch',
+			'library.calves.exercises.calfStretchSeated' => 'Calf stretch (seated)',
+			'library.calves.exercises.calfRaiseSledForwardAngled' => 'Calf raise (sled, forward, angled)',
+			'library.calves.exercises.calfPressSledOneLeg' => 'Calf press (sled, one leg)',
+			'library.calves.exercises.calfRaiseSmithOneLegFloor' => 'Calf raise (smith, one leg, floor)',
+			'library.calves.exercises.toeRaiseSmith' => 'Toe raise (smith)',
+			'library.calves.exercises.calfRaiseSmithSeatedOneLeg' => 'Calf raise (smith, seated, one leg)',
+			'library.calves.exercises.calfRaiseStandingStaircase' => 'Calf raise (standing, staircase)',
+			'library.calves.exercises.calfStretchStanding' => 'Calf stretch (standing)',
+			'library.calves.exercises.calfRaiseWeightedDonkey' => 'Calf raise (weighted, donkey)',
 			'library.quadriceps.name' => 'Quadriceps',
 			'library.quadriceps.exercises.reverseDumbbellLunges' => 'Reverse dumbbell lunges',
 			'library.quadriceps.exercises.walkingDumbbellLunges' => 'Walking dumbbell lunges',
@@ -10597,6 +14147,93 @@ extension on Translations {
 			'library.quadriceps.exercises.bulgarianSplitSquats' => 'Bulgarian split squats',
 			'library.quadriceps.exercises.bodyweightSquats' => 'Bodyweight squat',
 			'library.quadriceps.exercises.hackSquats' => 'Hack squats',
+			'library.quadriceps.exercises.quadricepsStretchQuadruped' => 'Quadriceps stretch (quadruped)',
+			'library.quadriceps.exercises.quadricepsStretchAssistedProne' => 'Quadriceps stretch (assisted, prone)',
+			'library.quadriceps.exercises.backwardJump' => 'Backward jump',
+			'library.quadriceps.exercises.balanceBoardStance' => 'Balance-board stance',
+			'library.quadriceps.exercises.splitSquatBandOneArmOneLeg' => 'Split squat (band, one arm, one leg)',
+			_ => null,
+		} ?? switch (path) {
+			'library.quadriceps.exercises.splitSquatBandOneLeg' => 'Split squat (band, one leg)',
+			'library.quadriceps.exercises.squatBand' => 'Squat (band)',
+			'library.quadriceps.exercises.squatRowBand' => 'Squat row (band)',
+			'library.quadriceps.exercises.stepUpBand' => 'Step-up (band)',
+			'library.quadriceps.exercises.frontSquatBarbellBench' => 'Front squat (barbell, bench)',
+			'library.quadriceps.exercises.squatBarbellBench' => 'Squat (barbell, bench)',
+			'library.quadriceps.exercises.cleanAndPressBarbell' => 'Clean and press (barbell)',
+			'library.quadriceps.exercises.zercherSquatBarbellFull' => 'Zercher squat (barbell, full)',
+			'library.quadriceps.exercises.hackSquatBarbell' => 'Hack squat (barbell)',
+			'library.quadriceps.exercises.squatBarbellHighBar' => 'Squat (barbell, high bar)',
+			'library.quadriceps.exercises.jeffersonSquatBarbell' => 'Jefferson squat (barbell)',
+			'library.quadriceps.exercises.jumpSquatBarbell' => 'Jump squat (barbell)',
+			'library.quadriceps.exercises.lateralLungeBarbell' => 'Lateral lunge (barbell)',
+			'library.quadriceps.exercises.squatBarbellLowBar' => 'Squat (barbell, low bar)',
+			'library.quadriceps.exercises.lungeBarbell' => 'Lunge (barbell)',
+			'library.quadriceps.exercises.squatBarbellNarrowStance' => 'Squat (barbell, narrow stance)',
+			'library.quadriceps.exercises.squatBarbellOneLeg' => 'Squat (barbell, one leg)',
+			'library.quadriceps.exercises.squatBarbellOverhead' => 'Squat (barbell, overhead)',
+			'library.quadriceps.exercises.rearLungeBarbell' => 'Rear lunge (barbell)',
+			'library.quadriceps.exercises.splitSquatBarbellSide' => 'Split squat (barbell, side)',
+			'library.quadriceps.exercises.splitSquatBarbellOneLeg' => 'Split squat (barbell, one leg)',
+			'library.quadriceps.exercises.squatBarbellSpeed' => 'Squat (barbell, speed)',
+			'library.quadriceps.exercises.splitSquatBarbell' => 'Split squat (barbell)',
+			'library.quadriceps.exercises.squatBarbellKnee' => 'Squat (barbell, knee)',
+			'library.quadriceps.exercises.barbellSquatJumpIntoReverseLunge' => 'Barbell squat jump into reverse lunge',
+			'library.quadriceps.exercises.stepUpBarbell' => 'Step-up (barbell)',
+			'library.quadriceps.exercises.squatBarbellWide' => 'Squat (barbell, wide)',
+			'library.quadriceps.exercises.zercherSquatBarbell' => 'Zercher squat (barbell)',
+			'library.quadriceps.exercises.jumpSquatBodyweightDrop' => 'Jump squat (bodyweight, drop)',
+			'library.quadriceps.exercises.chairSupportedQuadricepsStretch' => 'Chair-supported quadriceps stretch',
+			'library.quadriceps.exercises.curtsySquat' => 'Curtsy squat',
+			'library.quadriceps.exercises.squatDumbbellBench' => 'Squat (dumbbell, bench)',
+			'library.quadriceps.exercises.lungeDumbbellContralateralForward' => 'Lunge (dumbbell, contralateral forward)',
+			'library.quadriceps.exercises.squatDumbbellPlyo' => 'Squat (dumbbell, plyo)',
+			'library.quadriceps.exercises.squatDumbbellPistol' => 'Squat (dumbbell, pistol)',
+			'library.quadriceps.exercises.squatDumbbell' => 'Squat (dumbbell)',
+			'library.quadriceps.exercises.stepUpLungeDumbbell' => 'Step up lunge (dumbbell)',
+			'library.quadriceps.exercises.stepUpSplitSquatDumbbell' => 'Step up split squat (dumbbell)',
+			'library.quadriceps.exercises.squatDumbbellSupported' => 'Squat (dumbbell, supported)',
+			'library.quadriceps.exercises.farmersWalk' => 'Farmers walk',
+			'library.quadriceps.exercises.forwardJump' => 'Forward jump',
+			'library.quadriceps.exercises.lungeForward' => 'Lunge (forward)',
+			'library.quadriceps.exercises.squatFrankenstein' => 'Squat (frankenstein)',
+			'library.quadriceps.exercises.kneelingHipFlexorAndQuadricepsStretch' => 'Kneeling hip-flexor and quadriceps stretch',
+			'library.quadriceps.exercises.frontSquatKettlebell' => 'Front squat (kettlebell)',
+			'library.quadriceps.exercises.squatKettlebellGoblet' => 'Squat (kettlebell, goblet)',
+			'library.quadriceps.exercises.lungeKettlebellPassThrough' => 'Lunge (kettlebell, pass through)',
+			'library.quadriceps.exercises.squatKettlebellPistol' => 'Squat (kettlebell, pistol)',
+			'library.quadriceps.exercises.kettlebellTurkishGetUpThroughSquat' => 'Kettlebell Turkish get-up through squat',
+			'library.quadriceps.exercises.jumpSquatKneeling' => 'Jump squat (kneeling)',
+			'library.quadriceps.exercises.lungeJump' => 'Lunge (jump)',
+			'library.quadriceps.exercises.quadsStretchLyingSide' => 'Quads stretch (lying, side)',
+			'library.quadriceps.exercises.squatOneLeg' => 'Squat (one leg)',
+			'library.quadriceps.exercises.squatPottySupport' => 'Squat (potty, support)',
+			'library.quadriceps.exercises.rapidAlternatingFootTaps' => 'Rapid alternating foot taps',
+			'library.quadriceps.exercises.legExtensionResistanceBand' => 'Leg extension (resistance band)',
+			'library.quadriceps.exercises.squatPistol' => 'Squat (pistol)',
+			'library.quadriceps.exercises.sissySquat' => 'Sissy squat',
+			'library.quadriceps.exercises.hackSquatSledCloser' => 'Hack squat (sled, closer)',
+			'library.quadriceps.exercises.squatSledLying' => 'Squat (sled, lying)',
+			'library.quadriceps.exercises.squatSmithChair' => 'Squat (smith, chair)',
+			'library.quadriceps.exercises.frontSquatSmithCleanGrip' => 'Front squat (smith, clean grip)',
+			'library.quadriceps.exercises.hackSquatSmith' => 'Hack squat (smith)',
+			'library.quadriceps.exercises.squatSmithLowBar' => 'Squat (smith, low bar)',
+			'library.quadriceps.exercises.splitSquatSmithOneLeg' => 'Split squat (smith, one leg)',
+			'library.quadriceps.exercises.lungeSmithSprint' => 'Lunge (smith, sprint)',
+			'library.quadriceps.exercises.squatSmithSumo' => 'Squat (smith, sumo)',
+			'library.quadriceps.exercises.snatchPull' => 'Snatch pull',
+			'library.quadriceps.exercises.splitSquat' => 'Split squat',
+			'library.quadriceps.exercises.squatJerk' => 'Squat jerk',
+			'library.quadriceps.exercises.squatBosuBall' => 'Squat (bosu ball)',
+			'library.quadriceps.exercises.squatToOverheadReach' => 'Squat (to overhead reach)',
+			'library.quadriceps.exercises.squatToOverheadReachTwist' => 'Squat (to overhead reach twist)',
+			'library.quadriceps.exercises.splitSquatSuspended' => 'Split squat (suspended)',
+			'library.quadriceps.exercises.lungeWalking' => 'Lunge (walking)',
+			'library.quadriceps.exercises.squatWeightedCossack' => 'Squat (weighted, cossack)',
+			'library.quadriceps.exercises.weightedLungeWithArmSwing' => 'Weighted lunge with arm swing',
+			'library.quadriceps.exercises.sissySquatWeighted' => 'Sissy squat (weighted)',
+			'library.quadriceps.exercises.squatWeighted' => 'Squat (weighted)',
+			'library.quadriceps.exercises.lungeWeighted' => 'Lunge (weighted)',
 			'library.hamstrings.name' => 'Hamstrings',
 			'library.hamstrings.exercises.singleLegDumbbellRomanianDeadlift' => 'Single-leg dumbbell Romanian deadlift',
 			'library.hamstrings.exercises.legCurlStanding' => 'Standing machine leg curl',
@@ -10605,6 +14242,32 @@ extension on Translations {
 			'library.hamstrings.exercises.legCurlSeated' => 'Leg curl (seated)',
 			'library.hamstrings.exercises.romanianDeadlift' => 'Romanian deadlift (barbell)',
 			'library.hamstrings.exercises.romanianDeadliftDumbbell' => 'Romanian deadlift (dumbbells)',
+			'library.hamstrings.exercises.hamstringStretchAssistedProne' => 'Hamstring stretch (assisted, prone)',
+			'library.hamstrings.exercises.straightLegDeadliftBand' => 'Straight leg deadlift (band)',
+			'library.hamstrings.exercises.goodMorningBarbell' => 'Good morning (barbell)',
+			'library.hamstrings.exercises.goodMorningBarbellSeated' => 'Good morning (barbell, seated)',
+			'library.hamstrings.exercises.goodMorningBarbellStraightLeg' => 'Good morning (barbell, straight leg)',
+			'library.hamstrings.exercises.straightLegDeadliftBarbell' => 'Straight leg deadlift (barbell)',
+			'library.hamstrings.exercises.legCurlCableAssistedInverse' => 'Leg curl (cable, assisted, inverse)',
+			'library.hamstrings.exercises.legCurlDumbbellLying' => 'Leg curl (dumbbell, lying)',
+			'library.hamstrings.exercises.straightLegDeadliftDumbbell' => 'Straight leg deadlift (dumbbell)',
+			'library.hamstrings.exercises.hamstringStretchExerciseBallSeated' => 'Hamstring stretch (exercise ball, seated)',
+			'library.hamstrings.exercises.gluteHamRaiseOnBench' => 'Glute-ham raise on bench',
+			'library.hamstrings.exercises.hamstringStretch' => 'Hamstring stretch',
+			'library.hamstrings.exercises.hangCleanKettlebell' => 'Hang clean (kettlebell)',
+			'library.hamstrings.exercises.elevatedLegHamstringStretch' => 'Elevated-leg hamstring stretch',
+			'library.hamstrings.exercises.legCurlLeverKneeling' => 'Leg curl (lever, kneeling)',
+			'library.hamstrings.exercises.legCurlLeverLyingTwoOne' => 'Leg curl (lever, lying, two one)',
+			'library.hamstrings.exercises.goodMorningLeverSeated' => 'Good morning (lever, seated)',
+			'library.hamstrings.exercises.cleanPower' => 'Clean (power)',
+			'library.hamstrings.exercises.supineStrapAssistedHamstringStretch' => 'Supine strap-assisted hamstring stretch',
+			'library.hamstrings.exercises.runnerSHamstringStretch' => 'Runner’s hamstring stretch',
+			'library.hamstrings.exercises.seatedWideLegForwardFoldSequence' => 'Seated wide-leg forward-fold sequence',
+			'library.hamstrings.exercises.singleLegSlidingCurl' => 'Single-leg sliding curl',
+			'library.hamstrings.exercises.goodMorningSmithBentKnee' => 'Good morning (smith, bent knee)',
+			'library.hamstrings.exercises.strapAssistedHamstringAndCalfStretch' => 'Strap-assisted hamstring and calf stretch',
+			'library.hamstrings.exercises.legCurlStandingBodyweight' => 'Leg curl (standing)',
+			'library.hamstrings.exercises.lungeStretchWithThoracicRotation' => 'Lunge stretch with thoracic rotation',
 			'library.shoulders.name' => 'Shoulders',
 			'library.shoulders.exercises.standingCableReverseFly' => 'Standing cable reverse fly',
 			'library.shoulders.exercises.cableFrontRaise' => 'Cable front raise',
@@ -10628,6 +14291,137 @@ extension on Translations {
 			'library.shoulders.exercises.militaryPressSmithMachine' => 'Smith machine military press',
 			'library.shoulders.exercises.reverseButterfly' => 'Reverse pec deck fly',
 			'library.shoulders.exercises.militaryPressBarbell' => 'Barbell military press',
+			'library.shoulders.exercises.frontLateralRaiseBand' => 'Front lateral raise (band)',
+			'library.shoulders.exercises.frontRaiseBand' => 'Front raise (band)',
+			'library.shoulders.exercises.reverseFlyBand' => 'Reverse fly (band)',
+			'library.shoulders.exercises.shoulderPressBand' => 'Shoulder press (band)',
+			'library.shoulders.exercises.shrugBand' => 'Shrug (band)',
+			'library.shoulders.exercises.rearDeltRowBandStanding' => 'Rear delt row (band, standing)',
+			'library.shoulders.exercises.overheadPressBandTwisting' => 'Overhead press (band, twisting)',
+			'library.shoulders.exercises.yRaiseBand' => 'Y raise (band)',
+			'library.shoulders.exercises.frontRaiseBarbell' => 'Front raise (barbell)',
+			'library.shoulders.exercises.frontRaiseAndPulloverBarbell' => 'Front raise and pullover (barbell)',
+			'library.shoulders.exercises.shoulderPressBarbellIncline' => 'Shoulder press (barbell, incline)',
+			'library.shoulders.exercises.snatchBarbellOneArm' => 'Snatch (barbell, one arm)',
+			'library.shoulders.exercises.rearDeltRaiseBarbell' => 'Rear delt raise (barbell)',
+			'library.shoulders.exercises.rearDeltRowBarbell' => 'Rear delt row (barbell)',
+			'library.shoulders.exercises.militaryPressBarbellSeatedBehindHead' => 'Military press (barbell, seated, behind head)',
+			'library.shoulders.exercises.bradfordPressBarbellSeated' => 'Bradford press (barbell, seated)',
+			'library.shoulders.exercises.barbellSkiStyleHighPull' => 'Barbell ski-style high pull',
+			'library.shoulders.exercises.bradfordPressBarbellStanding' => 'Bradford press (barbell, standing)',
+			'library.shoulders.exercises.militaryPressBarbellStandingCloseGrip' => 'Military press (barbell, standing, close grip)',
+			'library.shoulders.exercises.frontRaiseBarbellStandingOverHead' => 'Front raise (barbell, standing, over head)',
+			'library.shoulders.exercises.militaryPressBarbellStandingWide' => 'Military press (barbell, standing, wide)',
+			'library.shoulders.exercises.thrusterBarbell' => 'Thruster (barbell)',
+			'library.shoulders.exercises.uprightRowBarbellWideGrip' => 'Upright row (barbell, wide grip)',
+			'library.shoulders.exercises.battlingRopes' => 'Battling ropes',
+			'library.shoulders.exercises.shoulderPressCableAlternate' => 'Shoulder press (cable, alternate)',
+			'library.shoulders.exercises.rearDeltRowCableKneelingRope' => 'Rear delt row (cable, kneeling, rope)',
+			'library.shoulders.exercises.reverseFlyCableOneArmBentOver' => 'Reverse fly (cable, one arm, bent over)',
+			'library.shoulders.exercises.rearDeltRowCableStirrups' => 'Rear delt row (cable, stirrups)',
+			'library.shoulders.exercises.rearDeltRowCableRope' => 'Rear delt row (cable, rope)',
+			'library.shoulders.exercises.rearLateralRaiseCableSeated' => 'Rear lateral raise (cable, seated)',
+			'library.shoulders.exercises.shoulderInternalRotationCableSeated' => 'Shoulder internal rotation (cable, seated)',
+			'library.shoulders.exercises.shoulderPressCable' => 'Shoulder press (cable)',
+			'library.shoulders.exercises.shrugCable' => 'Shrug (cable)',
+			'library.shoulders.exercises.rearDeltRowCableStandingRope' => 'Rear delt row (cable, standing, rope)',
+			'library.shoulders.exercises.shoulderExternalRotationCableStanding' => 'Shoulder external rotation (cable, standing)',
+			'library.shoulders.exercises.reverseFlyCableSupine' => 'Reverse fly (cable, supine)',
+			'library.shoulders.exercises.uprightRowCable' => 'Upright row (cable)',
+			'library.shoulders.exercises.pressDumbbellAlternateSide' => 'Press (dumbbell, alternate, side)',
+			'library.shoulders.exercises.cubanPressDumbbell' => 'Cuban press (dumbbell)',
+			'library.shoulders.exercises.shrugDumbbellDecline' => 'Shrug (dumbbell, decline)',
+			'library.shoulders.exercises.lateralRaiseDumbbellFullCan' => 'Lateral raise (dumbbell, full can)',
+			'library.shoulders.exercises.shoulderPressDumbbellIncline' => 'Shoulder press (dumbbell, incline)',
+			'library.shoulders.exercises.shrugDumbbellIncline' => 'Shrug (dumbbell, incline)',
+			'library.shoulders.exercises.tRaiseDumbbellIncline' => 'T raise (dumbbell, incline)',
+			'library.shoulders.exercises.lateralToFrontRaiseDumbbell' => 'Lateral to front raise (dumbbell)',
+			'library.shoulders.exercises.externalShoulderRotationDumbbellLying' => 'External shoulder rotation (dumbbell, lying)',
+			'library.shoulders.exercises.rearDeltRaiseDumbbellLyingFloor' => 'Rear delt raise (dumbbell, lying, floor)',
+			'library.shoulders.exercises.rearDeltRaiseDumbbellLyingOneArm' => 'Rear delt raise (dumbbell, lying, one arm)',
+			'library.shoulders.exercises.reverseFlyDumbbellLyingOneArm' => 'Reverse fly (dumbbell, lying, one arm)',
+			'library.shoulders.exercises.rearDeltRowDumbbellLying' => 'Rear delt row (dumbbell, lying)',
+			'library.shoulders.exercises.reverseFlyDumbbellLying' => 'Reverse fly (dumbbell, lying)',
+			'library.shoulders.exercises.lateralRaiseDumbbellOneArm' => 'Lateral raise (dumbbell, one arm)',
+			'library.shoulders.exercises.lateralRaiseDumbbellOneArmSupport' => 'Lateral raise (dumbbell, one arm, support)',
+			'library.shoulders.exercises.reverseFlyDumbbellOneArmSupport' => 'Reverse fly (dumbbell, one arm, support)',
+			'library.shoulders.exercises.shoulderPressDumbbellOneArm' => 'Shoulder press (dumbbell, one arm)',
+			'library.shoulders.exercises.uprightRowDumbbellOneArm' => 'Upright row (dumbbell, one arm)',
+			'library.shoulders.exercises.pushPressDumbbell' => 'Push press (dumbbell)',
+			'library.shoulders.exercises.reverseFlyDumbbellBentOver' => 'Reverse fly (dumbbell, bent over)',
+			'library.shoulders.exercises.rearDeltRowDumbbell' => 'Rear delt row (dumbbell)',
+			'library.shoulders.exercises.rearLateralRaiseDumbbellSupportHead' => 'Rear lateral raise (dumbbell, support head)',
+			'library.shoulders.exercises.reverseFlyDumbbellRotation' => 'Reverse fly (dumbbell, rotation)',
+			'library.shoulders.exercises.scottPressDumbbell' => 'Scott press (dumbbell)',
+			'library.shoulders.exercises.frontRaiseDumbbellSeatedAlternate' => 'Front raise (dumbbell, seated, alternate)',
+			'library.shoulders.exercises.shoulderPressDumbbellSeatedAlternate' => 'Shoulder press (dumbbell, seated, alternate)',
+			'library.shoulders.exercises.lateralRaiseDumbbellSeatedBentArm' => 'Lateral raise (dumbbell, seated, bent arm)',
+			'library.shoulders.exercises.bicepsCurlToShoulderPressDumbbellSeated' => 'Biceps curl to shoulder press (dumbbell, seated)',
+			'library.shoulders.exercises.frontRaiseDumbbellSeated' => 'Front raise (dumbbell, seated)',
+			'library.shoulders.exercises.lateralRaiseDumbbellSeated' => 'Lateral raise (dumbbell, seated)',
+			'library.shoulders.exercises.shoulderPressDumbbellSeatedNeutralGrip' => 'Shoulder press (dumbbell, seated, neutral grip)',
+			'library.shoulders.exercises.lateralRaiseDumbbellSideLyingOneArm' => 'Lateral raise (dumbbell, side lying, one arm)',
+			'library.shoulders.exercises.reverseFlyDumbbellSidePlank' => 'Reverse fly (dumbbell, side plank)',
+			'library.shoulders.exercises.singleArmOverheadDumbbellCarry' => 'Single-arm overhead dumbbell carry',
+			'library.shoulders.exercises.overheadPressDumbbellStandingAlternate' => 'Overhead press (dumbbell, standing, alternate)',
+			'library.shoulders.exercises.lateralRaiseDumbbellStandingAlternate' => 'Lateral raise (dumbbell, standing, alternate)',
+			'library.shoulders.exercises.standingDumbbellArmCircles' => 'Standing dumbbell arm circles',
+			'library.shoulders.exercises.frontRaiseDumbbellStandingAboveHead' => 'Front raise (dumbbell, standing, above head)',
+			'library.shoulders.exercises.pressDumbbellStandingOneArmNeutralGrip' => 'Press (dumbbell, standing, one arm, neutral grip)',
+			'library.shoulders.exercises.overheadPressDumbbellStanding' => 'Overhead press (dumbbell, standing)',
+			'library.shoulders.exercises.pressDumbbellStandingNeutralGrip' => 'Press (dumbbell, standing, neutral grip)',
+			'library.shoulders.exercises.uprightRowDumbbell' => 'Upright row (dumbbell)',
+			'library.shoulders.exercises.shoulderExternalRotationDumbbellUpright' => 'Shoulder external rotation (dumbbell, upright)',
+			'library.shoulders.exercises.wPressDumbbell' => 'W press (dumbbell)',
+			'library.shoulders.exercises.frontRaiseDumbbellSeatedAlternateExerciseBall' => 'Front raise (dumbbell, seated, alternate, exercise ball)',
+			'library.shoulders.exercises.shoulderPressEzBarbell' => 'Shoulder press (ez barbell)',
+			'library.shoulders.exercises.frogStand' => 'Frog stand',
+			'library.shoulders.exercises.fullMalteseHold' => 'Full Maltese hold',
+			'library.shoulders.exercises.fullPlancheHold' => 'Full planche hold',
+			'library.shoulders.exercises.pushUpFullPlanche' => 'Push-up (full, planche)',
+			'library.shoulders.exercises.handstand' => 'Handstand',
+			'library.shoulders.exercises.pressKettlebellAlternate' => 'Press (kettlebell, alternate)',
+			'library.shoulders.exercises.arnoldPressKettlebell' => 'Arnold press (kettlebell)',
+			'library.shoulders.exercises.jerkKettlebellDouble' => 'Jerk (kettlebell, double)',
+			'library.shoulders.exercises.pushPressKettlebellDouble' => 'Push press (kettlebell, double)',
+			'library.shoulders.exercises.snatchKettlebellDouble' => 'Snatch (kettlebell, double)',
+			'library.shoulders.exercises.cleanAndJerkKettlebellOneArm' => 'Clean and jerk (kettlebell, one arm)',
+			'library.shoulders.exercises.jerkKettlebellOneArm' => 'Jerk (kettlebell, one arm)',
+			'library.shoulders.exercises.militaryPressKettlebellOneArmToSide' => 'Military press (kettlebell, one arm, to side)',
+			'library.shoulders.exercises.pushPressKettlebellOneArm' => 'Push press (kettlebell, one arm)',
+			'library.shoulders.exercises.snatchKettlebellOneArm' => 'Snatch (kettlebell, one arm)',
+			'library.shoulders.exercises.cleanAndPressKettlebellOneArm' => 'Clean and press (kettlebell, one arm)',
+			'library.shoulders.exercises.pressKettlebellSeated' => 'Press (kettlebell, seated)',
+			'library.shoulders.exercises.militaryPressKettlebellSeatedTwoArm' => 'Military press (kettlebell, seated, two arm)',
+			'library.shoulders.exercises.pressKettlebellSeesaw' => 'Press (kettlebell, seesaw)',
+			'library.shoulders.exercises.sumoHighPullKettlebell' => 'Sumo high pull (kettlebell)',
+			'library.shoulders.exercises.thrusterKettlebell' => 'Thruster (kettlebell)',
+			'library.shoulders.exercises.cleanKettlebellTwoArm' => 'Clean (kettlebell, two arm)',
+			'library.shoulders.exercises.militaryPressKettlebellTwoArm' => 'Military press (kettlebell, two arm)',
+			'library.shoulders.exercises.lateralRaiseLandmine' => 'Lateral raise (landmine)',
+			'library.shoulders.exercises.plancheLean' => 'Planche (lean)',
+			'library.shoulders.exercises.boxingLeftHook' => 'Boxing left hook',
+			'library.shoulders.exercises.shrugLeverGripless' => 'Shrug (lever, gripless)',
+			'library.shoulders.exercises.shoulderPressLeverOneArm' => 'Shoulder press (lever, one arm)',
+			'library.shoulders.exercises.reverseFlyLeverSeatedNeutralGrip' => 'Reverse fly (lever, seated, neutral grip)',
+			'library.shoulders.exercises.shrugLever' => 'Shrug (lever)',
+			'library.shoulders.exercises.rearDeltoidStretch' => 'Rear deltoid stretch',
+			'library.shoulders.exercises.shoulderPressResistanceBandSeated' => 'Shoulder press (resistance band, seated)',
+			'library.shoulders.exercises.scapularDips' => 'Scapular dips',
+			'library.shoulders.exercises.scapularPullUp' => 'Scapular pull up',
+			'library.shoulders.exercises.shrugSmithBack' => 'Shrug (smith, back)',
+			'library.shoulders.exercises.pressSmithBehindNeck' => 'Press (smith, behind neck)',
+			'library.shoulders.exercises.rearDeltRowSmith' => 'Rear delt row (smith)',
+			'library.shoulders.exercises.shoulderPressSmithSeated' => 'Shoulder press (smith, seated)',
+			'library.shoulders.exercises.shoulderPressSmith' => 'Shoulder press (smith)',
+			'library.shoulders.exercises.shrugSmith' => 'Shrug (smith)',
+			'library.shoulders.exercises.militaryPressSmithStandingBehindHead' => 'Military press (smith, standing, behind head)',
+			'library.shoulders.exercises.uprightRowSmith' => 'Upright row (smith)',
+			'library.shoulders.exercises.pressStandingBehindNeck' => 'Press (standing, behind neck)',
+			'library.shoulders.exercises.straddleMalteseHold' => 'Straddle Maltese hold',
+			'library.shoulders.exercises.straddlePlancheHold' => 'Straddle planche hold',
+			'library.shoulders.exercises.frontRaiseWeighted' => 'Front raise (weighted)',
+			'library.shoulders.exercises.weightedKneelingStepAndSwing' => 'Weighted kneeling step and swing',
 			'library.back.name' => 'Back',
 			'library.back.exercises.chestSupportedDumbbellRow' => 'Chest-supported dumbbell row',
 			'library.back.exercises.singleArmCableRow' => 'Single-arm cable row',
@@ -10651,6 +14445,163 @@ extension on Translations {
 			'library.back.exercises.tBarRowWideProneGrip' => 'T-bar machine row (wide overhand grip)',
 			'library.back.exercises.dumbbellRow' => 'Dumbbell row',
 			'library.back.exercises.chinUps' => 'Chin-ups',
+			'library.back.exercises.pulldownCableAlternate' => 'Pulldown (cable, alternate)',
+			'library.back.exercises.pullUpArcher' => 'Pull-up (archer)',
+			'library.back.exercises.pullUpAssistedParallelCloseGrip' => 'Pull-up (assisted, parallel, close grip)',
+			'library.back.exercises.chinUpAssistedStanding' => 'Chin-up (assisted, standing)',
+			'library.back.exercises.pullUpAssistedStanding' => 'Pull-up (assisted, standing)',
+			'library.back.exercises.backExtensionExerciseBall' => 'Back extension (exercise ball)',
+			'library.back.exercises.backLever' => 'Back lever',
+			'library.back.exercises.chestStretchWithArmsBehindTheBack' => 'Chest stretch with arms behind the back',
+			'library.back.exercises.pullUpBandAssisted' => 'Pull-up (band, assisted)',
+			'library.back.exercises.pulldownBandCloseGrip' => 'Pulldown (band, close grip)',
+			'library.back.exercises.pulldownBandFixedBackCloseGrip' => 'Pulldown (band, fixed back, close grip)',
+			'library.back.exercises.pulldownBandFixedBackUnderhand' => 'Pulldown (band, fixed back, underhand)',
+			'library.back.exercises.pulldownBandKneelingOneArm' => 'Pulldown (band, kneeling, one arm)',
+			'library.back.exercises.rowBandOneArmStandingLow' => 'Row (band, one arm, standing, low)',
+			'library.back.exercises.rowBandOneArmTwistingSeated' => 'Row (band, one arm, twisting, seated)',
+			'library.back.exercises.pulldownBandUnderhand' => 'Pulldown (band, underhand)',
+			'library.back.exercises.pulloverBarbellBentArm' => 'Pullover (barbell, bent arm)',
+			'library.back.exercises.pulloverBarbellDeclineBentArm' => 'Pullover (barbell, decline, bent arm)',
+			'library.back.exercises.pulloverBarbellDeclineWideGrip' => 'Pullover (barbell, decline, wide grip)',
+			'library.back.exercises.rowBarbellIncline' => 'Row (barbell, incline)',
+			'library.back.exercises.bentOverRowBarbellOneArm' => 'Bent over row (barbell, one arm)',
+			'library.back.exercises.pendlayRowBarbell' => 'Pendlay row (barbell)',
+			'library.back.exercises.pulloverBarbell' => 'Pullover (barbell)',
+			'library.back.exercises.pulloverToPressBarbell' => 'Pullover to press (barbell)',
+			'library.back.exercises.bentOverRowBarbellReverseGrip' => 'Bent over row (barbell, reverse grip)',
+			'library.back.exercises.benchRowBarbellReverseGripIncline' => 'Bench row (barbell, reverse grip, incline)',
+			'library.back.exercises.benchSupportedPullUp' => 'Bench-supported pull-up',
+			'library.back.exercises.rowBodyweightSquatting' => 'Row (bodyweight, squatting)',
+			'library.back.exercises.rowBodyweightSquattingTowel' => 'Row (bodyweight, squatting, towel)',
+			'library.back.exercises.rowBodyweightStandingCloseGripOneArm' => 'Row (bodyweight, standing, close grip, one arm)',
+			'library.back.exercises.rowBodyweightStandingCloseGrip' => 'Row (bodyweight, standing, close grip)',
+			'library.back.exercises.rowBodyweightStandingOneArm' => 'Row (bodyweight, standing, one arm)',
+			'library.back.exercises.rowBodyweightStandingOneArmTowel' => 'Row (bodyweight, standing, one arm, towel)',
+			'library.back.exercises.rowBodyweightStanding' => 'Row (bodyweight, standing)',
+			'library.back.exercises.rowBodyweightStandingTowel' => 'Row (bodyweight, standing, towel)',
+			'library.back.exercises.latPulldownCableCrossover' => 'Lat pulldown (cable, crossover)',
+			'library.back.exercises.rowCableDeclineSeatedWideGrip' => 'Row (cable, decline, seated, wide grip)',
+			'library.back.exercises.rowCableFloorSeatedWideGrip' => 'Row (cable, floor, seated, wide grip)',
+			'library.back.exercises.rowCableHighKneeling' => 'Row (cable, high, kneeling)',
+			'library.back.exercises.benchRowCableIncline' => 'Bench row (cable, incline)',
+			'library.back.exercises.latPulldownCableRope' => 'Lat pulldown (cable, rope)',
+			'library.back.exercises.rowCableSeated' => 'Row (cable, seated)',
+			'library.back.exercises.pulloverCableLyingRope' => 'Pullover (cable, lying, rope)',
+			'library.back.exercises.pulldownCableOneArm' => 'Pulldown (cable, one arm)',
+			'library.back.exercises.rowCableOneArmStraightBackHighKneeling' => 'Row (cable, one arm, straight back, high, kneeling)',
+			'library.back.exercises.rowCablePalmRotational' => 'Row (cable, palm rotational)',
+			'library.back.exercises.latPulldownWithCurvedBar' => 'Lat pulldown with curved bar',
+			'library.back.exercises.pulldownCableRear' => 'Pulldown (cable, rear)',
+			'library.back.exercises.rowCableReverseGripStraightBackSeatedHigh' => 'Row (cable, reverse grip, straight back, seated, high)',
+			'library.back.exercises.rowCableRopeCrossoverSeated' => 'Row (cable, rope, crossover, seated)',
+			'library.back.exercises.rowCableRopeElevatedSeated' => 'Row (cable, rope, elevated, seated)',
+			'library.back.exercises.benchRowCableRopeExtensionIncline' => 'Bench row (cable, rope, extension, incline)',
+			'library.back.exercises.rowCableRopeSeated' => 'Row (cable, rope, seated)',
+			'library.back.exercises.rowCableSeatedOneArmAlternate' => 'Row (cable, seated, one arm, alternate)',
+			'library.back.exercises.rowCableSeatedWideGrip' => 'Row (cable, seated, wide grip)',
+			'library.back.exercises.squatRowCableRope' => 'Squat row (cable, rope)',
+			'library.back.exercises.rowCableStandingVBar' => 'Row (cable, standing, v bar)',
+			'library.back.exercises.twistRowCableStandingVBar' => 'Twist row (cable, standing, v bar)',
+			'library.back.exercises.cableKayakRow' => 'Cable kayak row',
+			'library.back.exercises.twistRowCableOneArm' => 'Twist row (cable, one arm)',
+			'library.back.exercises.rowCableUpper' => 'Row (cable, upper)',
+			'library.back.exercises.pulldownCableWideGripRearBehindNeck' => 'Pulldown (cable, wide grip, rear, behind neck)',
+			'library.back.exercises.rowCamberedBarLying' => 'Row (cambered bar, lying)',
+			'library.back.exercises.closeNeutralGripPullUp' => 'Close neutral-grip pull-up',
+			'library.back.exercises.bentOverRowDumbbell' => 'Bent over row (dumbbell)',
+			'library.back.exercises.yRaiseDumbbellIncline' => 'Y raise (dumbbell, incline)',
+			'library.back.exercises.bentOverRowDumbbellPalmRotational' => 'Bent over row (dumbbell, palm rotational)',
+			'library.back.exercises.rowDumbbellReverseGripInclineBenchOneArm' => 'Row (dumbbell, reverse grip, incline bench, one arm)',
+			'library.back.exercises.rowDumbbellReverseGripInclineBenchTwoArm' => 'Row (dumbbell, reverse grip, incline bench, two arm)',
+			'library.back.exercises.rowDumbbellReverseGrip' => 'Row (dumbbell, reverse grip)',
+			'library.back.exercises.bodyweightHipHinge' => 'Bodyweight hip hinge',
+			'library.back.exercises.backExtensionExerciseBallStraightArm' => 'Back extension (exercise ball, straight arm)',
+			'library.back.exercises.backExtensionExerciseBallHandsBehindHead' => 'Back extension (exercise ball, hands behind head)',
+			'library.back.exercises.backExtensionExerciseBallKneeOffGround' => 'Back extension (exercise ball, knee off ground)',
+			'library.back.exercises.backExtensionExerciseBallRotation' => 'Back extension (exercise ball, rotation)',
+			'library.back.exercises.seatedBackStretchHuggingABall' => 'Seated back stretch hugging a ball',
+			'library.back.exercises.latStretchExerciseBall' => 'Lat stretch (exercise ball)',
+			'library.back.exercises.pyramidPositionBackStretchOnBall' => 'Pyramid-position back stretch on ball',
+			'library.back.exercises.latStretchExerciseBallLyingSide' => 'Lat stretch (exercise ball, lying, side)',
+			'library.back.exercises.legRaiseExerciseBallProne' => 'Leg raise (exercise ball, prone)',
+			'library.back.exercises.pulloverEzBarLyingBentArm' => 'Pullover (ez bar, lying, bent arm)',
+			'library.back.exercises.bentOverRowEzBarReverseGrip' => 'Bent over row (ez bar, reverse grip)',
+			'library.back.exercises.frontLever' => 'Front lever',
+			'library.back.exercises.frontLeverReps' => 'Front lever (reps)',
+			'library.back.exercises.sternumToBarChinUp' => 'Sternum-to-bar chin-up',
+			'library.back.exercises.invertedRow' => 'Inverted row',
+			'library.back.exercises.invertedRowBentKnee' => 'Inverted row (bent knee)',
+			'library.back.exercises.invertedRowBench' => 'Inverted row (bench)',
+			'library.back.exercises.renegadeRowKettlebellAlternate' => 'Renegade row (kettlebell, alternate)',
+			'library.back.exercises.rowKettlebellAlternate' => 'Row (kettlebell, alternate)',
+			'library.back.exercises.rowKettlebellOneArm' => 'Row (kettlebell, one arm)',
+			'library.back.exercises.rowKettlebellTwoArm' => 'Row (kettlebell, two arm)',
+			'library.back.exercises.muscleUpKipping' => 'Muscle up (kipping)',
+			'library.back.exercises.latStretchKneeling' => 'Lat stretch (kneeling)',
+			'library.back.exercises.pullUpL' => 'Pull-up (l)',
+			'library.back.exercises.rowLeverAlternateNarrowGripSeated' => 'Row (lever, alternate, narrow grip, seated)',
+			'library.back.exercises.chinUpLeverAssisted' => 'Chin-up (lever, assisted)',
+			'library.back.exercises.backExtensionLever' => 'Back extension (lever)',
+			'library.back.exercises.bentOverRowLever' => 'Bent over row (lever)',
+			'library.back.exercises.bentOverRowLeverVBar' => 'Bent over row (lever, v bar)',
+			'library.back.exercises.pulldownLeverFront' => 'Pulldown (lever, front)',
+			'library.back.exercises.rowLeverHigh' => 'Row (lever, high)',
+			'library.back.exercises.bentOverRowLeverOneArm' => 'Bent over row (lever, one arm)',
+			'library.back.exercises.rowLeverOneArmLateralHigh' => 'Row (lever, one arm, lateral, high)',
+			'library.back.exercises.pulldownLeverOneArmLateralWide' => 'Pulldown (lever, one arm, lateral, wide)',
+			'library.back.exercises.pulloverLever' => 'Pullover (lever)',
+			'library.back.exercises.latPulldownLeverReverseGrip' => 'Lat pulldown (lever, reverse grip)',
+			'library.back.exercises.rowLeverReverseGripVertical' => 'Row (lever, reverse grip, vertical)',
+			'library.back.exercises.rowLeverReverseTBar' => 'Row (lever, reverse, t bar)',
+			'library.back.exercises.rowLeverTBar' => 'Row (lever, t bar)',
+			'library.back.exercises.rowLeverTBarReverseGrip' => 'Row (lever, t bar, reverse grip)',
+			'library.back.exercises.rowLeverOneArm' => 'Row (lever, one arm)',
+			'library.back.exercises.standingAnchoredRopeRow' => 'Standing anchored-rope row',
+			'library.back.exercises.seatedSpinalFlexion' => 'Seated spinal flexion',
+			'library.back.exercises.medicineBallCatchAndOverheadToss' => 'Medicine-ball catch and overhead toss',
+			'library.back.exercises.overheadMedicineBallSlam' => 'Overhead medicine-ball slam',
+			'library.back.exercises.chinUpMixedGrip' => 'Chin-up (mixed grip)',
+			'library.back.exercises.muscleUp' => 'Muscle up',
+			'library.back.exercises.muscleUpVerticalBar' => 'Muscle up (vertical, bar)',
+			'library.back.exercises.neckStretchSide' => 'Neck stretch (side)',
+			'library.back.exercises.singleArmWallLatStretch' => 'Single-arm wall lat stretch',
+			'library.back.exercises.chinUpOneArm' => 'Chin-up (one arm)',
+			'library.back.exercises.rowOneArmTowel' => 'Row (one arm, towel)',
+			'library.back.exercises.pullUpNeutralGrip' => 'Pull-up (neutral grip)',
+			'library.back.exercises.pullUpRear' => 'Pull-up (rear)',
+			'library.back.exercises.rowResistanceBandSeatedStraightBack' => 'Row (resistance band, seated, straight back)',
+			'library.back.exercises.pulldownLeverReverseGrip' => 'Pulldown (lever, reverse grip)',
+			'library.back.exercises.alternatingFrontAndBackPullUp' => 'Alternating front-and-back pull-up',
+			'library.back.exercises.backStretchRoller' => 'Back stretch (roller)',
+			'library.back.exercises.latStretchRollerSide' => 'Lat stretch (roller, side)',
+			'library.back.exercises.ropeClimbing' => 'Rope climbing',
+			'library.back.exercises.lowerBackStretchSeated' => 'Lower back stretch (seated)',
+			'library.back.exercises.latStretchSideLyingFloor' => 'Lat stretch (side lying, floor)',
+			'library.back.exercises.neckStretchSidePush' => 'Neck stretch (side, push)',
+			'library.back.exercises.sideToSideChinUp' => 'Side-to-side chin-up',
+			'library.back.exercises.skinTheCatRotation' => 'Skin-the-cat rotation',
+			'library.back.exercises.bentOverRowSmith' => 'Bent over row (smith)',
+			'library.back.exercises.rowSmithNarrow' => 'Row (smith, narrow)',
+			'library.back.exercises.rowSmithOneArm' => 'Row (smith, one arm)',
+			'library.back.exercises.bentOverRowSmithReverseGrip' => 'Bent over row (smith, reverse grip)',
+			'library.back.exercises.proneSphinxStretch' => 'Prone sphinx stretch',
+			'library.back.exercises.spineStretch' => 'Spine stretch',
+			'library.back.exercises.standingArcherPull' => 'Standing archer pull',
+			'library.back.exercises.latStretchStandingLateral' => 'Lat stretch (standing, lateral)',
+			'library.back.exercises.pelvicTiltStanding' => 'Pelvic tilt (standing)',
+			'library.back.exercises.pulldownCableNeutralGrip' => 'Pulldown (cable, neutral grip)',
+			'library.back.exercises.forwardFoldReachingBothToes' => 'Forward fold reaching both toes',
+			'library.back.exercises.upperBackStretch' => 'Upper back stretch',
+			'library.back.exercises.upwardFacingDogStretch' => 'Upward-facing dog stretch',
+			'library.back.exercises.chinUpWeightedCloseGripDipCage' => 'Chin-up (weighted, close grip, dip cage)',
+			'library.back.exercises.hyperextensionWeightedStabilityBall' => 'Hyperextension (weighted, stability ball)',
+			'library.back.exercises.muscleUpWeighted' => 'Muscle up (weighted)',
+			'library.back.exercises.muscleUpWeightedBar' => 'Muscle up (weighted, bar)',
+			'library.back.exercises.pullUpWeightedOneArm' => 'Pull-up (weighted, one arm)',
+			'library.back.exercises.pullUpWeighted' => 'Pull-up (weighted)',
+			'library.back.exercises.pullUpWideGrip' => 'Pull-up (wide grip)',
+			'library.back.exercises.pullUpWideGripRear' => 'Pull-up (wide grip, rear)',
 			'library.back.exercise.dualLowRowMachine' => 'Dual low row machine',
 			'library.back.exercise.dualHighRowMachine' => 'Dual high row machine',
 			'library.triceps.name' => 'Triceps',
@@ -10666,9 +14617,116 @@ extension on Translations {
 			'library.triceps.exercises.diamondPushUps' => 'Diamond push-ups',
 			'library.triceps.exercises.tricepsMachine' => 'Triceps machine',
 			'library.triceps.exercises.overheadTricepExtension' => 'Dumbbell overhead triceps extension',
+			'library.triceps.exercises.tricepsExtensionAssistedStandingTowel' => 'Triceps extension (assisted, standing, towel)',
+			'library.triceps.exercises.pushUpBandCloseGrip' => 'Push-up (band, close grip)',
+			'library.triceps.exercises.tricepsExtensionBandSide' => 'Triceps extension (band, side)',
+			'library.triceps.exercises.benchPressBarbellCloseGrip' => 'Bench press (barbell, close grip)',
+			'library.triceps.exercises.declineCloseGripPressIntoSkullCrusher' => 'Decline close-grip press into skull crusher',
+			'library.triceps.exercises.benchPressBarbellInclineCloseGrip' => 'Bench press (barbell, incline, close grip)',
+			'library.triceps.exercises.pressBarbellInclineReverseGrip' => 'Press (barbell, incline, reverse grip)',
+			'library.triceps.exercises.tricepsExtensionBarbellLyingBackOfHead' => 'Triceps extension (barbell, lying, back of head)',
+			'library.triceps.exercises.floorPressBarbellOneArm' => 'Floor press (barbell, one arm)',
+			'library.triceps.exercises.pinPressesBarbell' => 'Pin presses (barbell)',
+			'library.triceps.exercises.benchPressBarbellReverseCloseGrip' => 'Bench press (barbell, reverse, close grip)',
+			'library.triceps.exercises.skullcrusherBarbellReverseGrip' => 'Skullcrusher (barbell, reverse grip)',
+			'library.triceps.exercises.tricepsExtensionBarbellSeatedCloseGripBehindNeck' => 'Triceps extension (barbell, seated, close grip, behind neck)',
+			'library.triceps.exercises.tricepsExtensionBarbellSeatedOverhead' => 'Triceps extension (barbell, seated, overhead)',
+			'library.triceps.exercises.tricepsExtensionBarbellStandingOverhead' => 'Triceps extension (barbell, standing, overhead)',
+			'library.triceps.exercises.tricepsExtensionBodyweightKneeling' => 'Triceps extension (bodyweight, kneeling)',
+			'library.triceps.exercises.tricepsExtensionCableAlternate' => 'Triceps extension (cable, alternate)',
+			'library.triceps.exercises.extensionCableConcentrationKnee' => 'Extension (cable, concentration, knee)',
+			'library.triceps.exercises.tricepsExtensionCableHighPulleyOverhead' => 'Triceps extension (cable, high pulley, overhead)',
+			'library.triceps.exercises.tricepsExtensionCableIncline' => 'Triceps extension (cable, incline)',
+			'library.triceps.exercises.kickbackCable' => 'Kickback (cable)',
+			'library.triceps.exercises.tricepsExtensionCableKneeling' => 'Triceps extension (cable, kneeling)',
+			'library.triceps.exercises.tricepsExtensionCableLying' => 'Triceps extension (cable, lying)',
+			'library.triceps.exercises.cableRearwardTricepsDrive' => 'Cable rearward triceps drive',
+			'library.triceps.exercises.tricepsPushdownCableReverseGripSzBarArmBlaster' => 'Triceps pushdown (cable, reverse grip, sz bar, arm blaster)',
+			'library.triceps.exercises.pushdownCableReverseGrip' => 'Pushdown (cable, reverse grip)',
+			'library.triceps.exercises.tricepsExtensionCableRopeIncline' => 'Triceps extension (cable, rope, incline)',
+			'library.triceps.exercises.tricepsExtensionCableRopeLyingFloor' => 'Triceps extension (cable, rope, lying, floor)',
+			'library.triceps.exercises.tricepsExtensionCableStandingOneArm' => 'Triceps extension (cable, standing, one arm)',
+			'library.triceps.exercises.tricepsExtensionCableStandingReverseGripOneArmOverhead' => 'Triceps extension (cable, standing, reverse grip, one arm, overhead)',
+			'library.triceps.exercises.tricepsPushdownCableVBar' => 'Triceps pushdown (cable, v bar)',
+			'library.triceps.exercises.tricepsPushdownCableVBarArmBlaster' => 'Triceps pushdown (cable, v bar, arm blaster)',
+			'library.triceps.exercises.tricepsKickbackCableTwoArm' => 'Triceps kickback (cable, two arm)',
+			'library.triceps.exercises.pushUpCloseGrip' => 'Push-up (close grip)',
+			'library.triceps.exercises.pushUpCloseGripKnee' => 'Push-up (close grip, knee)',
+			'library.triceps.exercises.pressDumbbellCloseGrip' => 'Press (dumbbell, close grip)',
+			'library.triceps.exercises.pressDumbbellDeclineOneArmNeutralGrip' => 'Press (dumbbell, decline, one arm, neutral grip)',
+			'library.triceps.exercises.tricepsExtensionDumbbellDecline' => 'Triceps extension (dumbbell, decline)',
+			'library.triceps.exercises.forwardLungeTricepsExtensionDumbbell' => 'Forward lunge triceps extension (dumbbell)',
+			'library.triceps.exercises.pressDumbbellInclineNeutralGripExerciseBall' => 'Press (dumbbell, incline, neutral grip, exercise ball)',
+			'library.triceps.exercises.pressDumbbellInclineOneArmNeutralGrip' => 'Press (dumbbell, incline, one arm, neutral grip)',
+			'library.triceps.exercises.pressDumbbellInclineOneArmNeutralGripExerciseBall' => 'Press (dumbbell, incline, one arm, neutral grip, exercise ball)',
+			'library.triceps.exercises.tricepsExtensionDumbbellIncline' => 'Triceps extension (dumbbell, incline)',
+			'library.triceps.exercises.tricepsExtensionDumbbellInclineTwoArm' => 'Triceps extension (dumbbell, incline, two arm)',
+			'library.triceps.exercises.kickbackDumbbellExerciseBall' => 'Kickback (dumbbell, exercise ball)',
+			'library.triceps.exercises.tricepsExtensionDumbbellLyingAcrossFace' => 'Triceps extension (dumbbell, lying, across face)',
+			'library.triceps.exercises.extensionDumbbellLyingAlternate' => 'Extension (dumbbell, lying, alternate)',
+			'library.triceps.exercises.tricepsExtensionDumbbellLying' => 'Triceps extension (dumbbell, lying)',
+			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArmPronated' => 'Triceps extension (dumbbell, lying, one arm, pronated)',
+			_ => null,
+		} ?? switch (path) {
+			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArmSupinated' => 'Triceps extension (dumbbell, lying, one arm, supinated)',
+			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArm' => 'Triceps extension (dumbbell, lying, one arm)',
+			'library.triceps.exercises.frenchPressDumbbellOneArmExerciseBall' => 'French press (dumbbell, one arm, exercise ball)',
+			'library.triceps.exercises.pressDumbbellOneArmNeutralGripExerciseBall' => 'Press (dumbbell, one arm, neutral grip, exercise ball)',
+			'library.triceps.exercises.tricepsExtensionDumbbellOneArmBench' => 'Triceps extension (dumbbell, one arm, bench)',
+			'library.triceps.exercises.tricepsExtensionDumbbellPronateGrip' => 'Triceps extension (dumbbell, pronate grip)',
+			'library.triceps.exercises.extensionDumbbellSeatedBench' => 'Extension (dumbbell, seated, bench)',
+			'library.triceps.exercises.kickbackDumbbellSeatedBentOverAlternate' => 'Kickback (dumbbell, seated, bent over, alternate)',
+			'library.triceps.exercises.kickbackDumbbellSeated' => 'Kickback (dumbbell, seated)',
+			'library.triceps.exercises.kickbackDumbbellSeatedOneArm' => 'Kickback (dumbbell, seated, one arm)',
+			'library.triceps.exercises.tricepsExtensionDumbbellSeatedReverseGripOneArmOverhead' => 'Triceps extension (dumbbell, seated, reverse grip, one arm, overhead)',
+			'library.triceps.exercises.tricepsKickbackDumbbellStandingAlternate' => 'Triceps kickback (dumbbell, standing, alternate)',
+			'library.triceps.exercises.tricepsExtensionDumbbellStandingBentOverOneArm' => 'Triceps extension (dumbbell, standing, bent over, one arm)',
+			'library.triceps.exercises.kickbackDumbbellStanding' => 'Kickback (dumbbell, standing)',
+			'library.triceps.exercises.extensionDumbbellStandingOneArm' => 'Extension (dumbbell, standing, one arm)',
+			'library.triceps.exercises.tatePressDumbbell' => 'Tate press (dumbbell)',
+			'library.triceps.exercises.tricepsKickbackDumbbellStorkStance' => 'Triceps kickback (dumbbell, stork stance)',
+			'library.triceps.exercises.elbowSupportedDips' => 'Elbow-supported dips',
+			'library.triceps.exercises.dipExerciseBall' => 'Dip (exercise ball)',
+			'library.triceps.exercises.tricepsStretchExerciseBallSeated' => 'Triceps stretch (exercise ball, seated)',
+			'library.triceps.exercises.tricepsExtensionExerciseBallSupine' => 'Triceps extension (exercise ball, supine)',
+			'library.triceps.exercises.frenchPressEzBarExerciseBall' => 'French press (ez bar, exercise ball)',
+			'library.triceps.exercises.tricepsExtensionEzBarLyingCloseGripBehindHead' => 'Triceps extension (ez bar, lying, close grip, behind head)',
+			'library.triceps.exercises.frenchPressEzBarStanding' => 'French press (ez bar, standing)',
+			'library.triceps.exercises.declineEZBarFacePress' => 'Decline EZ-bar face press',
+			'library.triceps.exercises.tricepsExtensionEzBarbellDecline' => 'Triceps extension (ez barbell, decline)',
+			'library.triceps.exercises.tricepsExtensionEzBarbellIncline' => 'Triceps extension (ez barbell, incline)',
+			'library.triceps.exercises.tricepsExtensionEzBarbellSeated' => 'Triceps extension (ez barbell, seated)',
+			'library.triceps.exercises.benchPressEzBarCloseGrip' => 'Bench press (ez bar, close grip)',
+			'library.triceps.exercises.forearmTransitionDips' => 'Forearm-transition dips',
+			'library.triceps.exercises.pushUpInclineCloseGrip' => 'Push-up (incline, close grip)',
+			'library.triceps.exercises.tricepsDipLeverOverhand' => 'Triceps dip (lever, overhand)',
+			'library.triceps.exercises.dipLeverSeated' => 'Dip (lever, seated)',
+			'library.triceps.exercises.pushUpMedicineBallCloseGrip' => 'Push-up (medicine ball, close grip)',
+			'library.triceps.exercises.supineMedicineBallChestThrow' => 'Supine medicine-ball chest throw',
+			'library.triceps.exercises.tricepsExtensionOlympicBarbell' => 'Triceps extension (olympic barbell)',
+			'library.triceps.exercises.dipOneArm' => 'Dip (one arm)',
+			'library.triceps.exercises.tricepsStretchOverhead' => 'Triceps stretch (overhead)',
+			'library.triceps.exercises.pushUpCloseGripOffDumbbell' => 'Push-up (close grip, off, dumbbell)',
+			'library.triceps.exercises.dipReverse' => 'Dip (reverse)',
+			'library.triceps.exercises.dipRing' => 'Dip (ring)',
+			'library.triceps.exercises.benchPressSmithCloseGrip' => 'Bench press (smith, close grip)',
+			'library.triceps.exercises.benchPressSmithMachineDeclineCloseGrip' => 'Bench press (smith machine, decline, close grip)',
+			'library.triceps.exercises.tricepsExtensionSmithMachineIncline' => 'Triceps extension (smith machine, incline)',
+			'library.triceps.exercises.stalderPressToHandstand' => 'Stalder press to handstand',
+			'library.triceps.exercises.dipThreeBench' => 'Dip (three, bench)',
+			'library.triceps.exercises.tricepsDipFloor' => 'Triceps dip (floor)',
+			'library.triceps.exercises.dipWeightedBench' => 'Dip (weighted, bench)',
+			'library.triceps.exercises.dipWeightedThreeBench' => 'Dip (weighted, three, bench)',
+			'library.triceps.exercises.tricepsDipWeighted' => 'Triceps dip (weighted)',
+			'library.triceps.exercises.jmPressBarbell' => 'JM press (barbell)',
+			'library.triceps.exercises.jmPressEzBarbell' => 'JM press (ez barbell)',
 			'library.newCustomExercise' => 'New exercise',
 			'library.custom.name' => 'Custom exercises',
 			'library.hips.exercises.hipAdduction' => 'Machine hip adduction',
+			'library.hips.exercises.adductorStretchAssistedSideLying' => 'Adductor stretch (assisted, side lying)',
+			'library.hips.exercises.hipAdductionCable' => 'Hip adduction (cable)',
+			'library.hips.exercises.hipAdductionSideLying' => 'Hip adduction (side lying)',
+			'library.hips.exercises.hipAdductionSidePlank' => 'Hip adduction (side plank)',
 			'library.hips.name' => 'Hips',
 			'library.forearms.name' => 'Forearms',
 			'library.forearms.exercises.wristCurlsBarbell' => 'Wrist curls (barbell)',
@@ -10682,6 +14740,34 @@ extension on Translations {
 			'library.forearms.exercises.reverseCurlsDumbbell' => 'Reverse curls (dumbbell)',
 			'library.forearms.exercises.dumbbellSingleArmReverseCurl' => 'Single-arm dumbbell reverse curl',
 			'library.forearms.exercises.singleArmCableReverseCurl' => 'Single-arm cable reverse curl',
+			'library.forearms.exercises.reverseWristCurlBand' => 'Reverse wrist curl (band)',
+			'library.forearms.exercises.wristCurlBand' => 'Wrist curl (band)',
+			'library.forearms.exercises.wristCurlBarbellStandingBack' => 'Wrist curl (barbell, standing, back)',
+			'library.forearms.exercises.reverseWristCurlCable' => 'Reverse wrist curl (cable)',
+			'library.forearms.exercises.wristCurlCableStandingBack' => 'Wrist curl (cable, standing, back)',
+			'library.forearms.exercises.wristCurlCable' => 'Wrist curl (cable)',
+			'library.forearms.exercises.dumbbellFingerFlexion' => 'Dumbbell finger flexion',
+			'library.forearms.exercises.pronationDumbbellLying' => 'Pronation (dumbbell, lying)',
+			'library.forearms.exercises.pronationDumbbellLyingFloor' => 'Pronation (dumbbell, lying, floor)',
+			'library.forearms.exercises.supinationDumbbellLying' => 'Supination (dumbbell, lying)',
+			'library.forearms.exercises.supinationDumbbellLyingFloor' => 'Supination (dumbbell, lying, floor)',
+			'library.forearms.exercises.reverseWristCurlDumbbellOneArm' => 'Reverse wrist curl (dumbbell, one arm)',
+			'library.forearms.exercises.neutralWristCurlDumbbellOneArmSeated' => 'Neutral wrist curl (dumbbell, one arm, seated)',
+			'library.forearms.exercises.wristCurlDumbbellOneArm' => 'Wrist curl (dumbbell, one arm)',
+			'library.forearms.exercises.benchSupportedDumbbellRadialDeviation' => 'Bench-supported dumbbell radial deviation',
+			'library.forearms.exercises.neutralWristCurlDumbbellBenchOneArm' => 'Neutral wrist curl (dumbbell, bench, one arm)',
+			'library.forearms.exercises.reverseWristCurlDumbbellBenchOneArm' => 'Reverse wrist curl (dumbbell, bench, one arm)',
+			'library.forearms.exercises.wristCurlDumbbellBenchOneArm' => 'Wrist curl (dumbbell, bench, one arm)',
+			'library.forearms.exercises.seatedDumbbellRadialDeviation' => 'Seated dumbbell radial deviation',
+			'library.forearms.exercises.shoulderExternalRotationDumbbellSeatedOneArm' => 'Shoulder external rotation (dumbbell, seated, one arm)',
+			'library.forearms.exercises.fingerFlexionCurls' => 'Finger flexion curls',
+			'library.forearms.exercises.hangCleanKettlebellAlternate' => 'Hang clean (kettlebell, alternate)',
+			'library.forearms.exercises.machineHandGripSqueeze' => 'Machine hand-grip squeeze',
+			'library.forearms.exercises.wristStretchWithSidePull' => 'Wrist stretch with side pull',
+			'library.forearms.exercises.wristCurlSmithSeated' => 'Wrist curl (smith, seated)',
+			'library.forearms.exercises.wristCurlSmithStandingBack' => 'Wrist curl (smith, standing, back)',
+			'library.forearms.exercises.weightedHandGripSqueeze' => 'Weighted hand-grip squeeze',
+			'library.forearms.exercises.wristCircles' => 'Wrist circles',
 			'library.obliques.exercises.sidewaysPlank' => 'Side plank',
 			'library.obliques.exercises.sidewaysPlankReachThrough' => 'Side plank reach through',
 			'library.other.name' => 'Other',
@@ -10700,6 +14786,68 @@ extension on Translations {
 			'library.glutes.exercises.hipAbduction' => 'Machine hip abduction',
 			'library.glutes.exercises.clamshells' => 'Clamshells',
 			'library.glutes.exercises.hipThrustBarbell' => 'Hip thrust (barbell)',
+			'library.glutes.exercises.standingToeTouchCirclesArmsOpen' => 'Standing toe-touch circles, arms open',
+			'library.glutes.exercises.assistedSupineGluteStretch' => 'Assisted supine glute stretch',
+			'library.glutes.exercises.assistedGluteAndPiriformisStretch' => 'Assisted glute and piriformis stretch',
+			'library.glutes.exercises.hipExtensionBandBentOver' => 'Hip extension (band, bent over)',
+			'library.glutes.exercises.gluteBridgeBand' => 'Glute bridge (band)',
+			'library.glutes.exercises.hipInternalRotationBandLying' => 'Hip internal rotation (band, lying)',
+			'library.glutes.exercises.pullThroughBand' => 'Pull through (band)',
+			'library.glutes.exercises.hipInternalRotationBandSeated' => 'Hip internal rotation (band, seated)',
+			'library.glutes.exercises.gluteBridgeBarbell' => 'Glute bridge (barbell)',
+			'library.glutes.exercises.gluteBridgeBarbellBench' => 'Glute bridge (barbell, bench)',
+			'library.glutes.exercises.deadliftBarbellOneArmSide' => 'Deadlift (barbell, one arm, side)',
+			'library.glutes.exercises.rackPullBarbell' => 'Rack pull (barbell)',
+			'library.glutes.exercises.deadliftBarbellOneLeg' => 'Deadlift (barbell, one leg)',
+			'library.glutes.exercises.deadliftBarbellSumo' => 'Deadlift (barbell, sumo)',
+			'library.glutes.exercises.standingForwardFoldToToes' => 'Standing forward fold to toes',
+			'library.glutes.exercises.hipExtensionBench' => 'Hip extension (bench)',
+			'library.glutes.exercises.twistBentKneeLying' => 'Twist (bent knee, lying)',
+			'library.glutes.exercises.deadliftCable' => 'Deadlift (cable)',
+			'library.glutes.exercises.pullThroughCableRope' => 'Pull through (cable, rope)',
+			'library.glutes.exercises.hipExtensionCableStanding' => 'Hip extension (cable, standing)',
+			'library.glutes.exercises.cleanDumbbell' => 'Clean (dumbbell)',
+			'library.glutes.exercises.deadliftDumbbell' => 'Deadlift (dumbbell)',
+			'library.glutes.exercises.snatchDumbbellOneArm' => 'Snatch (dumbbell, one arm)',
+			'library.glutes.exercises.deadliftDumbbellOneLegStepboxSupport' => 'Deadlift (dumbbell, one leg, stepbox support)',
+			'library.glutes.exercises.pullThroughDumbbellSumo' => 'Pull through (dumbbell, sumo)',
+			'library.glutes.exercises.hipFlexorStretchExerciseBall' => 'Hip flexor stretch (exercise ball)',
+			'library.glutes.exercises.proneSingleLegHipRotationOnBall' => 'Prone single-leg hip rotation on ball',
+			'library.glutes.exercises.ballSupportedDiagonalKickAndLegCurl' => 'Ball-supported diagonal kick and leg curl',
+			'library.glutes.exercises.flutterKicks' => 'Flutter kicks',
+			'library.glutes.exercises.gluteBridgeMarch' => 'Glute bridge (march)',
+			'library.glutes.exercises.gluteBridgeTwoLegBench' => 'Glute bridge (two leg, bench)',
+			'library.glutes.exercises.toeTouchCirclesWithHandsClasped' => 'Toe-touch circles with hands clasped',
+			'library.glutes.exercises.toeTouchCirclesWithReversedHandClasp' => 'Toe-touch circles with reversed hand clasp',
+			'library.glutes.exercises.supineKneesToChestStretch' => 'Supine knees-to-chest stretch',
+			'library.glutes.exercises.supineCrossBodyRotationStretch' => 'Supine cross-body rotation stretch',
+			'library.glutes.exercises.deadliftLever' => 'Deadlift (lever)',
+			'library.glutes.exercises.hipExtensionLever' => 'Hip extension (lever)',
+			'library.glutes.exercises.legPressLeverHorizontalOneLeg' => 'Leg press (lever, horizontal, one leg)',
+			'library.glutes.exercises.reverseHyperextensionLever' => 'Reverse hyperextension (lever)',
+			'library.glutes.exercises.wallSitWithAlternatingKneeLifts' => 'Wall sit with alternating knee lifts',
+			'library.glutes.exercises.pelvicTiltIntoGluteBridge' => 'Pelvic tilt into glute bridge',
+			'library.glutes.exercises.pushUpPikeToCobra' => 'Push-up (pike to cobra)',
+			'library.glutes.exercises.elevatedReverseBridge' => 'Elevated reverse bridge',
+			'library.glutes.exercises.hipThrustsResistanceBandKnee' => 'Hip thrusts (resistance band, knee)',
+			'library.glutes.exercises.hipAbductionResistanceBandSeated' => 'Hip abduction (resistance band, seated)',
+			'library.glutes.exercises.reverseHyperextensionStabilityBall' => 'Reverse hyperextension (stability ball)',
+			'library.glutes.exercises.reverseHyperextensionFlatBench' => 'Reverse hyperextension (flat bench)',
+			'library.glutes.exercises.rockingFrogAdductorStretch' => 'Rocking frog adductor stretch',
+			'library.glutes.exercises.latStretchRollerHip' => 'Lat stretch (roller, hip)',
+			'library.glutes.exercises.hipStretchRoller' => 'Hip stretch (roller)',
+			'library.glutes.exercises.gluteStretchSeated' => 'Glute stretch (seated)',
+			'library.glutes.exercises.piriformisStretchSeated' => 'Piriformis stretch (seated)',
+			'library.glutes.exercises.hipAbductionSideBridge' => 'Hip abduction (side bridge)',
+			'library.glutes.exercises.hipAbductionSide' => 'Hip abduction (side)',
+			'library.glutes.exercises.legPressSled45WideStance' => 'Leg press (sled, 45°, wide stance)',
+			'library.glutes.exercises.deadliftSmith' => 'Deadlift (smith)',
+			'library.glutes.exercises.legPressSmith' => 'Leg press (smith)',
+			'library.glutes.exercises.sideLyingStraightLegHipAbduction' => 'Side-lying straight-leg hip abduction',
+			'library.glutes.exercises.swimmerKicks' => 'Swimmer kicks',
+			'library.glutes.exercises.tireTurnover' => 'Tire turnover',
+			'library.glutes.exercises.trapBarDeadlift' => 'Trap-bar deadlift',
+			'library.glutes.exercises.hipLiftWithRotation' => 'Hip lift with rotation',
 			'library.glutes.name' => 'Glutes',
 			'infobox.label' => 'Notes',
 			'superset' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ), 
@@ -11032,6 +15180,8 @@ extension on Translations {
 			'food.languages.ba' => 'Bashkir',
 			'food.languages.be' => 'Belarusian',
 			'food.languages.bg' => 'Bulgarian',
+			_ => null,
+		} ?? switch (path) {
 			'food.languages.bh' => 'Bihari',
 			'food.languages.bi' => 'Bislama',
 			'food.languages.bm' => 'Bambara',
@@ -11044,8 +15194,6 @@ extension on Translations {
 			'food.languages.ch' => 'Chamorro',
 			'food.languages.co' => 'Corsican',
 			'food.languages.cr' => 'Cree',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.cs' => 'Czech',
 			'food.languages.cu' => 'Church Slavonic',
 			'food.languages.cv' => 'Chuvash',
@@ -11546,6 +15694,8 @@ extension on Translations {
 			'food.recipes.empty' => 'No saved recipes',
 			'food.recipes.search' => 'Search recipes',
 			'food.recipes.name' => 'Name',
+			_ => null,
+		} ?? switch (path) {
 			'food.recipes.description' => 'Description',
 			'food.recipes.instructions' => 'Cooking instructions',
 			'food.recipes.servings' => 'Servings',
@@ -11558,8 +15708,6 @@ extension on Translations {
 			'food.recipes.perServing' => 'Per serving',
 			'food.recipes.save' => 'Save',
 			'food.recipes.delete' => 'Delete',
-			_ => null,
-		} ?? switch (path) {
 			'food.recipes.deletePrompt' => 'Delete this recipe? Previously logged meals will stay unchanged.',
 			'food.recipes.cancel' => 'Cancel',
 			'food.recipes.confirm' => 'Confirm',

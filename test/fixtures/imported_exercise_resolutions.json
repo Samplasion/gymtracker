@@ -1,0 +1,6627 @@
+{
+  "sourceFile": "exercises.json",
+  "sourceCount": 1324,
+  "resolutions": [
+    {
+      "sourceId": "0001",
+      "exerciseId": "library.abs.exercises.sitUp34",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0002",
+      "exerciseId": "library.abs.exercises.sideBendOnA45Bench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0003",
+      "exerciseId": "library.abs.exercises.bicycleCrunches",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1512",
+      "exerciseId": "library.quadriceps.exercises.quadricepsStretchQuadruped",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0006",
+      "exerciseId": "library.abs.exercises.heelTouches",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0007",
+      "exerciseId": "library.back.exercises.pulldownCableAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1368",
+      "exerciseId": "library.calves.exercises.ankleRotations",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3293",
+      "exerciseId": "library.back.exercises.pullUpArcher",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3294",
+      "exerciseId": "library.chest.exercises.pushUpArcher",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2355",
+      "exerciseId": "library.abs.exercises.hangingKneeRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2333",
+      "exerciseId": "library.abs.exercises.legRaiseHangingStraps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3214",
+      "exerciseId": "library.glutes.exercises.standingToeTouchCirclesArmsOpen",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3204",
+      "exerciseId": "library.abs.exercises.sitUpArmsOverheadFull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0009",
+      "exerciseId": "library.chest.exercises.chestDipAssistedKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0011",
+      "exerciseId": "library.abs.exercises.kneeRaiseAssistedHanging",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0010",
+      "exerciseId": "library.abs.exercises.kneeRaiseAssistedHangingThrowDown",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1708",
+      "exerciseId": "library.calves.exercises.calvesStretchAssistedLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1709",
+      "exerciseId": "library.glutes.exercises.assistedSupineGluteStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1710",
+      "exerciseId": "library.glutes.exercises.assistedGluteAndPiriformisStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0012",
+      "exerciseId": "library.abs.exercises.legRaiseAssistedLyingLateralThrowDown",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0013",
+      "exerciseId": "library.abs.exercises.legRaiseAssistedLyingThrowDown",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0014",
+      "exerciseId": "library.abs.exercises.russianTwistAssistedMotion",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0015",
+      "exerciseId": "library.back.exercises.pullUpAssistedParallelCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0016",
+      "exerciseId": "library.hamstrings.exercises.hamstringStretchAssistedProne",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1713",
+      "exerciseId": "library.quadriceps.exercises.quadricepsStretchAssistedProne",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1714",
+      "exerciseId": "library.quadriceps.exercises.quadricepsStretchAssistedProne",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0017",
+      "exerciseId": "library.back.exercises.machineAssistedPullUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1716",
+      "exerciseId": "library.chest.exercises.pectoralisMajorStretchAssistedSeatedStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1712",
+      "exerciseId": "library.hips.exercises.adductorStretchAssistedSideLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1758",
+      "exerciseId": "library.abs.exercises.sitUpAssisted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1431",
+      "exerciseId": "library.back.exercises.chinUpAssistedStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1432",
+      "exerciseId": "library.back.exercises.pullUpAssistedStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0018",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionAssistedStandingTowel",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0019",
+      "exerciseId": "library.triceps.exercises.machineAssistedDips",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2364",
+      "exerciseId": "library.chest.exercises.chestDipAssistedWideGripKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3220",
+      "exerciseId": "library.cardio.exercises.straddleJumps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3672",
+      "exerciseId": "library.cardio.exercises.forwardAndBackwardSteps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1314",
+      "exerciseId": "library.back.exercises.backExtensionExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3297",
+      "exerciseId": "library.back.exercises.backLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1405",
+      "exerciseId": "library.back.exercises.chestStretchWithArmsBehindTheBack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1473",
+      "exerciseId": "library.quadriceps.exercises.backwardJump",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0020",
+      "exerciseId": "library.quadriceps.exercises.balanceBoardStance",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0968",
+      "exerciseId": "library.biceps.exercises.bicepsCurlBandAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0969",
+      "exerciseId": "library.abs.exercises.vUpBandAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0970",
+      "exerciseId": "library.back.exercises.pullUpBandAssisted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0971",
+      "exerciseId": "library.abs.exercises.rolloutBandAssistedWheel",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1254",
+      "exerciseId": "library.chest.exercises.benchPressBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0980",
+      "exerciseId": "library.glutes.exercises.hipExtensionBandBentOver",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0972",
+      "exerciseId": "library.abs.exercises.bicycleCrunchBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0974",
+      "exerciseId": "library.back.exercises.pulldownBandCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0975",
+      "exerciseId": "library.triceps.exercises.pushUpBandCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0976",
+      "exerciseId": "library.biceps.exercises.concentrationCurlBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3117",
+      "exerciseId": "library.back.exercises.pulldownBandFixedBackCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3116",
+      "exerciseId": "library.back.exercises.pulldownBandFixedBackUnderhand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0977",
+      "exerciseId": "library.shoulders.exercises.frontLateralRaiseBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0978",
+      "exerciseId": "library.shoulders.exercises.frontRaiseBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1408",
+      "exerciseId": "library.glutes.exercises.gluteBridgeBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0979",
+      "exerciseId": "library.abs.exercises.pallofPressBandHorizontal",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0981",
+      "exerciseId": "library.abs.exercises.jackknifeSitUpBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0983",
+      "exerciseId": "library.back.exercises.pulldownBandKneelingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0985",
+      "exerciseId": "library.abs.exercises.crunchBandKneelingTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0984",
+      "exerciseId": "library.glutes.exercises.hipInternalRotationBandLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1002",
+      "exerciseId": "library.abs.exercises.legRaiseBandLyingStraightLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0986",
+      "exerciseId": "library.biceps.exercises.bicepsCurlBandOneArmOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0987",
+      "exerciseId": "library.quadriceps.exercises.splitSquatBandOneArmOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0988",
+      "exerciseId": "library.back.exercises.rowBandOneArmStandingLow",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0989",
+      "exerciseId": "library.chest.exercises.chestPressBandOneArmTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0990",
+      "exerciseId": "library.back.exercises.rowBandOneArmTwistingSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0991",
+      "exerciseId": "library.glutes.exercises.pullThroughBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0992",
+      "exerciseId": "library.abs.exercises.sitUpBandPush",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0993",
+      "exerciseId": "library.shoulders.exercises.reverseFlyBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0994",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0996",
+      "exerciseId": "library.glutes.exercises.hipInternalRotationBandSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1011",
+      "exerciseId": "library.abs.exercises.twistBandSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0997",
+      "exerciseId": "library.shoulders.exercises.shoulderPressBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1018",
+      "exerciseId": "library.shoulders.exercises.shrugBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0998",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionBandSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0999",
+      "exerciseId": "library.calves.exercises.calfRaiseBandOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1000",
+      "exerciseId": "library.calves.exercises.reverseCalfRaiseBandOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1001",
+      "exerciseId": "library.quadriceps.exercises.splitSquatBandOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1004",
+      "exerciseId": "library.quadriceps.exercises.squatBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1003",
+      "exerciseId": "library.quadriceps.exercises.squatRowBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1005",
+      "exerciseId": "library.abs.exercises.crunchBandStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1022",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowBandStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1007",
+      "exerciseId": "library.abs.exercises.crunchBandStandingTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1008",
+      "exerciseId": "library.quadriceps.exercises.stepUpBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1009",
+      "exerciseId": "library.hamstrings.exercises.straightLegDeadliftBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1023",
+      "exerciseId": "library.hamstrings.exercises.straightLegDeadliftBand",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1010",
+      "exerciseId": "library.hamstrings.exercises.straightLegDeadliftBand",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1012",
+      "exerciseId": "library.shoulders.exercises.overheadPressBandTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1369",
+      "exerciseId": "library.calves.exercises.calfRaiseBandStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1013",
+      "exerciseId": "library.back.exercises.pulldownBandUnderhand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1014",
+      "exerciseId": "library.abs.exercises.vUpBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1015",
+      "exerciseId": "library.abs.exercises.pallofPressBandVertical",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1016",
+      "exerciseId": "library.forearms.exercises.wristCurlBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1017",
+      "exerciseId": "library.shoulders.exercises.yRaiseBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0023",
+      "exerciseId": "library.biceps.exercises.bicepsCurlBarbellAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0024",
+      "exerciseId": "library.quadriceps.exercises.frontSquatBarbellBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0025",
+      "exerciseId": "library.chest.exercises.barbellBenchPressFlat",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0026",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1316",
+      "exerciseId": "library.back.exercises.pulloverBarbellBentArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0027",
+      "exerciseId": "library.back.exercises.barbellRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2407",
+      "exerciseId": "library.biceps.exercises.bicepsCurlBarbellArmBlaster",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0028",
+      "exerciseId": "library.quadriceps.exercises.cleanAndPressBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0029",
+      "exerciseId": "library.quadriceps.exercises.frontSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0030",
+      "exerciseId": "library.triceps.exercises.benchPressBarbellCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0031",
+      "exerciseId": "library.biceps.exercises.barbellBicepsCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0032",
+      "exerciseId": "library.back.exercises.deadlift",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0033",
+      "exerciseId": "library.chest.exercises.barbellBenchPressDecline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0034",
+      "exerciseId": "library.back.exercises.pulloverBarbellDeclineBentArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0035",
+      "exerciseId": "library.triceps.exercises.declineCloseGripPressIntoSkullCrusher",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1255",
+      "exerciseId": "library.chest.exercises.pulloverBarbellDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0036",
+      "exerciseId": "library.chest.exercises.pressBarbellDeclineWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0037",
+      "exerciseId": "library.back.exercises.pulloverBarbellDeclineWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0038",
+      "exerciseId": "library.biceps.exercises.dragCurlBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1370",
+      "exerciseId": "library.calves.exercises.calfRaiseBarbellFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0039",
+      "exerciseId": "library.quadriceps.exercises.frontSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0041",
+      "exerciseId": "library.shoulders.exercises.frontRaiseBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0040",
+      "exerciseId": "library.shoulders.exercises.frontRaiseAndPulloverBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0042",
+      "exerciseId": "library.quadriceps.exercises.frontSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0043",
+      "exerciseId": "library.quadriceps.exercises.squatsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1461",
+      "exerciseId": "library.quadriceps.exercises.squatsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1462",
+      "exerciseId": "library.quadriceps.exercises.squatsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1545",
+      "exerciseId": "library.quadriceps.exercises.zercherSquatBarbellFull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1409",
+      "exerciseId": "library.glutes.exercises.gluteBridgeBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3562",
+      "exerciseId": "library.glutes.exercises.gluteBridgeBarbellBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0044",
+      "exerciseId": "library.hamstrings.exercises.goodMorningBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0045",
+      "exerciseId": "library.chest.exercises.benchPressBarbellGuillotine",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0046",
+      "exerciseId": "library.quadriceps.exercises.hackSquatBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1436",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellHighBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0047",
+      "exerciseId": "library.chest.exercises.barbellBenchPressIncline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1719",
+      "exerciseId": "library.triceps.exercises.benchPressBarbellInclineCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0048",
+      "exerciseId": "library.triceps.exercises.pressBarbellInclineReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0049",
+      "exerciseId": "library.back.exercises.rowBarbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0050",
+      "exerciseId": "library.shoulders.exercises.shoulderPressBarbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0051",
+      "exerciseId": "library.quadriceps.exercises.jeffersonSquatBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0052",
+      "exerciseId": "library.triceps.exercises.jmPressBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0053",
+      "exerciseId": "library.quadriceps.exercises.jumpSquatBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1410",
+      "exerciseId": "library.quadriceps.exercises.lateralLungeBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1435",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellLowBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0054",
+      "exerciseId": "library.quadriceps.exercises.lungeBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1720",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionBarbellLyingBackOfHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0055",
+      "exerciseId": "library.triceps.exercises.benchPressBarbellCloseGrip",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0056",
+      "exerciseId": "library.triceps.exercises.skullCrushers",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0057",
+      "exerciseId": "library.triceps.exercises.skullCrushers",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0058",
+      "exerciseId": "library.glutes.exercises.gluteBridgeBarbellBench",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0059",
+      "exerciseId": "library.biceps.exercises.preacherCurlBarbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0061",
+      "exerciseId": "library.triceps.exercises.skullCrushers",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0060",
+      "exerciseId": "library.triceps.exercises.skullCrushers",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0063",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellNarrowStance",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0064",
+      "exerciseId": "library.back.exercises.bentOverRowBarbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0065",
+      "exerciseId": "library.triceps.exercises.floorPressBarbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0066",
+      "exerciseId": "library.glutes.exercises.deadliftBarbellOneArmSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0067",
+      "exerciseId": "library.shoulders.exercises.snatchBarbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0068",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0069",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1411",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1412",
+      "exerciseId": "library.forearms.exercises.wristCurlsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3017",
+      "exerciseId": "library.back.exercises.pendlayRowBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1751",
+      "exerciseId": "library.triceps.exercises.pinPressesBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0070",
+      "exerciseId": "library.biceps.exercises.preacherCurlBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0071",
+      "exerciseId": "library.abs.exercises.sitUpBarbellPress",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0072",
+      "exerciseId": "library.biceps.exercises.spiderCurls",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0073",
+      "exerciseId": "library.back.exercises.pulloverBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0022",
+      "exerciseId": "library.back.exercises.pulloverToPressBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0074",
+      "exerciseId": "library.glutes.exercises.rackPullBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0075",
+      "exerciseId": "library.shoulders.exercises.rearDeltRaiseBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0076",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0078",
+      "exerciseId": "library.quadriceps.exercises.rearLungeBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0077",
+      "exerciseId": "library.quadriceps.exercises.rearLungeBarbell",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0079",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2187",
+      "exerciseId": "library.triceps.exercises.benchPressBarbellReverseCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0080",
+      "exerciseId": "library.forearms.exercises.reverseCurls",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0118",
+      "exerciseId": "library.back.exercises.bentOverRowBarbellReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1256",
+      "exerciseId": "library.chest.exercises.benchPressBarbellReverseGripDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1257",
+      "exerciseId": "library.chest.exercises.benchPressBarbellReverseGripIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1317",
+      "exerciseId": "library.back.exercises.benchRowBarbellReverseGripIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1721",
+      "exerciseId": "library.triceps.exercises.skullcrusherBarbellReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0081",
+      "exerciseId": "library.biceps.exercises.reversePreacherCurlBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0082",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0084",
+      "exerciseId": "library.abs.exercises.rolloutBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0083",
+      "exerciseId": "library.abs.exercises.rolloutBarbellFromBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0085",
+      "exerciseId": "library.hamstrings.exercises.romanianDeadlift",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0086",
+      "exerciseId": "library.shoulders.exercises.militaryPressBarbellSeatedBehindHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0087",
+      "exerciseId": "library.shoulders.exercises.bradfordPressBarbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0088",
+      "exerciseId": "library.calves.exercises.calfRaiseBarbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1371",
+      "exerciseId": "library.calves.exercises.calfRaiseBarbellSeated",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1718",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionBarbellSeatedCloseGripBehindNeck",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0089",
+      "exerciseId": "library.biceps.exercises.concentrationCurlBarbellSeatedCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0090",
+      "exerciseId": "library.hamstrings.exercises.goodMorningBarbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0091",
+      "exerciseId": "library.shoulders.exercises.militaryPressBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0092",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionBarbellSeatedOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0094",
+      "exerciseId": "library.abs.exercises.twistBarbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0095",
+      "exerciseId": "library.shoulders.exercises.shrugsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0096",
+      "exerciseId": "library.abs.exercises.sideBendBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0098",
+      "exerciseId": "library.quadriceps.exercises.splitSquatBarbellSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0097",
+      "exerciseId": "library.quadriceps.exercises.splitSquatBarbellSide",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1756",
+      "exerciseId": "library.glutes.exercises.deadliftBarbellOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0099",
+      "exerciseId": "library.quadriceps.exercises.splitSquatBarbellOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2799",
+      "exerciseId": "library.abs.exercises.legRaiseBarbellSeatedAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2800",
+      "exerciseId": "library.abs.exercises.legRaiseBarbellSeatedAlternate",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0100",
+      "exerciseId": "library.shoulders.exercises.barbellSkiStyleHighPull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0101",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellSpeed",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2810",
+      "exerciseId": "library.quadriceps.exercises.splitSquatBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0102",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellKnee",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2798",
+      "exerciseId": "library.quadriceps.exercises.barbellSquatJumpIntoReverseLunge",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0103",
+      "exerciseId": "library.abs.exercises.abRolloutBarbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0104",
+      "exerciseId": "library.forearms.exercises.wristCurlBarbellStandingBack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0105",
+      "exerciseId": "library.shoulders.exercises.bradfordPressBarbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1372",
+      "exerciseId": "library.calves.exercises.calfRaiseBarbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0106",
+      "exerciseId": "library.biceps.exercises.curlBarbellStandingCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1456",
+      "exerciseId": "library.shoulders.exercises.militaryPressBarbellStandingCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2414",
+      "exerciseId": "library.biceps.exercises.concentrationCurlBarbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0107",
+      "exerciseId": "library.shoulders.exercises.frontRaiseBarbellStandingOverHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0108",
+      "exerciseId": "library.calves.exercises.calfRaiseBarbellStanding",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0109",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionBarbellStandingOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0110",
+      "exerciseId": "library.forearms.exercises.reverseCurls",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0111",
+      "exerciseId": "library.calves.exercises.calfRaiseBarbellStandingRockingLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0112",
+      "exerciseId": "library.abs.exercises.twistBarbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1629",
+      "exerciseId": "library.biceps.exercises.bicepsCurlBarbellStandingWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1457",
+      "exerciseId": "library.shoulders.exercises.militaryPressBarbellStandingWide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0113",
+      "exerciseId": "library.biceps.exercises.bicepsCurlBarbellStandingWideGrip",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0114",
+      "exerciseId": "library.quadriceps.exercises.stepUpBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0115",
+      "exerciseId": "library.hamstrings.exercises.goodMorningBarbellStraightLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0116",
+      "exerciseId": "library.hamstrings.exercises.straightLegDeadliftBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0117",
+      "exerciseId": "library.glutes.exercises.deadliftBarbellSumo",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3305",
+      "exerciseId": "library.shoulders.exercises.thrusterBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0120",
+      "exerciseId": "library.shoulders.exercises.uprightRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0119",
+      "exerciseId": "library.shoulders.exercises.uprightRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0121",
+      "exerciseId": "library.shoulders.exercises.uprightRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0122",
+      "exerciseId": "library.chest.exercises.benchPressBarbellWide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1258",
+      "exerciseId": "library.chest.exercises.benchPressBarbellWideReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0124",
+      "exerciseId": "library.quadriceps.exercises.squatBarbellWide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0123",
+      "exerciseId": "library.shoulders.exercises.uprightRowBarbellWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0126",
+      "exerciseId": "library.forearms.exercises.wristCurlsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0125",
+      "exerciseId": "library.forearms.exercises.wristCurlsBarbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0127",
+      "exerciseId": "library.quadriceps.exercises.zercherSquatBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3212",
+      "exerciseId": "library.glutes.exercises.standingForwardFoldToToes",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0128",
+      "exerciseId": "library.shoulders.exercises.battlingRopes",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3360",
+      "exerciseId": "library.cardio.exercises.bearCrawl",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1259",
+      "exerciseId": "library.chest.exercises.chestStretchBehindHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0129",
+      "exerciseId": "library.triceps.exercises.benchDips",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1399",
+      "exerciseId": "library.triceps.exercises.benchDips",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0130",
+      "exerciseId": "library.glutes.exercises.hipExtensionBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3019",
+      "exerciseId": "library.back.exercises.benchSupportedPullUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3639",
+      "exerciseId": "library.glutes.exercises.twistBentKneeLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1770",
+      "exerciseId": "library.biceps.exercises.legResistedConcentrationCurl",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0139",
+      "exerciseId": "library.biceps.exercises.chinUpCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0140",
+      "exerciseId": "library.biceps.exercises.chinUps",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0137",
+      "exerciseId": "library.triceps.exercises.benchDips",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3543",
+      "exerciseId": "library.quadriceps.exercises.jumpSquatBodyweightDrop",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3544",
+      "exerciseId": "library.abs.exercises.sidePlankBodyweightIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1771",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionBodyweightKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1769",
+      "exerciseId": "library.biceps.exercises.bicepsCurlBodyweightSideLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3168",
+      "exerciseId": "library.back.exercises.rowBodyweightSquatting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3167",
+      "exerciseId": "library.back.exercises.rowBodyweightSquattingTowel",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1373",
+      "exerciseId": "library.calves.exercises.standingBodyweightCalfRaise",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3156",
+      "exerciseId": "library.back.exercises.rowBodyweightStandingCloseGripOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3158",
+      "exerciseId": "library.back.exercises.rowBodyweightStandingCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3162",
+      "exerciseId": "library.back.exercises.rowBodyweightStandingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3161",
+      "exerciseId": "library.back.exercises.rowBodyweightStandingOneArmTowel",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3166",
+      "exerciseId": "library.back.exercises.rowBodyweightStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3165",
+      "exerciseId": "library.back.exercises.rowBodyweightStandingTowel",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0138",
+      "exerciseId": "library.abs.exercises.reverseCrunchWithVerticalHipLift",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1374",
+      "exerciseId": "library.calves.exercises.boxDropWithSingleLegLanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2466",
+      "exerciseId": "library.abs.exercises.crossBodyMountainClimber",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1160",
+      "exerciseId": "library.cardio.exercises.burpees",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0870",
+      "exerciseId": "library.abs.exercises.plankHipLifts",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1494",
+      "exerciseId": "library.chest.exercises.seatedButterflyStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0148",
+      "exerciseId": "library.shoulders.exercises.shoulderPressCableAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0149",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3235",
+      "exerciseId": "library.hamstrings.exercises.legCurlCableAssistedInverse",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0150",
+      "exerciseId": "library.back.exercises.latPulldowns",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0151",
+      "exerciseId": "library.chest.exercises.cableBenchPressFlat",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1630",
+      "exerciseId": "library.biceps.exercises.curlCableCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1631",
+      "exerciseId": "library.biceps.exercises.concentrationCurlCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0152",
+      "exerciseId": "library.triceps.exercises.extensionCableConcentrationKnee",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0153",
+      "exerciseId": "library.back.exercises.latPulldownCableCrossover",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0154",
+      "exerciseId": "library.shoulders.exercises.standingCableReverseFly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0155",
+      "exerciseId": "library.chest.exercises.midHeightCableFly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0868",
+      "exerciseId": "library.biceps.exercises.cableBicepsCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0157",
+      "exerciseId": "library.glutes.exercises.deadliftCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0158",
+      "exerciseId": "library.chest.exercises.cableFlyCrossovers",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1260",
+      "exerciseId": "library.chest.exercises.pressCableDeclineOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1261",
+      "exerciseId": "library.chest.exercises.cableBenchPressDecline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0159",
+      "exerciseId": "library.back.exercises.rowCableDeclineSeatedWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1632",
+      "exerciseId": "library.biceps.exercises.dragCurlCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0160",
+      "exerciseId": "library.back.exercises.rowCableFloorSeatedWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0161",
+      "exerciseId": "library.shoulders.exercises.cableFrontRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0162",
+      "exerciseId": "library.shoulders.exercises.cableFrontRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0164",
+      "exerciseId": "library.shoulders.exercises.cableFrontRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0165",
+      "exerciseId": "library.biceps.exercises.ropeHammerCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1722",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableHighPulleyOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0167",
+      "exerciseId": "library.back.exercises.rowCableHighKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0168",
+      "exerciseId": "library.hips.exercises.hipAdductionCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0169",
+      "exerciseId": "library.chest.exercises.cableBenchPressIncline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1318",
+      "exerciseId": "library.back.exercises.benchRowCableIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0171",
+      "exerciseId": "library.chest.exercises.flyCableIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0170",
+      "exerciseId": "library.chest.exercises.flyCableInclineStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0172",
+      "exerciseId": "library.back.exercises.straightArmCablePushdown",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0173",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0174",
+      "exerciseId": "library.abs.exercises.cableRotationalShoulderThrow",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0860",
+      "exerciseId": "library.triceps.exercises.kickbackCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0175",
+      "exerciseId": "library.abs.exercises.cableCrunch",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3697",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowCableKneelingRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0176",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2330",
+      "exerciseId": "library.back.exercises.latPulldowns",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0177",
+      "exerciseId": "library.back.exercises.latPulldownCableRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2616",
+      "exerciseId": "library.back.exercises.triangleBarLatPulldowns",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0178",
+      "exerciseId": "library.shoulders.exercises.latRaisesCable",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0179",
+      "exerciseId": "library.chest.exercises.lowCableFly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0180",
+      "exerciseId": "library.back.exercises.rowCableSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1634",
+      "exerciseId": "library.biceps.exercises.bicepsCurlCableLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0182",
+      "exerciseId": "library.biceps.exercises.curlCableLyingCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0184",
+      "exerciseId": "library.back.exercises.pulloverCableLyingRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0185",
+      "exerciseId": "library.chest.exercises.flyCableLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0186",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0188",
+      "exerciseId": "library.chest.exercises.midHeightCableFly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0189",
+      "exerciseId": "library.back.exercises.singleArmCableRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0190",
+      "exerciseId": "library.biceps.exercises.curlCableOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1262",
+      "exerciseId": "library.chest.exercises.chestFlyCableOneArmDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1263",
+      "exerciseId": "library.chest.exercises.flyCableOneArmExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1264",
+      "exerciseId": "library.chest.exercises.flyCableOneArmInclineExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1265",
+      "exerciseId": "library.chest.exercises.pressCableOneArmIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1266",
+      "exerciseId": "library.chest.exercises.pressCableOneArmInclineExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0191",
+      "exerciseId": "library.shoulders.exercises.reverseFlyCableOneArmBentOver",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0192",
+      "exerciseId": "library.shoulders.exercises.latRaisesCable",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1633",
+      "exerciseId": "library.biceps.exercises.preacherCurlCableOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1267",
+      "exerciseId": "library.chest.exercises.pressCableOneArmExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3563",
+      "exerciseId": "library.back.exercises.pulldownCableOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1635",
+      "exerciseId": "library.biceps.exercises.reversePreacherCurlCableOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0193",
+      "exerciseId": "library.back.exercises.rowCableOneArmStraightBackHighKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1723",
+      "exerciseId": "library.triceps.exercises.singleArmTricepsPushdown",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1636",
+      "exerciseId": "library.biceps.exercises.dualCableHighCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1637",
+      "exerciseId": "library.biceps.exercises.curlCableOverheadExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0194",
+      "exerciseId": "library.triceps.exercises.overheadRopeTricepExtension",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1319",
+      "exerciseId": "library.back.exercises.rowCablePalmRotational",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0195",
+      "exerciseId": "library.biceps.exercises.preacherCurlCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1268",
+      "exerciseId": "library.chest.exercises.pressCableExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0196",
+      "exerciseId": "library.glutes.exercises.pullThroughCableRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0198",
+      "exerciseId": "library.back.exercises.latPulldowns",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0197",
+      "exerciseId": "library.back.exercises.latPulldownWithCurvedBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1638",
+      "exerciseId": "library.biceps.exercises.bicepsCurlCablePulldown",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0201",
+      "exerciseId": "library.triceps.exercises.barTricepsPushdown",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0199",
+      "exerciseId": "library.back.exercises.straightArmCablePushdown",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0200",
+      "exerciseId": "library.triceps.exercises.tricepsRopePushdown",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0202",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowCableStirrups",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0203",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowCableRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0204",
+      "exerciseId": "library.triceps.exercises.cableRearwardTricepsDrive",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0205",
+      "exerciseId": "library.back.exercises.pulldownCableRear",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0873",
+      "exerciseId": "library.abs.exercises.reverseCrunchCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0206",
+      "exerciseId": "library.biceps.exercises.reverseCurlCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2406",
+      "exerciseId": "library.triceps.exercises.tricepsPushdownCableReverseGripSzBarArmBlaster",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1413",
+      "exerciseId": "library.forearms.exercises.singleArmCableReverseCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0209",
+      "exerciseId": "library.biceps.exercises.reversePreacherCurlCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0210",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0207",
+      "exerciseId": "library.triceps.exercises.pushdownCableReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0208",
+      "exerciseId": "library.back.exercises.rowCableReverseGripStraightBackSeatedHigh",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1320",
+      "exerciseId": "library.back.exercises.rowCableRopeCrossoverSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1321",
+      "exerciseId": "library.back.exercises.rowCableRopeElevatedSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1322",
+      "exerciseId": "library.back.exercises.benchRowCableRopeExtensionIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1639",
+      "exerciseId": "library.biceps.exercises.hammerPreacherCurlCableRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1724",
+      "exerciseId": "library.triceps.exercises.overheadRopeTricepExtension",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1725",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableRopeIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1726",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableRopeLyingFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1640",
+      "exerciseId": "library.biceps.exercises.hammerPreacherCurlCableRopeOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1323",
+      "exerciseId": "library.back.exercises.rowCableRopeSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0211",
+      "exerciseId": "library.abs.exercises.russianTwistCableStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2144",
+      "exerciseId": "library.chest.exercises.cableChestPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0212",
+      "exerciseId": "library.abs.exercises.crunchCableSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1641",
+      "exerciseId": "library.biceps.exercises.curlCableSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0213",
+      "exerciseId": "library.back.exercises.cableSeatedRowTriangleBar",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0214",
+      "exerciseId": "library.back.exercises.rowCableSeatedOneArmAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1642",
+      "exerciseId": "library.biceps.exercises.concentrationCurlCableSeatedOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1643",
+      "exerciseId": "library.biceps.exercises.curlCableSeatedOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0215",
+      "exerciseId": "library.shoulders.exercises.rearLateralRaiseCableSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0861",
+      "exerciseId": "library.back.exercises.rowCableSeated",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0216",
+      "exerciseId": "library.shoulders.exercises.shoulderInternalRotationCableSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2399",
+      "exerciseId": "library.abs.exercises.twistCableSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0218",
+      "exerciseId": "library.back.exercises.rowCableSeatedWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0219",
+      "exerciseId": "library.shoulders.exercises.shoulderPressCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0220",
+      "exerciseId": "library.shoulders.exercises.shrugCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0222",
+      "exerciseId": "library.abs.exercises.sideBendCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0221",
+      "exerciseId": "library.abs.exercises.sideBendCableCrunchBosuBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0223",
+      "exerciseId": "library.abs.exercises.sideCrunchCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1717",
+      "exerciseId": "library.back.exercises.squatRowCableRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1644",
+      "exerciseId": "library.biceps.exercises.curlCableSquatting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0224",
+      "exerciseId": "library.forearms.exercises.wristCurlCableStandingBack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1375",
+      "exerciseId": "library.calves.exercises.calfRaiseCableStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0225",
+      "exerciseId": "library.shoulders.exercises.standingCableReverseFly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0226",
+      "exerciseId": "library.abs.exercises.crunchCableStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0874",
+      "exerciseId": "library.abs.exercises.crunchCableStandingRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0227",
+      "exerciseId": "library.chest.exercises.midHeightCableFly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0228",
+      "exerciseId": "library.glutes.exercises.hipExtensionCableStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0229",
+      "exerciseId": "library.biceps.exercises.curlCableStandingInner",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0230",
+      "exerciseId": "library.abs.exercises.lowToHighCableWoodchop",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0231",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableStandingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1376",
+      "exerciseId": "library.calves.exercises.calfRaiseCableStandingOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0232",
+      "exerciseId": "library.biceps.exercises.bicepsCurlCableRopeStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0233",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowCableStandingRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1727",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionCableStandingReverseGripOneArmOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0234",
+      "exerciseId": "library.back.exercises.rowCableStandingVBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0235",
+      "exerciseId": "library.shoulders.exercises.shoulderExternalRotationCableStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0236",
+      "exerciseId": "library.back.exercises.twistRowCableStandingVBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1269",
+      "exerciseId": "library.chest.exercises.midHeightCableFly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0238",
+      "exerciseId": "library.back.exercises.straightArmCablePushdown",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0237",
+      "exerciseId": "library.back.exercises.straightArmCablePushdown",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0239",
+      "exerciseId": "library.back.exercises.rowCableSeated",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0240",
+      "exerciseId": "library.shoulders.exercises.reverseFlyCableSupine",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2464",
+      "exerciseId": "library.back.exercises.cableKayakRow",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0241",
+      "exerciseId": "library.triceps.exercises.tricepsPushdownCableVBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2405",
+      "exerciseId": "library.triceps.exercises.tricepsPushdownCableVBarArmBlaster",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0242",
+      "exerciseId": "library.abs.exercises.reverseCrunchCableTuck",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0243",
+      "exerciseId": "library.abs.exercises.twistCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0862",
+      "exerciseId": "library.abs.exercises.highCableWoodchopper",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0244",
+      "exerciseId": "library.back.exercises.twistRowCableOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1645",
+      "exerciseId": "library.biceps.exercises.curlCableTwoArmInclineBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1728",
+      "exerciseId": "library.triceps.exercises.tricepsKickbackCableTwoArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0245",
+      "exerciseId": "library.back.exercises.underhandGripLatPulldowns",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1270",
+      "exerciseId": "library.chest.exercises.lowCableFly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1324",
+      "exerciseId": "library.back.exercises.rowCableUpper",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0246",
+      "exerciseId": "library.shoulders.exercises.uprightRowCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1325",
+      "exerciseId": "library.back.exercises.pulldownCableWideGripRearBehindNeck",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0247",
+      "exerciseId": "library.forearms.exercises.wristCurlCable",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1407",
+      "exerciseId": "library.calves.exercises.wallCalfStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1377",
+      "exerciseId": "library.calves.exercises.wallCalfStretch",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1378",
+      "exerciseId": "library.calves.exercises.calfStretchRope",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0248",
+      "exerciseId": "library.back.exercises.rowCamberedBarLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2963",
+      "exerciseId": "library.abs.exercises.legRaiseParallelBars",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1548",
+      "exerciseId": "library.quadriceps.exercises.chairSupportedQuadricepsStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1271",
+      "exerciseId": "library.chest.exercises.chestAndAnteriorShoulderStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0251",
+      "exerciseId": "library.chest.exercises.chestDip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1430",
+      "exerciseId": "library.chest.exercises.chestDip",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "2462",
+      "exerciseId": "library.chest.exercises.chestDipStraightBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1272",
+      "exerciseId": "library.chest.exercises.chestStretchExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3216",
+      "exerciseId": "library.chest.exercises.pushUpChestTap",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1326",
+      "exerciseId": "library.biceps.exercises.chinUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0253",
+      "exerciseId": "library.back.exercises.closeNeutralGripPullUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0257",
+      "exerciseId": "library.calves.exercises.kneeCircles",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1273",
+      "exerciseId": "library.chest.exercises.pushUpClap",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0258",
+      "exerciseId": "library.chest.exercises.pushUpWithAlternatingSideReach",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1327",
+      "exerciseId": "library.biceps.exercises.chinUpCloseGrip",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0259",
+      "exerciseId": "library.triceps.exercises.pushUpCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2398",
+      "exerciseId": "library.triceps.exercises.pushUpCloseGripKnee",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0260",
+      "exerciseId": "library.abs.exercises.sitUp34",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1468",
+      "exerciseId": "library.abs.exercises.crabPositionToeTouches",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0262",
+      "exerciseId": "library.abs.exercises.crunchCrossBody",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0267",
+      "exerciseId": "library.abs.exercises.crunchHandsOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0271",
+      "exerciseId": "library.abs.exercises.crunchStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0272",
+      "exerciseId": "library.abs.exercises.crunchStabilityBallStraightArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0274",
+      "exerciseId": "library.abs.exercises.crunches",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3016",
+      "exerciseId": "library.abs.exercises.crunches",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3769",
+      "exerciseId": "library.quadriceps.exercises.curtsySquat",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2331",
+      "exerciseId": "library.cardio.exercises.ellipticalCycling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0276",
+      "exerciseId": "library.abs.exercises.deadBugHold",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0277",
+      "exerciseId": "library.abs.exercises.crunchDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0279",
+      "exerciseId": "library.chest.exercises.declinePushUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0282",
+      "exerciseId": "library.abs.exercises.sitUpDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1274",
+      "exerciseId": "library.chest.exercises.pushUpDeep",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0283",
+      "exerciseId": "library.triceps.exercises.diamondPushUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0284",
+      "exerciseId": "library.calves.exercises.calfRaiseDonkey",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1275",
+      "exerciseId": "library.chest.exercises.pushUpDrop",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0285",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2403",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellAlternateArmBlaster",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1646",
+      "exerciseId": "library.biceps.exercises.hammerPreacherCurlDumbbellAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1647",
+      "exerciseId": "library.biceps.exercises.preacherCurlDumbbellAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1648",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellAlternateSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0286",
+      "exerciseId": "library.shoulders.exercises.pressDumbbellAlternateSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1649",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellAlternateLegRaisedExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1650",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellAlternateSeatedExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2137",
+      "exerciseId": "library.shoulders.exercises.arnoldPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0287",
+      "exerciseId": "library.shoulders.exercises.arnoldPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0288",
+      "exerciseId": "library.back.exercises.dumbbellPullover",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0289",
+      "exerciseId": "library.chest.exercises.dumbbellBenchPressFlat",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0290",
+      "exerciseId": "library.shoulders.exercises.shoulderPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0291",
+      "exerciseId": "library.quadriceps.exercises.squatDumbbellBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0293",
+      "exerciseId": "library.back.exercises.bentOverRowDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1651",
+      "exerciseId": "library.biceps.exercises.dumbbellCurlWithBowlingLunge",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1652",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellExerciseBallLegRaised",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1653",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellStorkStance",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0294",
+      "exerciseId": "library.biceps.exercises.dumbbellBicepsCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2401",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellArmBlaster",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1654",
+      "exerciseId": "library.forearms.exercises.reverseCurlsDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1655",
+      "exerciseId": "library.biceps.exercises.bicepsCurlSquatDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1656",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellVSitBosuBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1201",
+      "exerciseId": "library.cardio.exercises.burpeeDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0295",
+      "exerciseId": "library.glutes.exercises.cleanDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1731",
+      "exerciseId": "library.triceps.exercises.pressDumbbellCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0296",
+      "exerciseId": "library.triceps.exercises.pressDumbbellCloseGrip",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0297",
+      "exerciseId": "library.biceps.exercises.concentrationCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3635",
+      "exerciseId": "library.quadriceps.exercises.lungeDumbbellContralateralForward",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0298",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellCrossBody",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1657",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellCrossBody",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0299",
+      "exerciseId": "library.shoulders.exercises.cubanPressDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2136",
+      "exerciseId": "library.shoulders.exercises.cubanPressDumbbell",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0300",
+      "exerciseId": "library.glutes.exercises.deadliftDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0301",
+      "exerciseId": "library.chest.exercises.dumbbellBenchPressDecline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0302",
+      "exerciseId": "library.chest.exercises.flyDumbbellDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0303",
+      "exerciseId": "library.chest.exercises.benchPressDumbbellDeclineNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1276",
+      "exerciseId": "library.chest.exercises.flyDumbbellDeclineOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1617",
+      "exerciseId": "library.triceps.exercises.pressDumbbellDeclineOneArmNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0305",
+      "exerciseId": "library.shoulders.exercises.shrugDumbbellDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0304",
+      "exerciseId": "library.shoulders.exercises.shrugDumbbellDecline",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0306",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0307",
+      "exerciseId": "library.chest.exercises.flyDumbbellDeclineTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1437",
+      "exerciseId": "library.forearms.exercises.dumbbellFingerFlexion",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0308",
+      "exerciseId": "library.chest.exercises.benchFlys",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1277",
+      "exerciseId": "library.chest.exercises.flyDumbbellExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1732",
+      "exerciseId": "library.triceps.exercises.forwardLungeTricepsExtensionDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0310",
+      "exerciseId": "library.shoulders.exercises.frontDumbbellRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0309",
+      "exerciseId": "library.shoulders.exercises.frontDumbbellRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0311",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseDumbbellFullCan",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1760",
+      "exerciseId": "library.quadriceps.exercises.gobletSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0313",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1659",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0312",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2402",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellArmBlaster",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1664",
+      "exerciseId": "library.biceps.exercises.highCurlDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3545",
+      "exerciseId": "library.chest.exercises.benchPressDumbbellInclineAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0314",
+      "exerciseId": "library.chest.exercises.dumbbellBenchPressIncline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0315",
+      "exerciseId": "library.biceps.exercises.inclineDumbbellCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0316",
+      "exerciseId": "library.chest.exercises.dumbbellBenchPressIncline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0318",
+      "exerciseId": "library.biceps.exercises.preacherCurlDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0317",
+      "exerciseId": "library.biceps.exercises.preacherCurlDumbbellIncline",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0319",
+      "exerciseId": "library.chest.exercises.inclineBenchFlys",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1278",
+      "exerciseId": "library.chest.exercises.flyDumbbellInclineExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0320",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0321",
+      "exerciseId": "library.chest.exercises.benchPressDumbbellInclineNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1618",
+      "exerciseId": "library.triceps.exercises.pressDumbbellInclineNeutralGripExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0322",
+      "exerciseId": "library.biceps.exercises.innerBicepsCurlDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1279",
+      "exerciseId": "library.chest.exercises.flyDumbbellInclineOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1280",
+      "exerciseId": "library.chest.exercises.flyDumbbellInclineOneArmExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1619",
+      "exerciseId": "library.triceps.exercises.pressDumbbellInclineOneArmNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1620",
+      "exerciseId": "library.triceps.exercises.pressDumbbellInclineOneArmNeutralGripExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0323",
+      "exerciseId": "library.shoulders.exercises.latRaisesInclinedBench",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1281",
+      "exerciseId": "library.chest.exercises.pressDumbbellInclineOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1282",
+      "exerciseId": "library.chest.exercises.pressDumbbellInclineOneArmExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0324",
+      "exerciseId": "library.chest.exercises.benchPressDumbbellInclineNeutralGrip",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1283",
+      "exerciseId": "library.chest.exercises.pressDumbbellInclineExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0325",
+      "exerciseId": "library.shoulders.exercises.shoulderPressDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0326",
+      "exerciseId": "library.shoulders.exercises.reverseFlysInclinedBench",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0327",
+      "exerciseId": "library.back.exercises.chestSupportedDumbbellRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0328",
+      "exerciseId": "library.chest.exercises.shoulderRaiseDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0329",
+      "exerciseId": "library.shoulders.exercises.shrugDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3542",
+      "exerciseId": "library.shoulders.exercises.tRaiseDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0330",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0331",
+      "exerciseId": "library.chest.exercises.flyDumbbellInclineTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1733",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellInclineTwoArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3541",
+      "exerciseId": "library.back.exercises.yRaiseDumbbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0332",
+      "exerciseId": "library.shoulders.exercises.latRaisesDumbbells",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0333",
+      "exerciseId": "library.triceps.exercises.tricepKickbacks",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1734",
+      "exerciseId": "library.triceps.exercises.kickbackDumbbellExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1660",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellKneelingExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0334",
+      "exerciseId": "library.shoulders.exercises.latRaisesDumbbells",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0335",
+      "exerciseId": "library.shoulders.exercises.lateralToFrontRaiseDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0336",
+      "exerciseId": "library.quadriceps.exercises.lunges",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1658",
+      "exerciseId": "library.biceps.exercises.lungeBicepsCurlDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0337",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellLyingAcrossFace",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1729",
+      "exerciseId": "library.triceps.exercises.extensionDumbbellLyingAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0338",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0863",
+      "exerciseId": "library.shoulders.exercises.externalShoulderRotationDumbbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0339",
+      "exerciseId": "library.hamstrings.exercises.legCurlDumbbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0340",
+      "exerciseId": "library.chest.exercises.pressDumbbellLyingNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2470",
+      "exerciseId": "library.shoulders.exercises.rearDeltRaiseDumbbellLyingFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0341",
+      "exerciseId": "library.shoulders.exercises.rearDeltRaiseDumbbellLyingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0343",
+      "exerciseId": "library.chest.exercises.pressDumbbellLyingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0342",
+      "exerciseId": "library.chest.exercises.pressDumbbellLyingOneArm",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0344",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellLyingOneArmPronated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0345",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellLyingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0346",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellLyingOneArmSupinated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0347",
+      "exerciseId": "library.forearms.exercises.pronationDumbbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2705",
+      "exerciseId": "library.forearms.exercises.pronationDumbbellLyingFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1284",
+      "exerciseId": "library.chest.exercises.pulloverDumbbellExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1328",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowDumbbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0348",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1735",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellLyingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0349",
+      "exerciseId": "library.forearms.exercises.supinationDumbbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2706",
+      "exerciseId": "library.forearms.exercises.supinationDumbbellLyingFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1661",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellLyingSupine",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0350",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0351",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellLying",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1662",
+      "exerciseId": "library.biceps.exercises.curlDumbbellLyingWide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0352",
+      "exerciseId": "library.chest.exercises.benchPressDumbbellNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1285",
+      "exerciseId": "library.chest.exercises.flyDumbbellOneArmBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0292",
+      "exerciseId": "library.back.exercises.dumbbellRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1286",
+      "exerciseId": "library.chest.exercises.chestFlyDumbbellOneArmExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0353",
+      "exerciseId": "library.biceps.exercises.concentrationCurlDumbbellOneArmStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1287",
+      "exerciseId": "library.chest.exercises.chestPressDumbbellOneArmDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1288",
+      "exerciseId": "library.chest.exercises.chestFlyDumbbellOneArmExerciseBall",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1736",
+      "exerciseId": "library.triceps.exercises.frenchPressDumbbellOneArmExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1663",
+      "exerciseId": "library.biceps.exercises.hammerPreacherCurlDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1621",
+      "exerciseId": "library.triceps.exercises.pressDumbbellOneArmNeutralGripExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1289",
+      "exerciseId": "library.chest.exercises.chestPressDumbbellOneArmIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0354",
+      "exerciseId": "library.triceps.exercises.tricepKickbacks",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0355",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0356",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseDumbbellOneArmSupport",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1290",
+      "exerciseId": "library.chest.exercises.pressDumbbellOneArmExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1665",
+      "exerciseId": "library.biceps.exercises.curlDumbbellOneArmProne",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1666",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellOneArmProne",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1291",
+      "exerciseId": "library.chest.exercises.pulloverDumbbellOneArmExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0358",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0359",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellOneArmSupport",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1622",
+      "exerciseId": "library.chest.exercises.pressDumbbellOneArmReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1414",
+      "exerciseId": "library.biceps.exercises.reversePreacherCurlDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1667",
+      "exerciseId": "library.biceps.exercises.reverseSpiderCurlDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1668",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellOneArmSeatedExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1669",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellOneArmSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1415",
+      "exerciseId": "library.forearms.exercises.neutralWristCurlDumbbellOneArmSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0361",
+      "exerciseId": "library.shoulders.exercises.shoulderPressDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0360",
+      "exerciseId": "library.shoulders.exercises.shoulderPressDumbbellOneArm",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "3888",
+      "exerciseId": "library.glutes.exercises.snatchDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1670",
+      "exerciseId": "library.biceps.exercises.curlDumbbellOneArmStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1671",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellOneArmStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0362",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellOneArmBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0363",
+      "exerciseId": "library.shoulders.exercises.uprightRowDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0364",
+      "exerciseId": "library.forearms.exercises.wristCurlDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1672",
+      "exerciseId": "library.biceps.exercises.zottmanPreacherCurlDumbbellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1292",
+      "exerciseId": "library.chest.exercises.flyDumbbellOneLegExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0365",
+      "exerciseId": "library.forearms.exercises.benchSupportedDumbbellRadialDeviation",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0366",
+      "exerciseId": "library.forearms.exercises.neutralWristCurlDumbbellBenchOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1441",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlDumbbellBenchOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0367",
+      "exerciseId": "library.forearms.exercises.wristCurlDumbbellBenchOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0368",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlsDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0369",
+      "exerciseId": "library.forearms.exercises.wristCurlsDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1329",
+      "exerciseId": "library.back.exercises.bentOverRowDumbbellPalmRotational",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1623",
+      "exerciseId": "library.chest.exercises.benchPressDumbbellInclineNeutralGrip",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0370",
+      "exerciseId": "library.biceps.exercises.hammerPreacherCurlDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0371",
+      "exerciseId": "library.quadriceps.exercises.squatDumbbellPlyo",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0372",
+      "exerciseId": "library.biceps.exercises.scottCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1673",
+      "exerciseId": "library.biceps.exercises.preacherCurlDumbbellExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1293",
+      "exerciseId": "library.chest.exercises.pressDumbbellExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0373",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellPronateGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0374",
+      "exerciseId": "library.biceps.exercises.curlDumbbellProneIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1674",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellProneIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0375",
+      "exerciseId": "library.back.exercises.dumbbellPullover",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1294",
+      "exerciseId": "library.chest.exercises.pulloverDumbbellExerciseBall",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1295",
+      "exerciseId": "library.chest.exercises.pulloverDumbbellExerciseBall",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1700",
+      "exerciseId": "library.shoulders.exercises.pushPressDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0376",
+      "exerciseId": "library.shoulders.exercises.latRaisesDumbbells",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2292",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellBentOver",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0377",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0378",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellBentOver",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0380",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellBentOver",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0379",
+      "exerciseId": "library.shoulders.exercises.rearLateralRaiseDumbbellSupportHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0381",
+      "exerciseId": "library.quadriceps.exercises.reverseDumbbellLunges",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0382",
+      "exerciseId": "library.forearms.exercises.reverseCurlsDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1624",
+      "exerciseId": "library.chest.exercises.benchPressDumbbellReverse",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0383",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellBentOver",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1330",
+      "exerciseId": "library.back.exercises.rowDumbbellReverseGripInclineBenchOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1331",
+      "exerciseId": "library.back.exercises.rowDumbbellReverseGripInclineBenchTwoArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2327",
+      "exerciseId": "library.back.exercises.rowDumbbellReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0384",
+      "exerciseId": "library.biceps.exercises.reversePreacherCurlDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1675",
+      "exerciseId": "library.biceps.exercises.reverseSpiderCurlDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0385",
+      "exerciseId": "library.forearms.exercises.reverseWristCurlsDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1459",
+      "exerciseId": "library.hamstrings.exercises.romanianDeadliftDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0386",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellRotation",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2397",
+      "exerciseId": "library.shoulders.exercises.scottPressDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0387",
+      "exerciseId": "library.shoulders.exercises.frontRaiseDumbbellSeatedAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1676",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellSeatedAlternateExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0388",
+      "exerciseId": "library.shoulders.exercises.shoulderPressDumbbellSeatedAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3546",
+      "exerciseId": "library.shoulders.exercises.shoulderPressDumbbellSeatedAlternate",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0389",
+      "exerciseId": "library.triceps.exercises.extensionDumbbellSeatedBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2317",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseDumbbellSeatedBentArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1730",
+      "exerciseId": "library.triceps.exercises.kickbackDumbbellSeatedBentOverAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1737",
+      "exerciseId": "library.triceps.exercises.kickbackDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1677",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0390",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellSeatedExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3547",
+      "exerciseId": "library.shoulders.exercises.bicepsCurlToShoulderPressDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1379",
+      "exerciseId": "library.calves.exercises.calfRaiseDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0391",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellSeated",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0392",
+      "exerciseId": "library.shoulders.exercises.frontRaiseDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1678",
+      "exerciseId": "library.biceps.exercises.hammerCurlDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0393",
+      "exerciseId": "library.biceps.exercises.innerBicepsCurlDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0394",
+      "exerciseId": "library.triceps.exercises.kickbackDumbbellSeated",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0396",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0395",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseDumbbellSeated",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0397",
+      "exerciseId": "library.forearms.exercises.seatedDumbbellRadialDeviation",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1679",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellSeatedOneArmExerciseBallLegRaised",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0398",
+      "exerciseId": "library.triceps.exercises.kickbackDumbbellSeatedOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0399",
+      "exerciseId": "library.forearms.exercises.shoulderExternalRotationDumbbellSeatedOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0400",
+      "exerciseId": "library.calves.exercises.calfRaiseDumbbellSeatedOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1380",
+      "exerciseId": "library.calves.exercises.calfRaiseDumbbellSeatedOneLegHammerGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1381",
+      "exerciseId": "library.calves.exercises.calfRaiseDumbbellSeatedOneLegPalmUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0401",
+      "exerciseId": "library.forearms.exercises.wristCurlsDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0402",
+      "exerciseId": "library.biceps.exercises.preacherCurlDumbbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0403",
+      "exerciseId": "library.biceps.exercises.concentrationCurlDumbbellSeatedReverse",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1738",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellSeatedReverseGripOneArmOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0405",
+      "exerciseId": "library.shoulders.exercises.shoulderPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0404",
+      "exerciseId": "library.shoulders.exercises.shoulderPressDumbbellSeatedNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2188",
+      "exerciseId": "library.triceps.exercises.overheadTricepExtension",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0406",
+      "exerciseId": "library.shoulders.exercises.dumbbellShrugs",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0407",
+      "exerciseId": "library.abs.exercises.sideBendDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0408",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseDumbbellSideLyingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3664",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellSidePlank",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3548",
+      "exerciseId": "library.shoulders.exercises.singleArmOverheadDumbbellCarry",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0409",
+      "exerciseId": "library.calves.exercises.calfRaiseDumbbellOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1757",
+      "exerciseId": "library.hamstrings.exercises.singleLegDumbbellRomanianDeadlift",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2805",
+      "exerciseId": "library.glutes.exercises.deadliftDumbbellOneLegStepboxSupport",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0410",
+      "exerciseId": "library.quadriceps.exercises.bulgarianSplitSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0411",
+      "exerciseId": "library.quadriceps.exercises.squatDumbbellPistol",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0413",
+      "exerciseId": "library.quadriceps.exercises.squatDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3560",
+      "exerciseId": "library.biceps.exercises.hammerCurlAndPressDumbbellStandingAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0414",
+      "exerciseId": "library.shoulders.exercises.overheadPressDumbbellStandingAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0415",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseDumbbellStandingAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1739",
+      "exerciseId": "library.triceps.exercises.tricepsKickbackDumbbellStandingAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2143",
+      "exerciseId": "library.shoulders.exercises.standingDumbbellArmCircles",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1740",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionDumbbellStandingBentOverOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1741",
+      "exerciseId": "library.triceps.exercises.kickbackDumbbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0416",
+      "exerciseId": "library.biceps.exercises.dumbbellBicepsCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0417",
+      "exerciseId": "library.calves.exercises.calfRaiseDumbbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0418",
+      "exerciseId": "library.biceps.exercises.concentrationCurlDumbbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0419",
+      "exerciseId": "library.shoulders.exercises.frontRaiseDumbbellStandingAboveHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2321",
+      "exerciseId": "library.biceps.exercises.innerBicepsCurlDumbbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0420",
+      "exerciseId": "library.triceps.exercises.kickbackDumbbellStanding",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0421",
+      "exerciseId": "library.biceps.exercises.concentrationCurlDumbbellStandingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0422",
+      "exerciseId": "library.biceps.exercises.curlDumbbellStandingOneArmInclineBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1680",
+      "exerciseId": "library.biceps.exercises.curlDumbbellStandingOneArmInclineBench",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0423",
+      "exerciseId": "library.triceps.exercises.extensionDumbbellStandingOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0424",
+      "exerciseId": "library.shoulders.exercises.pressDumbbellStandingOneArmNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0425",
+      "exerciseId": "library.forearms.exercises.dumbbellSingleArmReverseCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0426",
+      "exerciseId": "library.shoulders.exercises.overheadPressDumbbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0427",
+      "exerciseId": "library.shoulders.exercises.pressDumbbellStandingNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0428",
+      "exerciseId": "library.biceps.exercises.preacherCurlDumbbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0429",
+      "exerciseId": "library.forearms.exercises.reverseCurlsDumbbell",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0430",
+      "exerciseId": "library.triceps.exercises.overheadTricepExtension",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2293",
+      "exerciseId": "library.biceps.exercises.zottmanPreacherCurlDumbbellStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1684",
+      "exerciseId": "library.biceps.exercises.stepUpWithBalanceAndDumbbellCurl",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0431",
+      "exerciseId": "library.quadriceps.exercises.stepUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2796",
+      "exerciseId": "library.quadriceps.exercises.stepUpLungeDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2812",
+      "exerciseId": "library.quadriceps.exercises.stepUpSplitSquatDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0432",
+      "exerciseId": "library.hamstrings.exercises.straightLegDeadliftDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0433",
+      "exerciseId": "library.back.exercises.dumbbellPullover",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0434",
+      "exerciseId": "library.hamstrings.exercises.straightLegDeadliftDumbbell",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "2808",
+      "exerciseId": "library.glutes.exercises.pullThroughDumbbellSumo",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2803",
+      "exerciseId": "library.quadriceps.exercises.squatDumbbellSupported",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0436",
+      "exerciseId": "library.triceps.exercises.tatePressDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1742",
+      "exerciseId": "library.triceps.exercises.tricepsKickbackDumbbellStorkStance",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1743",
+      "exerciseId": "library.chest.exercises.benchPressDumbbellTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0437",
+      "exerciseId": "library.shoulders.exercises.uprightRowDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1765",
+      "exerciseId": "library.shoulders.exercises.uprightRowDumbbell",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0864",
+      "exerciseId": "library.shoulders.exercises.shoulderExternalRotationDumbbellUpright",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "5201",
+      "exerciseId": "library.biceps.exercises.bicepsCurlDumbbellWaiter",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0438",
+      "exerciseId": "library.shoulders.exercises.wPressDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0439",
+      "exerciseId": "library.biceps.exercises.zottmanCurlDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2294",
+      "exerciseId": "library.biceps.exercises.zottmanPreacherCurlDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2189",
+      "exerciseId": "library.triceps.exercises.overheadTricepExtension",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1167",
+      "exerciseId": "library.chest.exercises.dynamicPectoralStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3287",
+      "exerciseId": "library.triceps.exercises.elbowSupportedDips",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1772",
+      "exerciseId": "library.chest.exercises.supineElbowPressUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0443",
+      "exerciseId": "library.abs.exercises.alternatingElbowToKneeCrunch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3292",
+      "exerciseId": "library.back.exercises.bodyweightHipHinge",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1332",
+      "exerciseId": "library.shoulders.exercises.frontRaiseDumbbellSeatedAlternateExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1333",
+      "exerciseId": "library.back.exercises.backExtensionExerciseBallStraightArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1334",
+      "exerciseId": "library.back.exercises.backExtensionExerciseBallHandsBehindHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1335",
+      "exerciseId": "library.back.exercises.backExtensionExerciseBallKneeOffGround",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1336",
+      "exerciseId": "library.back.exercises.backExtensionExerciseBallRotation",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1744",
+      "exerciseId": "library.triceps.exercises.dipExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1559",
+      "exerciseId": "library.glutes.exercises.hipFlexorStretchExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1338",
+      "exerciseId": "library.back.exercises.seatedBackStretchHuggingABall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1339",
+      "exerciseId": "library.back.exercises.latStretchExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1341",
+      "exerciseId": "library.back.exercises.pyramidPositionBackStretchOnBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1342",
+      "exerciseId": "library.back.exercises.latStretchExerciseBallLyingSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1382",
+      "exerciseId": "library.calves.exercises.calfRaiseExerciseBallWall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3241",
+      "exerciseId": "library.calves.exercises.wallBallCalfRaiseBallBetweenAnkles",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3240",
+      "exerciseId": "library.calves.exercises.wallBallCalfRaiseBallBetweenKnees",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1416",
+      "exerciseId": "library.glutes.exercises.proneSingleLegHipRotationOnBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1417",
+      "exerciseId": "library.glutes.exercises.ballSupportedDiagonalKickAndLegCurl",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1296",
+      "exerciseId": "library.chest.exercises.pikePushUpExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1343",
+      "exerciseId": "library.back.exercises.legRaiseExerciseBallProne",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1560",
+      "exerciseId": "library.hamstrings.exercises.hamstringStretchExerciseBallSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1745",
+      "exerciseId": "library.triceps.exercises.tricepsStretchExerciseBallSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1746",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionExerciseBallSupine",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1747",
+      "exerciseId": "library.triceps.exercises.frenchPressEzBarExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3010",
+      "exerciseId": "library.back.exercises.pulloverEzBarLyingBentArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1748",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionEzBarLyingCloseGripBehindHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1344",
+      "exerciseId": "library.back.exercises.bentOverRowEzBarReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1682",
+      "exerciseId": "library.biceps.exercises.concentrationCurlEzBarSeatedCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1749",
+      "exerciseId": "library.triceps.exercises.frenchPressEzBarStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0445",
+      "exerciseId": "library.shoulders.exercises.shoulderPressEzBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1627",
+      "exerciseId": "library.biceps.exercises.preacherCurlEzBarbellCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0446",
+      "exerciseId": "library.biceps.exercises.curlEzBarbellCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0447",
+      "exerciseId": "library.biceps.exercises.curlEzBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0448",
+      "exerciseId": "library.triceps.exercises.declineEZBarFacePress",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2186",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionEzBarbellDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0449",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionEzBarbellIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0450",
+      "exerciseId": "library.triceps.exercises.jmPressEzBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0451",
+      "exerciseId": "library.biceps.exercises.reverseCurlEzBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0452",
+      "exerciseId": "library.biceps.exercises.reversePreacherCurlEzBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1458",
+      "exerciseId": "library.biceps.exercises.curlEzBarbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0453",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionEzBarbellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0454",
+      "exerciseId": "library.biceps.exercises.spiderCurlEzBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1628",
+      "exerciseId": "library.biceps.exercises.spiderCurlEzBarbell",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "2404",
+      "exerciseId": "library.biceps.exercises.bicepsCurlEzBarArmBlaster",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2432",
+      "exerciseId": "library.triceps.exercises.benchPressEzBarCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2741",
+      "exerciseId": "library.biceps.exercises.bicepsCurlEzBarbellStandingWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2133",
+      "exerciseId": "library.quadriceps.exercises.farmersWalk",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0455",
+      "exerciseId": "library.forearms.exercises.fingerFlexionCurls",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3303",
+      "exerciseId": "library.abs.exercises.humanFlagHold",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0456",
+      "exerciseId": "library.abs.exercises.sitUpFlexionLegBentKnee",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0457",
+      "exerciseId": "library.abs.exercises.sitUpFlexionLegStraightArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0458",
+      "exerciseId": "library.chest.exercises.flyFloorBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0459",
+      "exerciseId": "library.glutes.exercises.flutterKicks",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1472",
+      "exerciseId": "library.quadriceps.exercises.forwardJump",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3470",
+      "exerciseId": "library.quadriceps.exercises.lungeForward",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3194",
+      "exerciseId": "library.quadriceps.exercises.squatFrankenstein",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2429",
+      "exerciseId": "library.abs.exercises.crunchFrog",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3301",
+      "exerciseId": "library.shoulders.exercises.frogStand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3296",
+      "exerciseId": "library.back.exercises.frontLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3295",
+      "exerciseId": "library.back.exercises.frontLeverReps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0464",
+      "exerciseId": "library.abs.exercises.plankTrunkRotations",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3315",
+      "exerciseId": "library.shoulders.exercises.fullMalteseHold",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3299",
+      "exerciseId": "library.shoulders.exercises.fullPlancheHold",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3327",
+      "exerciseId": "library.shoulders.exercises.pushUpFullPlanche",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0466",
+      "exerciseId": "library.back.exercises.sternumToBarChinUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3561",
+      "exerciseId": "library.glutes.exercises.gluteBridgeMarch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3523",
+      "exerciseId": "library.glutes.exercises.gluteBridgeTwoLegBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3193",
+      "exerciseId": "library.hamstrings.exercises.gluteHamRaiseOnBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0467",
+      "exerciseId": "library.abs.exercises.chinUpWithKneeTuck",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0469",
+      "exerciseId": "library.abs.exercises.reverseCrunch",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1383",
+      "exerciseId": "library.calves.exercises.calfRaiseHack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1384",
+      "exerciseId": "library.calves.exercises.calfRaiseHackOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3221",
+      "exerciseId": "library.cardio.exercises.partialKneeBends",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3202",
+      "exerciseId": "library.abs.exercises.sitUpHalf",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1511",
+      "exerciseId": "library.hamstrings.exercises.hamstringStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2139",
+      "exerciseId": "library.cardio.exercises.armCycleErgometer",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3218",
+      "exerciseId": "library.glutes.exercises.toeTouchCirclesWithHandsClasped",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3215",
+      "exerciseId": "library.glutes.exercises.toeTouchCirclesWithReversedHandClasp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3302",
+      "exerciseId": "library.shoulders.exercises.handstand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0471",
+      "exerciseId": "library.shoulders.exercises.handstandPushUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1764",
+      "exerciseId": "library.abs.exercises.legHipRaiseHanging",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0472",
+      "exerciseId": "library.abs.exercises.legRaiseHanging",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1761",
+      "exerciseId": "library.abs.exercises.kneeRaiseHangingOblique",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0473",
+      "exerciseId": "library.abs.exercises.hangingPikeRaise",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0474",
+      "exerciseId": "library.abs.exercises.legHipRaiseHanging",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0475",
+      "exerciseId": "library.abs.exercises.legRaiseHanging",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0476",
+      "exerciseId": "library.abs.exercises.legHipRaiseHangingStraightLegTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3636",
+      "exerciseId": "library.cardio.exercises.wallSupportedHighKnees",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0484",
+      "exerciseId": "library.abs.exercises.kneeRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1418",
+      "exerciseId": "library.glutes.exercises.supineKneesToChestStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3234",
+      "exerciseId": "library.chest.exercises.flyHyghtDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0489",
+      "exerciseId": "library.back.exercises.hyperExtensions",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0488",
+      "exerciseId": "library.back.exercises.hyperExtensions",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3289",
+      "exerciseId": "library.triceps.exercises.forearmTransitionDips",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1471",
+      "exerciseId": "library.abs.exercises.inchworm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3698",
+      "exerciseId": "library.abs.exercises.inchworm",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0490",
+      "exerciseId": "library.triceps.exercises.pushUpInclineCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0491",
+      "exerciseId": "library.abs.exercises.legHipRaiseInclineStraightLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0492",
+      "exerciseId": "library.chest.exercises.pushUpInclineDepthJump",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0493",
+      "exerciseId": "library.chest.exercises.inclinePushUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3785",
+      "exerciseId": "library.chest.exercises.inclinePushUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0494",
+      "exerciseId": "library.chest.exercises.pushUpInclineReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3011",
+      "exerciseId": "library.chest.exercises.pushUpInclineScapula",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0495",
+      "exerciseId": "library.abs.exercises.sitUpInclineTwisting",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1564",
+      "exerciseId": "library.quadriceps.exercises.kneelingHipFlexorAndQuadricepsStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0496",
+      "exerciseId": "library.hamstrings.exercises.nordicCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2400",
+      "exerciseId": "library.hamstrings.exercises.nordicCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0499",
+      "exerciseId": "library.back.exercises.invertedRow",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2300",
+      "exerciseId": "library.back.exercises.invertedRowBentKnee",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2298",
+      "exerciseId": "library.back.exercises.invertedRowBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0497",
+      "exerciseId": "library.back.exercises.invertedRow",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0498",
+      "exerciseId": "library.back.exercises.ringRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1419",
+      "exerciseId": "library.glutes.exercises.supineCrossBodyRotationStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1297",
+      "exerciseId": "library.chest.exercises.isometricPalmToPalmChestSqueeze",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0500",
+      "exerciseId": "library.chest.exercises.isometricPushUpWithSideShifts",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0501",
+      "exerciseId": "library.cardio.exercises.burpeeWithJumpingJack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3224",
+      "exerciseId": "library.cardio.exercises.jumpingJackHops",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0507",
+      "exerciseId": "library.abs.exercises.jackknifeSitUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0508",
+      "exerciseId": "library.abs.exercises.sitUpJanda",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2612",
+      "exerciseId": "library.cardio.exercises.jumpRope",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0514",
+      "exerciseId": "library.cardio.exercises.squatJumps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0513",
+      "exerciseId": "library.cardio.exercises.squatJumps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0517",
+      "exerciseId": "library.abs.exercises.windmillKettlebellAdvanced",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0518",
+      "exerciseId": "library.forearms.exercises.hangCleanKettlebellAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0520",
+      "exerciseId": "library.shoulders.exercises.pressKettlebellAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0519",
+      "exerciseId": "library.chest.exercises.pressKettlebellAlternateFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0521",
+      "exerciseId": "library.back.exercises.renegadeRowKettlebellAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0522",
+      "exerciseId": "library.back.exercises.rowKettlebellAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0523",
+      "exerciseId": "library.shoulders.exercises.arnoldPressKettlebell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0524",
+      "exerciseId": "library.abs.exercises.pressKettlebellBent",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0525",
+      "exerciseId": "library.biceps.exercises.cleanKettlebellBottomsUpFromHangPosition",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0526",
+      "exerciseId": "library.biceps.exercises.hangCleanKettlebellDoubleAlternate",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0527",
+      "exerciseId": "library.shoulders.exercises.jerkKettlebellDouble",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0528",
+      "exerciseId": "library.shoulders.exercises.pushPressKettlebellDouble",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0529",
+      "exerciseId": "library.shoulders.exercises.snatchKettlebellDouble",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0530",
+      "exerciseId": "library.abs.exercises.windmillKettlebellDouble",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0531",
+      "exerciseId": "library.chest.exercises.pressKettlebellExtendedRangeOneArmFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0532",
+      "exerciseId": "library.abs.exercises.kettlebellFigureEightPass",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0533",
+      "exerciseId": "library.quadriceps.exercises.frontSquatKettlebell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0534",
+      "exerciseId": "library.quadriceps.exercises.squatKettlebellGoblet",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0535",
+      "exerciseId": "library.hamstrings.exercises.hangCleanKettlebell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0536",
+      "exerciseId": "library.quadriceps.exercises.lungeKettlebellPassThrough",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0537",
+      "exerciseId": "library.shoulders.exercises.cleanAndJerkKettlebellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1298",
+      "exerciseId": "library.chest.exercises.floorPressKettlebellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0538",
+      "exerciseId": "library.shoulders.exercises.jerkKettlebellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0539",
+      "exerciseId": "library.shoulders.exercises.militaryPressKettlebellOneArmToSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0540",
+      "exerciseId": "library.shoulders.exercises.pushPressKettlebellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0541",
+      "exerciseId": "library.back.exercises.rowKettlebellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0542",
+      "exerciseId": "library.shoulders.exercises.snatchKettlebellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0543",
+      "exerciseId": "library.shoulders.exercises.cleanAndPressKettlebellOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0544",
+      "exerciseId": "library.quadriceps.exercises.squatKettlebellPistol",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0545",
+      "exerciseId": "library.chest.exercises.pushUpKettlebellPlyo",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0546",
+      "exerciseId": "library.shoulders.exercises.pressKettlebellSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1438",
+      "exerciseId": "library.shoulders.exercises.militaryPressKettlebellSeatedTwoArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0547",
+      "exerciseId": "library.shoulders.exercises.pressKettlebellSeesaw",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0548",
+      "exerciseId": "library.shoulders.exercises.sumoHighPullKettlebell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0549",
+      "exerciseId": "library.glutes.exercises.kettlebellSwing",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0550",
+      "exerciseId": "library.shoulders.exercises.thrusterKettlebell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0551",
+      "exerciseId": "library.quadriceps.exercises.kettlebellTurkishGetUpThroughSquat",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0552",
+      "exerciseId": "library.shoulders.exercises.cleanKettlebellTwoArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0553",
+      "exerciseId": "library.shoulders.exercises.militaryPressKettlebellTwoArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1345",
+      "exerciseId": "library.back.exercises.rowKettlebellTwoArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0554",
+      "exerciseId": "library.abs.exercises.windmillKettlebell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0555",
+      "exerciseId": "library.abs.exercises.seatedKneeTucksOnBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0558",
+      "exerciseId": "library.back.exercises.muscleUpKipping",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3640",
+      "exerciseId": "library.abs.exercises.crunchKneeTouch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1420",
+      "exerciseId": "library.quadriceps.exercises.jumpSquatKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1346",
+      "exerciseId": "library.back.exercises.latStretchKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3239",
+      "exerciseId": "library.abs.exercises.kneelingPlankShoulderTaps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3211",
+      "exerciseId": "library.chest.exercises.pushUpKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3288",
+      "exerciseId": "library.chest.exercises.rearBarDips",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3418",
+      "exerciseId": "library.back.exercises.pullUpL",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3419",
+      "exerciseId": "library.abs.exercises.lSitFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0562",
+      "exerciseId": "library.abs.exercises.landmineTrunkRotations",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3237",
+      "exerciseId": "library.shoulders.exercises.lateralRaiseLandmine",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3300",
+      "exerciseId": "library.shoulders.exercises.plancheLean",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2271",
+      "exerciseId": "library.shoulders.exercises.boxingLeftHook",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0570",
+      "exerciseId": "library.abs.exercises.benchKneeTucks",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1576",
+      "exerciseId": "library.hamstrings.exercises.elevatedLegHamstringStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2287",
+      "exerciseId": "library.quadriceps.exercises.legPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0571",
+      "exerciseId": "library.back.exercises.rowLeverAlternateNarrowGripSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0572",
+      "exerciseId": "library.back.exercises.chinUpLeverAssisted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0573",
+      "exerciseId": "library.back.exercises.backExtensionLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0574",
+      "exerciseId": "library.back.exercises.bentOverRowLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3200",
+      "exerciseId": "library.back.exercises.bentOverRowLeverVBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0575",
+      "exerciseId": "library.biceps.exercises.bicepsCurlMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2289",
+      "exerciseId": "library.calves.exercises.calfPressLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0577",
+      "exerciseId": "library.chest.exercises.verticalChestPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0576",
+      "exerciseId": "library.chest.exercises.verticalChestPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0578",
+      "exerciseId": "library.glutes.exercises.deadliftLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1300",
+      "exerciseId": "library.chest.exercises.chestPressLeverDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1253",
+      "exerciseId": "library.calves.exercises.calfRaiseLeverDonkey",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0579",
+      "exerciseId": "library.back.exercises.pulldownLeverFront",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0580",
+      "exerciseId": "library.shoulders.exercises.shrugLeverGripless",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1439",
+      "exerciseId": "library.shoulders.exercises.shrugLeverGripless",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "2288",
+      "exerciseId": "library.forearms.exercises.machineHandGripSqueeze",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1615",
+      "exerciseId": "library.biceps.exercises.preacherCurlLeverHammerGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0581",
+      "exerciseId": "library.back.exercises.rowLeverHigh",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2286",
+      "exerciseId": "library.glutes.exercises.hipExtensionLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2611",
+      "exerciseId": "library.glutes.exercises.legPressLeverHorizontalOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1299",
+      "exerciseId": "library.chest.exercises.inclineMachineChestPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1479",
+      "exerciseId": "library.chest.exercises.inclineMachineChestPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0582",
+      "exerciseId": "library.hamstrings.exercises.legCurlLeverKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0583",
+      "exerciseId": "library.abs.exercises.twistLeverKneeling",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0584",
+      "exerciseId": "library.shoulders.exercises.deltoidMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0585",
+      "exerciseId": "library.quadriceps.exercises.legExtension",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0586",
+      "exerciseId": "library.hamstrings.exercises.legCurlProne",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3195",
+      "exerciseId": "library.hamstrings.exercises.legCurlLeverLyingTwoOne",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0587",
+      "exerciseId": "library.shoulders.exercises.shoulderPressMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0588",
+      "exerciseId": "library.back.exercises.rowMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0589",
+      "exerciseId": "library.back.exercises.bentOverRowLeverOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1356",
+      "exerciseId": "library.back.exercises.rowLeverOneArmLateralHigh",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1347",
+      "exerciseId": "library.back.exercises.pulldownLeverOneArmLateralWide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0590",
+      "exerciseId": "library.shoulders.exercises.shoulderPressLeverOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0591",
+      "exerciseId": "library.triceps.exercises.tricepsDipLeverOverhand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0592",
+      "exerciseId": "library.biceps.exercises.preacherCurlLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1614",
+      "exerciseId": "library.biceps.exercises.preacherCurlLever",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "2285",
+      "exerciseId": "library.back.exercises.pulloverLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2736",
+      "exerciseId": "library.back.exercises.latPulldownLeverReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1616",
+      "exerciseId": "library.biceps.exercises.reversePreacherCurlLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1348",
+      "exerciseId": "library.back.exercises.rowLeverReverseGripVertical",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0593",
+      "exerciseId": "library.glutes.exercises.reverseHyperextensionLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1349",
+      "exerciseId": "library.back.exercises.rowLeverReverseTBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2315",
+      "exerciseId": "library.calves.exercises.rotaryCalfMachinePress",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2335",
+      "exerciseId": "library.calves.exercises.calfPressLeverSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0594",
+      "exerciseId": "library.calves.exercises.calfRaiseSeated",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1452",
+      "exerciseId": "library.abs.exercises.crunchMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0595",
+      "exerciseId": "library.abs.exercises.crunchLeverSeatedChestPad",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3760",
+      "exerciseId": "library.abs.exercises.crunchMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1451",
+      "exerciseId": "library.triceps.exercises.dipLeverSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0596",
+      "exerciseId": "library.chest.exercises.butterflyMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3759",
+      "exerciseId": "library.hamstrings.exercises.goodMorningLeverSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0597",
+      "exerciseId": "library.hips.exercises.hipAbduction",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0598",
+      "exerciseId": "library.hips.exercises.hipAdduction",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0599",
+      "exerciseId": "library.hamstrings.exercises.legCurlSeated",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0600",
+      "exerciseId": "library.abs.exercises.legRaiseLeverSeatedCrunch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0602",
+      "exerciseId": "library.shoulders.exercises.reverseButterfly",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0601",
+      "exerciseId": "library.shoulders.exercises.reverseFlyLeverSeatedNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1350",
+      "exerciseId": "library.back.exercises.rowMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1385",
+      "exerciseId": "library.calves.exercises.seatedSquatCalfRaiseOnLegPress",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0603",
+      "exerciseId": "library.shoulders.exercises.shoulderPressMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0869",
+      "exerciseId": "library.shoulders.exercises.shoulderPressMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2318",
+      "exerciseId": "library.shoulders.exercises.shoulderPressMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0604",
+      "exerciseId": "library.shoulders.exercises.shrugLever",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0605",
+      "exerciseId": "library.calves.exercises.calfRaiseLeverStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3758",
+      "exerciseId": "library.chest.exercises.chestPressLeverStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0606",
+      "exerciseId": "library.back.exercises.rowLeverTBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1351",
+      "exerciseId": "library.back.exercises.rowLeverTBarReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0607",
+      "exerciseId": "library.triceps.exercises.tricepsMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1313",
+      "exerciseId": "library.back.exercises.rowLeverOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0609",
+      "exerciseId": "library.back.exercises.standingAnchoredRopeRow",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3013",
+      "exerciseId": "library.hips.exercises.gluteBridge",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1352",
+      "exerciseId": "library.back.exercises.seatedSpinalFlexion",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3582",
+      "exerciseId": "library.quadriceps.exercises.lungeJump",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1688",
+      "exerciseId": "library.abs.exercises.lungeTwist",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0613",
+      "exerciseId": "library.quadriceps.exercises.quadsStretchLyingSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2312",
+      "exerciseId": "library.abs.exercises.alternatingElbowToKneeCrunch",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0620",
+      "exerciseId": "library.abs.exercises.legRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0865",
+      "exerciseId": "library.abs.exercises.legHipRaiseLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1301",
+      "exerciseId": "library.chest.exercises.machineChestSqueezePress",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0624",
+      "exerciseId": "library.glutes.exercises.wallSitWithAlternatingKneeLifts",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1353",
+      "exerciseId": "library.back.exercises.medicineBallCatchAndOverheadToss",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1302",
+      "exerciseId": "library.chest.exercises.medicineBallChestPass",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1303",
+      "exerciseId": "library.chest.exercises.medicineBallChestThrowFromThreePointStart",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1304",
+      "exerciseId": "library.chest.exercises.repeatedMedicineBallChestPasses",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1305",
+      "exerciseId": "library.chest.exercises.singleMedicineBallChestThrow",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1312",
+      "exerciseId": "library.chest.exercises.medicineBallChestThrowWithRunOut",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1701",
+      "exerciseId": "library.triceps.exercises.pushUpMedicineBallCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1354",
+      "exerciseId": "library.back.exercises.overheadMedicineBallSlam",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1750",
+      "exerciseId": "library.triceps.exercises.supineMedicineBallChestThrow",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0627",
+      "exerciseId": "library.back.exercises.chinUpMixedGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3217",
+      "exerciseId": "library.chest.exercises.pushUpModifiedHindu",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1421",
+      "exerciseId": "library.chest.exercises.kneelingPushUpToForearms",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0628",
+      "exerciseId": "library.glutes.exercises.lateralBandWalk",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0630",
+      "exerciseId": "library.abs.exercises.mountainClimber",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0631",
+      "exerciseId": "library.back.exercises.muscleUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1401",
+      "exerciseId": "library.back.exercises.muscleUpVerticalBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2328",
+      "exerciseId": "library.chest.exercises.pushUpNarrowExerciseBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1403",
+      "exerciseId": "library.back.exercises.neckStretchSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0634",
+      "exerciseId": "library.abs.exercises.crunchNegative",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1495",
+      "exerciseId": "library.abs.exercises.obliqueCrunches",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0635",
+      "exerciseId": "library.abs.exercises.obliqueCrunches",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0636",
+      "exerciseId": "library.biceps.exercises.hammerCurlOlympicBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0637",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionOlympicBarbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1355",
+      "exerciseId": "library.back.exercises.singleArmWallLatStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0638",
+      "exerciseId": "library.back.exercises.chinUpOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0639",
+      "exerciseId": "library.triceps.exercises.dipOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0640",
+      "exerciseId": "library.abs.exercises.singleArmMedicineBallSlam",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1773",
+      "exerciseId": "library.back.exercises.rowOneArmTowel",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1386",
+      "exerciseId": "library.calves.exercises.calfRaiseOneLegDonkey",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1387",
+      "exerciseId": "library.calves.exercises.calfRaiseOneLegFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1476",
+      "exerciseId": "library.quadriceps.exercises.squatOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0641",
+      "exerciseId": "library.abs.exercises.sitUp34",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0642",
+      "exerciseId": "library.chest.exercises.pushUpOutsideLegKick",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0643",
+      "exerciseId": "library.triceps.exercises.tricepsStretchOverhead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3147",
+      "exerciseId": "library.abs.exercises.supinePelvicTilts",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1422",
+      "exerciseId": "library.glutes.exercises.pelvicTiltIntoGluteBridge",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1388",
+      "exerciseId": "library.calves.exercises.peronealsStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3662",
+      "exerciseId": "library.glutes.exercises.pushUpPikeToCobra",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1306",
+      "exerciseId": "library.chest.exercises.pushUpPlyo",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1687",
+      "exerciseId": "library.abs.exercises.reverseStepWithOverheadReach",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1389",
+      "exerciseId": "library.calves.exercises.posteriorTibialisStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3119",
+      "exerciseId": "library.abs.exercises.squatPotty",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3132",
+      "exerciseId": "library.quadriceps.exercises.squatPottySupport",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0648",
+      "exerciseId": "library.hamstrings.exercises.cleanPower",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3665",
+      "exerciseId": "library.abs.exercises.plankWithOppositeArmAndLegReach",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3203",
+      "exerciseId": "library.abs.exercises.sitUpPrisonerHalf",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1707",
+      "exerciseId": "library.abs.exercises.twistProneStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0651",
+      "exerciseId": "library.back.exercises.pullUpNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0650",
+      "exerciseId": "library.abs.exercises.stabilityBallKneeTuck",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0652",
+      "exerciseId": "library.back.exercises.pullUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1689",
+      "exerciseId": "library.chest.exercises.bodyweightPushAndPull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3638",
+      "exerciseId": "library.cardio.exercises.pushUpIntoRunningStart",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1307",
+      "exerciseId": "library.chest.exercises.pushUpBosuBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0662",
+      "exerciseId": "library.chest.exercises.pushUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0653",
+      "exerciseId": "library.chest.exercises.pushUpBosuBall",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0655",
+      "exerciseId": "library.chest.exercises.pushUpStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0656",
+      "exerciseId": "library.chest.exercises.pushUpStabilityBall",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0659",
+      "exerciseId": "library.chest.exercises.pushUpWall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0658",
+      "exerciseId": "library.chest.exercises.pushUpWall",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0660",
+      "exerciseId": "library.triceps.exercises.pushUpCloseGripOffDumbbell",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0661",
+      "exerciseId": "library.chest.exercises.pushUpInsideLegKick",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0663",
+      "exerciseId": "library.chest.exercises.pushUpMedicineBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1467",
+      "exerciseId": "library.chest.exercises.pushUpLowerArms",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3145",
+      "exerciseId": "library.chest.exercises.pushUpPlus",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0664",
+      "exerciseId": "library.chest.exercises.pushUpIntoSidePlank",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3533",
+      "exerciseId": "library.quadriceps.exercises.bodyweightSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3201",
+      "exerciseId": "library.abs.exercises.sitUpQuarter",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3552",
+      "exerciseId": "library.quadriceps.exercises.rapidAlternatingFootTaps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0666",
+      "exerciseId": "library.chest.exercises.pushUpArcher",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0668",
+      "exerciseId": "library.glutes.exercises.elevatedReverseBridge",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0669",
+      "exerciseId": "library.shoulders.exercises.rearDeltoidStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0670",
+      "exerciseId": "library.back.exercises.pullUpRear",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1582",
+      "exerciseId": "library.hamstrings.exercises.supineStrapAssistedHamstringStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3236",
+      "exerciseId": "library.glutes.exercises.hipThrustsResistanceBandKnee",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3007",
+      "exerciseId": "library.quadriceps.exercises.legExtensionResistanceBand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3123",
+      "exerciseId": "library.biceps.exercises.bicepsCurlResistanceBandSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3124",
+      "exerciseId": "library.chest.exercises.chestPressResistanceBandSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3006",
+      "exerciseId": "library.glutes.exercises.hipAbductionResistanceBandSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3122",
+      "exerciseId": "library.shoulders.exercises.shoulderPressResistanceBandSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3144",
+      "exerciseId": "library.back.exercises.rowResistanceBandSeatedStraightBack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0872",
+      "exerciseId": "library.abs.exercises.reverseCrunch",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0672",
+      "exerciseId": "library.triceps.exercises.dipReverse",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0673",
+      "exerciseId": "library.back.exercises.pulldownLeverReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0674",
+      "exerciseId": "library.biceps.exercises.chinUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0675",
+      "exerciseId": "library.glutes.exercises.reverseHyperextensionStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1423",
+      "exerciseId": "library.glutes.exercises.reverseHyperextensionFlatBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3663",
+      "exerciseId": "library.abs.exercises.reversePlankWithAlternatingLegRaises",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0677",
+      "exerciseId": "library.triceps.exercises.dipRing",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2571",
+      "exerciseId": "library.glutes.exercises.rockingFrogAdductorStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0678",
+      "exerciseId": "library.back.exercises.alternatingFrontAndBackPullUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2208",
+      "exerciseId": "library.back.exercises.backStretchRoller",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2204",
+      "exerciseId": "library.abs.exercises.bodySawRoller",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2205",
+      "exerciseId": "library.glutes.exercises.latStretchRollerHip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2202",
+      "exerciseId": "library.glutes.exercises.hipStretchRoller",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2206",
+      "exerciseId": "library.abs.exercises.reverseCrunchRoller",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2203",
+      "exerciseId": "library.chest.exercises.seatedRollerReachForward",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2209",
+      "exerciseId": "library.chest.exercises.seatedStraightArmRollerRaise",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2207",
+      "exerciseId": "library.back.exercises.latStretchRollerSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0680",
+      "exerciseId": "library.back.exercises.ropeClimbing",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0685",
+      "exerciseId": "library.cardio.exercises.running",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0684",
+      "exerciseId": "library.cardio.exercises.treadmill",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1585",
+      "exerciseId": "library.hamstrings.exercises.runnerSHamstringStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0687",
+      "exerciseId": "library.abs.exercises.russianTwistBodyweight",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3012",
+      "exerciseId": "library.shoulders.exercises.scapularDips",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3021",
+      "exerciseId": "library.chest.exercises.pushUpScapula",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0688",
+      "exerciseId": "library.shoulders.exercises.scapularPullUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3219",
+      "exerciseId": "library.cardio.exercises.scissorJumps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1390",
+      "exerciseId": "library.calves.exercises.calfStretchSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1424",
+      "exerciseId": "library.glutes.exercises.gluteStretchSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0689",
+      "exerciseId": "library.abs.exercises.legRaiseSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0690",
+      "exerciseId": "library.back.exercises.lowerBackStretchSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2567",
+      "exerciseId": "library.glutes.exercises.piriformisStretchSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0691",
+      "exerciseId": "library.abs.exercises.sideCrunchSeatedWall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1587",
+      "exerciseId": "library.hamstrings.exercises.seatedWideLegForwardFoldSequence",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0697",
+      "exerciseId": "library.hamstrings.exercises.nordicCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1766",
+      "exerciseId": "library.hamstrings.exercises.nordicCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0696",
+      "exerciseId": "library.hamstrings.exercises.nordicCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3222",
+      "exerciseId": "library.cardio.exercises.squatSemiJump",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3656",
+      "exerciseId": "library.cardio.exercises.shortStrideRunning",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1763",
+      "exerciseId": "library.back.exercises.pullUps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3699",
+      "exerciseId": "library.abs.exercises.shoulderTap",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0699",
+      "exerciseId": "library.chest.exercises.pushUpWithShoulderTaps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1774",
+      "exerciseId": "library.glutes.exercises.hipAbductionSideBridge",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0705",
+      "exerciseId": "library.abs.exercises.sideBridgeHipLifts",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0709",
+      "exerciseId": "library.abs.exercises.lateralLegRaisesOnParallelBars",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0710",
+      "exerciseId": "library.glutes.exercises.hipAbductionSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1358",
+      "exerciseId": "library.back.exercises.latStretchSideLyingFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3667",
+      "exerciseId": "library.hips.exercises.hipAdductionSideLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1775",
+      "exerciseId": "library.hips.exercises.hipAdductionSidePlank",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0716",
+      "exerciseId": "library.back.exercises.neckStretchSidePush",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0717",
+      "exerciseId": "library.chest.exercises.pushUpSide",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0721",
+      "exerciseId": "library.forearms.exercises.wristStretchWithSidePull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0720",
+      "exerciseId": "library.back.exercises.sideToSideChinUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3213",
+      "exerciseId": "library.abs.exercises.alternatingCrossBodyToeTouches",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0725",
+      "exerciseId": "library.chest.exercises.pushUpOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3645",
+      "exerciseId": "library.glutes.exercises.singleLegGluteBridge",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0727",
+      "exerciseId": "library.calves.exercises.calfRaiseDumbbellOneLeg",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0730",
+      "exerciseId": "library.hamstrings.exercises.singleLegSlidingCurl",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1759",
+      "exerciseId": "library.quadriceps.exercises.squatPistol",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1489",
+      "exerciseId": "library.quadriceps.exercises.sissySquat",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0735",
+      "exerciseId": "library.abs.exercises.sitUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3679",
+      "exerciseId": "library.abs.exercises.sitUpArmsChest",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3361",
+      "exerciseId": "library.cardio.exercises.skaterJumps",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2142",
+      "exerciseId": "library.cardio.exercises.skiergDoublePolePull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3671",
+      "exerciseId": "library.cardio.exercises.alternatingSkiSteps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3304",
+      "exerciseId": "library.back.exercises.skinTheCatRotation",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1425",
+      "exerciseId": "library.quadriceps.exercises.singleLegLegPress",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0738",
+      "exerciseId": "library.calves.exercises.calfPressLegPressMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0739",
+      "exerciseId": "library.quadriceps.exercises.legPress45deg",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1464",
+      "exerciseId": "library.quadriceps.exercises.legPress45deg",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1463",
+      "exerciseId": "library.quadriceps.exercises.legPress45deg",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0740",
+      "exerciseId": "library.glutes.exercises.legPressSled45WideStance",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1391",
+      "exerciseId": "library.calves.exercises.calfPressLegPressMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0741",
+      "exerciseId": "library.quadriceps.exercises.hackSquatSledCloser",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0742",
+      "exerciseId": "library.calves.exercises.calfRaiseSledForwardAngled",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0743",
+      "exerciseId": "library.quadriceps.exercises.hackSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2334",
+      "exerciseId": "library.calves.exercises.calfPressLegPressMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0744",
+      "exerciseId": "library.quadriceps.exercises.squatSledLying",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1392",
+      "exerciseId": "library.calves.exercises.calfPressSledOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1496",
+      "exerciseId": "library.abs.exercises.sledgehammerTireStrikes",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0746",
+      "exerciseId": "library.shoulders.exercises.shrugSmithBack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0747",
+      "exerciseId": "library.shoulders.exercises.pressSmithBehindNeck",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0748",
+      "exerciseId": "library.chest.exercises.smithMachineBenchPressFlat",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0749",
+      "exerciseId": "library.hamstrings.exercises.goodMorningSmithBentKnee",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1359",
+      "exerciseId": "library.back.exercises.bentOverRowSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0750",
+      "exerciseId": "library.quadriceps.exercises.squatSmithChair",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0751",
+      "exerciseId": "library.triceps.exercises.benchPressSmithCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0752",
+      "exerciseId": "library.glutes.exercises.deadliftSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0753",
+      "exerciseId": "library.chest.exercises.smithMachineBenchPressDecline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0754",
+      "exerciseId": "library.chest.exercises.pressSmithDeclineReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1433",
+      "exerciseId": "library.quadriceps.exercises.frontSquatSmithCleanGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3281",
+      "exerciseId": "library.quadriceps.exercises.smithMachineSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0755",
+      "exerciseId": "library.quadriceps.exercises.hackSquatSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0756",
+      "exerciseId": "library.glutes.exercises.smithMachineHipThrust",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0757",
+      "exerciseId": "library.chest.exercises.smithMachineBenchPressIncline",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0758",
+      "exerciseId": "library.chest.exercises.pressSmithInclineReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0759",
+      "exerciseId": "library.chest.exercises.inclineSmithMachineHighPull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0760",
+      "exerciseId": "library.glutes.exercises.legPressSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1434",
+      "exerciseId": "library.quadriceps.exercises.squatSmithLowBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1683",
+      "exerciseId": "library.biceps.exercises.bicepsCurlSmithMachine",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1625",
+      "exerciseId": "library.triceps.exercises.benchPressSmithMachineDeclineCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1752",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionSmithMachineIncline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1626",
+      "exerciseId": "library.chest.exercises.benchPressSmithMachineReverseDeclineCloseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0761",
+      "exerciseId": "library.back.exercises.rowSmithNarrow",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1360",
+      "exerciseId": "library.back.exercises.rowSmithOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1393",
+      "exerciseId": "library.calves.exercises.calfRaiseSmithOneLegFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0762",
+      "exerciseId": "library.shoulders.exercises.rearDeltRowSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0763",
+      "exerciseId": "library.calves.exercises.toeRaiseSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1394",
+      "exerciseId": "library.calves.exercises.toeRaiseSmith",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1361",
+      "exerciseId": "library.back.exercises.bentOverRowSmithReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0764",
+      "exerciseId": "library.chest.exercises.pressSmithReverseGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1395",
+      "exerciseId": "library.calves.exercises.calfRaiseSmithSeatedOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0765",
+      "exerciseId": "library.shoulders.exercises.shoulderPressSmithSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1426",
+      "exerciseId": "library.forearms.exercises.wristCurlSmithSeated",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0766",
+      "exerciseId": "library.shoulders.exercises.shoulderPressSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0767",
+      "exerciseId": "library.shoulders.exercises.shrugSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0768",
+      "exerciseId": "library.quadriceps.exercises.splitSquatSmithOneLeg",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0769",
+      "exerciseId": "library.quadriceps.exercises.lungeSmithSprint",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0770",
+      "exerciseId": "library.quadriceps.exercises.smithMachineSquats",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0771",
+      "exerciseId": "library.forearms.exercises.wristCurlSmithStandingBack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0772",
+      "exerciseId": "library.shoulders.exercises.militaryPressSmithStandingBehindHead",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0773",
+      "exerciseId": "library.calves.exercises.smithMachineCalfRaise",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0774",
+      "exerciseId": "library.shoulders.exercises.militaryPressSmithMachine",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3142",
+      "exerciseId": "library.quadriceps.exercises.squatSmithSumo",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1396",
+      "exerciseId": "library.calves.exercises.toeRaiseSmith",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0775",
+      "exerciseId": "library.shoulders.exercises.uprightRowSmith",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1308",
+      "exerciseId": "library.chest.exercises.benchPressSmithWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1309",
+      "exerciseId": "library.chest.exercises.benchPressSmithWideGripDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0776",
+      "exerciseId": "library.quadriceps.exercises.snatchPull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0777",
+      "exerciseId": "library.abs.exercises.diagonalDumbbellTrunkRotations",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1362",
+      "exerciseId": "library.back.exercises.proneSphinxStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0778",
+      "exerciseId": "library.chest.exercises.pushUpSpiderCrawl",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1363",
+      "exerciseId": "library.back.exercises.spineStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2329",
+      "exerciseId": "library.abs.exercises.twistSpine",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2368",
+      "exerciseId": "library.quadriceps.exercises.splitSquat",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0786",
+      "exerciseId": "library.quadriceps.exercises.squatJerk",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1705",
+      "exerciseId": "library.quadriceps.exercises.squatBosuBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1685",
+      "exerciseId": "library.quadriceps.exercises.squatToOverheadReach",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1686",
+      "exerciseId": "library.quadriceps.exercises.squatToOverheadReachTwist",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2297",
+      "exerciseId": "library.abs.exercises.crunchStabilityBallHandsBehindHeadFull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3291",
+      "exerciseId": "library.triceps.exercises.stalderPressToHandstand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3669",
+      "exerciseId": "library.back.exercises.standingArcherPull",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0788",
+      "exerciseId": "library.shoulders.exercises.pressStandingBehindNeck",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1490",
+      "exerciseId": "library.calves.exercises.calfRaiseStandingStaircase",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1397",
+      "exerciseId": "library.calves.exercises.standingBodyweightCalfRaise",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "1398",
+      "exerciseId": "library.calves.exercises.calfStretchStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1599",
+      "exerciseId": "library.hamstrings.exercises.strapAssistedHamstringAndCalfStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0794",
+      "exerciseId": "library.back.exercises.latStretchStandingLateral",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1364",
+      "exerciseId": "library.back.exercises.pelvicTiltStanding",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0795",
+      "exerciseId": "library.hamstrings.exercises.legCurlStandingBodyweight",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0796",
+      "exerciseId": "library.abs.exercises.rolloutStandingWheel",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3223",
+      "exerciseId": "library.cardio.exercises.explosiveStarJumps",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2138",
+      "exerciseId": "library.cardio.exercises.ergometer",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0798",
+      "exerciseId": "library.cardio.exercises.ergometerHorizontal",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3314",
+      "exerciseId": "library.shoulders.exercises.straddleMalteseHold",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3298",
+      "exerciseId": "library.shoulders.exercises.straddlePlancheHold",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1427",
+      "exerciseId": "library.glutes.exercises.sideLyingStraightLegHipAbduction",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0803",
+      "exerciseId": "library.chest.exercises.pushUpSuperman",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0805",
+      "exerciseId": "library.abs.exercises.suspensionStrapAbdominalRollout",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0806",
+      "exerciseId": "library.chest.exercises.pushUpSuspended",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0807",
+      "exerciseId": "library.abs.exercises.reverseCrunchSuspended",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0808",
+      "exerciseId": "library.back.exercises.ringRow",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0809",
+      "exerciseId": "library.quadriceps.exercises.splitSquatSuspended",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3433",
+      "exerciseId": "library.glutes.exercises.swimmerKicks",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3318",
+      "exerciseId": "library.cardio.exercises.kettlebellCircularSwing",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1753",
+      "exerciseId": "library.triceps.exercises.dipThreeBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2459",
+      "exerciseId": "library.glutes.exercises.tireTurnover",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0811",
+      "exerciseId": "library.glutes.exercises.trapBarDeadlift",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0814",
+      "exerciseId": "library.triceps.exercises.dips",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0812",
+      "exerciseId": "library.triceps.exercises.benchDips",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0813",
+      "exerciseId": "library.triceps.exercises.benchDips",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0815",
+      "exerciseId": "library.triceps.exercises.tricepsDipFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0816",
+      "exerciseId": "library.triceps.exercises.tricepsExtensionBodyweightKneeling",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0817",
+      "exerciseId": "library.triceps.exercises.tricepsStretchOverhead",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0871",
+      "exerciseId": "library.abs.exercises.fullBodyCrunch",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0818",
+      "exerciseId": "library.back.exercises.pulldownCableNeutralGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1466",
+      "exerciseId": "library.glutes.exercises.hipLiftWithRotation",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2802",
+      "exerciseId": "library.abs.exercises.legRaiseTwisted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2801",
+      "exerciseId": "library.abs.exercises.legRaiseTwisted",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "3231",
+      "exerciseId": "library.back.exercises.forwardFoldReachingBothToes",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1365",
+      "exerciseId": "library.back.exercises.upperBackStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1366",
+      "exerciseId": "library.back.exercises.upwardFacingDogStretch",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3420",
+      "exerciseId": "library.abs.exercises.vSitFloor",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0826",
+      "exerciseId": "library.abs.exercises.legRaiseParallelBars",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "2141",
+      "exerciseId": "library.cardio.exercises.ellipticalTrainerWalking",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3655",
+      "exerciseId": "library.cardio.exercises.lungeWalkingHighKnee",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1460",
+      "exerciseId": "library.quadriceps.exercises.lungeWalking",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3666",
+      "exerciseId": "library.cardio.exercises.inclineTreadmillWalking",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2311",
+      "exerciseId": "library.cardio.exercises.stairClimberStepping",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0830",
+      "exerciseId": "library.triceps.exercises.dipWeightedBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2987",
+      "exerciseId": "library.back.exercises.chinUpWeightedCloseGripDipCage",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3643",
+      "exerciseId": "library.quadriceps.exercises.squatWeightedCossack",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0832",
+      "exerciseId": "library.abs.exercises.crunchWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3670",
+      "exerciseId": "library.abs.exercises.sitUpWeightedDecline",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0833",
+      "exerciseId": "library.calves.exercises.calfRaiseWeightedDonkey",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1310",
+      "exerciseId": "library.chest.exercises.pushUpWeightedDrop",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2135",
+      "exerciseId": "library.abs.exercises.plankWeightedFront",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0834",
+      "exerciseId": "library.shoulders.exercises.frontRaiseWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0866",
+      "exerciseId": "library.abs.exercises.legHipRaiseWeightedHanging",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0835",
+      "exerciseId": "library.back.exercises.hyperextensionWeightedStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3641",
+      "exerciseId": "library.shoulders.exercises.weightedKneelingStepAndSwing",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3644",
+      "exerciseId": "library.quadriceps.exercises.weightedLungeWithArmSwing",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3286",
+      "exerciseId": "library.back.exercises.muscleUpWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3312",
+      "exerciseId": "library.back.exercises.muscleUpWeightedBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3290",
+      "exerciseId": "library.back.exercises.pullUpWeightedOneArm",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0840",
+      "exerciseId": "library.abs.exercises.crunchWeightedOverheadStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0841",
+      "exerciseId": "library.back.exercises.pullUpWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0844",
+      "exerciseId": "library.shoulders.exercises.reverseFlyDumbbellBentOver",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0846",
+      "exerciseId": "library.abs.exercises.russianTwist",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0845",
+      "exerciseId": "library.abs.exercises.russianTwistWeightedLegsUp",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2371",
+      "exerciseId": "library.abs.exercises.russianTwist",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0847",
+      "exerciseId": "library.biceps.exercises.bicepsCurlWeightedSeatedStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0849",
+      "exerciseId": "library.abs.exercises.twistWeightedSeatedStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0850",
+      "exerciseId": "library.abs.exercises.sideBendWeightedStabilityBall",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0851",
+      "exerciseId": "library.quadriceps.exercises.sissySquatWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0852",
+      "exerciseId": "library.quadriceps.exercises.squatWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0853",
+      "exerciseId": "library.biceps.exercises.dumbbellBicepsCurl",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "0854",
+      "exerciseId": "library.forearms.exercises.weightedHandGripSqueeze",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3313",
+      "exerciseId": "library.chest.exercises.dipWeightedStraightBar",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "3642",
+      "exerciseId": "library.quadriceps.exercises.lungeWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0856",
+      "exerciseId": "library.chest.exercises.svendPressWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1754",
+      "exerciseId": "library.triceps.exercises.dipWeightedThreeBench",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1755",
+      "exerciseId": "library.triceps.exercises.tricepsDipWeighted",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1767",
+      "exerciseId": "library.triceps.exercises.tricepsDipWeighted",
+      "resolution": "alias"
+    },
+    {
+      "sourceId": "0857",
+      "exerciseId": "library.abs.exercises.abWheelRollout",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "3637",
+      "exerciseId": "library.abs.exercises.abWheelRollout",
+      "resolution": "existing"
+    },
+    {
+      "sourceId": "1429",
+      "exerciseId": "library.back.exercises.pullUpWideGrip",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1367",
+      "exerciseId": "library.back.exercises.pullUpWideGripRear",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1311",
+      "exerciseId": "library.chest.exercises.pushUpWideHand",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "2363",
+      "exerciseId": "library.chest.exercises.chestDipWideGripHighParallelBars",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0858",
+      "exerciseId": "library.cardio.exercises.repeatedSprintIntervals",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1604",
+      "exerciseId": "library.hamstrings.exercises.lungeStretchWithThoracicRotation",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "1428",
+      "exerciseId": "library.forearms.exercises.wristCircles",
+      "resolution": "added"
+    },
+    {
+      "sourceId": "0859",
+      "exerciseId": "library.forearms.exercises.wristRoller",
+      "resolution": "existing"
+    }
+  ],
+  "sourceSha256": "656634224b8977b99a6d765470ee123260d4979715eaa4e7c0b7c8bb0d79f93d"
+}

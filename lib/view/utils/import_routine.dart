@@ -6,10 +6,8 @@ import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/view/actions/purchases.dart';
-import 'package:gymtracker/view/components/badges.dart';
-import 'package:gymtracker/view/components/gradient_bottom_bar.dart';
 import 'package:gymtracker/view/components/pro_builder.dart';
-import 'package:gymtracker/view/components/routines.dart';
+import 'package:gymtracker/view/components/routine_import_content.dart';
 
 class ImportRoutineModal extends ConsumerStatefulWidget {
   final Workout workout;
@@ -20,65 +18,33 @@ class ImportRoutineModal extends ConsumerStatefulWidget {
   ConsumerState<ImportRoutineModal> createState() => _ImportRoutineModalState();
 }
 
-class _ImportRoutineModalState extends ConsumerState<ImportRoutineModal>
-    with SingleTickerProviderStateMixin {
-  late AnimationController controller = BottomSheet.createAnimationController(
-    this,
-  );
+class _ImportRoutineModalState extends ConsumerState<ImportRoutineModal> {
   Workout get workout => widget.workout;
 
   @override
-  Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final gradientColor = colorScheme.surfaceContainerHigh;
-    return Scaffold(
-      body: GradientBottomBar.wrap(
-        context: context,
-        child: Builder(
-          builder: (context) {
-            return RoutinePreview(routine: workout);
-          },
-        ),
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(
+      title: Text(workout.name),
+      leading: IconButton(
+        icon: const Icon(Icons.close_rounded),
+        tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+        onPressed: () => Go.back(),
       ),
-      extendBody: true,
-      bottomNavigationBar: GradientBottomBar(
-        color: gradientColor,
-        center: true,
-        buttons: [
-          FilledButton.tonal(
-            onPressed: () => Go.back(),
-            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
-          ),
-          ProBuilder(
-            builder: (context, subscriptionInfo) {
-              final shouldDisable =
-                  subscriptionInfo == null || !subscriptionInfo.hasProFeatures;
-              return FilledButton(
-                onPressed: () {
-                  if (shouldDisable) {
-                    ref.read(purchasesControllerProvider).presentPaywall();
-                    return;
-                  }
-                  Go.back();
-                  ref.read(routinesControllerProvider).importWorkout(workout);
-                  Go.snack(context.t.importRoutine.import.done);
-                },
-                child: Text.rich(
-                  TextSpan(
-                    text: context.t.importRoutine.import.label,
-                    children: [
-                      if (shouldDisable) ...[
-                        const TextSpan(text: " "),
-                        WidgetSpan(child: ProBadge()),
-                      ],
-                    ],
-                  ),
-                ),
-              );
-            },
-          ),
-        ],
+    ),
+    body: RoutineImportContent(routines: [workout]),
+    bottomNavigationBar: ProBuilder(
+      builder: (context, subscription) => RoutineImportActionBar(
+        isPro: subscription?.hasProFeatures == true,
+        onPressed: () {
+          if (subscription?.hasProFeatures != true) {
+            ref.read(purchasesControllerProvider).presentPaywall();
+            return;
+          }
+          Go.back();
+          ref.read(routinesControllerProvider).importWorkout(workout);
+          Go.snack(context.t.importRoutine.import.done);
+        },
       ),
-    );
-  }
+    ),
+  );
 }

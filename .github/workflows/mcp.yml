@@ -1,9 +1,9 @@
 name: MCP integration
 on:
   push:
-    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'lib/struct/nutrition*', 'lib/db/model/tables/water_logs.dart', 'lib/repository/hydration.dart', 'lib/struct/nutrition.values.dart', 'lib/model/measurements.dart', 'lib/model/progression.dart', 'lib/model/workout.dart', 'lib/data/configuration.dart', 'test/model/mcp*', 'test/fixtures/mcp*', '.github/workflows/mcp.yml']
+    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'tools/test_personal_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'lib/struct/nutrition*', 'lib/db/model/tables/water_logs.dart', 'lib/repository/hydration.dart', 'lib/struct/nutrition.values.dart', 'lib/model/measurements.dart', 'lib/model/progression.dart', 'lib/model/workout.dart', 'lib/data/configuration.dart', 'test/model/mcp*', 'test/fixtures/mcp*', '.github/workflows/mcp.yml']
   pull_request:
-    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'lib/struct/nutrition*', 'lib/db/model/tables/water_logs.dart', 'lib/repository/hydration.dart', 'lib/struct/nutrition.values.dart', 'lib/model/measurements.dart', 'lib/model/progression.dart', 'lib/model/workout.dart', 'lib/data/configuration.dart', 'test/model/mcp*', 'test/fixtures/mcp*', '.github/workflows/mcp.yml']
+    paths: ['supabase/**', 'tools/*mcp*', 'tools/test_sync_v2_backend.sh', 'tools/test_personal_backend.sh', 'test/backend/**', 'lib/data/exercises.dart', 'lib/model/exercise.dart', 'lib/model/set.dart', 'lib/i18n/**', 'lib/struct/nutrition*', 'lib/db/model/tables/water_logs.dart', 'lib/repository/hydration.dart', 'lib/struct/nutrition.values.dart', 'lib/model/measurements.dart', 'lib/model/progression.dart', 'lib/model/workout.dart', 'lib/data/configuration.dart', 'test/model/mcp*', 'test/fixtures/mcp*', '.github/workflows/mcp.yml']
   workflow_dispatch:
 jobs:
   mcp:
@@ -24,5 +24,11 @@ jobs:
           deno check --config supabase/functions/delete-user-complete/deno.json supabase/functions/delete-user-complete/index.ts
           deno check --config supabase/functions/gdpr-data-export/deno.json supabase/functions/gdpr-data-export/index.ts
           deno test supabase/functions/_shared/first_party_test.ts
+      - name: Check personal dashboard and shared-program API
+        run: |
+          deno check supabase/functions/personal-api/index.ts
+          deno test --allow-env supabase/functions/personal-api/*_test.ts
+      - name: Personal dashboard database integration
+        run: bash tools/test_personal_backend.sh
       - name: Backend integration and concurrent retries
         run: bash tools/test_sync_v2_backend.sh

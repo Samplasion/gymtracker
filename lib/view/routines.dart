@@ -1,4 +1,3 @@
-import 'package:gymtracker/provider/trainer.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -11,8 +10,10 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/data/configuration.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
+import 'package:gymtracker/model/shared_program.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/routines.dart';
+import 'package:gymtracker/provider/trainer.dart';
 import 'package:gymtracker/repository/routines.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/extensions.dart';
@@ -40,6 +41,7 @@ import 'package:gymtracker/view/skeleton.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/drag_handle.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
+import 'package:gymtracker/view/utils/shared_program.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:sliver_tools/sliver_tools.dart';
@@ -146,6 +148,14 @@ class _RoutinesViewState extends ConsumerState<RoutinesView> with _RoutineList {
             title: Text(isLoading ? "Routines" : context.t.routines.title),
             leading: const SkeletonDrawerButton(),
             actions: [
+              IconButton(
+                icon: const Icon(Icons.link),
+                tooltip: Localizations.localeOf(context).languageCode == 'it'
+                    ? 'Link condivisi'
+                    : 'Shared links',
+                onPressed: () => Go.to(() => const SharedProgramLinksView()),
+              ),
+
               IconButton(
                 onPressed: () {
                   Go.to(() => const BoutiqueView());
@@ -422,6 +432,36 @@ class _EditFolderModalState extends ConsumerState<EditFolderModal> {
         title: Text(context.t.routines.editFolder),
         actions: [
           IconButton(
+            icon: const Icon(Icons.share_outlined),
+            tooltip: Localizations.localeOf(context).languageCode == 'it'
+                ? 'Condividi programma'
+                : 'Share program',
+            onPressed: () {
+              final routines = controller.workouts
+                  .where((r) => r.folder?.id == widget.folder.id)
+                  .toList();
+              if (routines.isNotEmpty) {
+                shareProgram(
+                  context,
+                  ref,
+                  SharedProgramV1.fromWorkouts(
+                    widget.folder.name,
+                    routines,
+                    folder: widget.folder,
+                  ),
+                );
+              }
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.link),
+            tooltip: Localizations.localeOf(context).languageCode == 'it'
+                ? 'Link condivisi'
+                : 'Shared links',
+            onPressed: () => Go.to(() => const SharedProgramLinksView()),
+          ),
+
+          IconButton(
             icon: const Icon(GTIcons.delete),
             tooltip: context.t.actions.remove,
             onPressed: () {
@@ -429,8 +469,9 @@ class _EditFolderModalState extends ConsumerState<EditFolderModal> {
                 (r) =>
                     r.folder?.id == widget.folder.id &&
                     trainerControls(ref, r.id),
-              ))
+              )) {
                 return;
+              }
               controller.deleteFolder(widget.folder);
             },
           ),

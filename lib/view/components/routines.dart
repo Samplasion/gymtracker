@@ -60,21 +60,24 @@ class RoutinePreview extends StatelessWidget {
     super.key,
     required this.routine,
     this.automaticallyImplyLeading = false,
+    this.showHeader = true,
   });
 
   final Workout routine;
   final bool automaticallyImplyLeading;
+  final bool showHeader;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       controller: ModalScrollController.of(context),
       slivers: [
-        SliverAppBar.large(
-          title: SafeArea(child: Text(routine.name)),
-          automaticallyImplyLeading: automaticallyImplyLeading,
-          shadowColor: Colors.transparent,
-        ),
+        if (showHeader)
+          SliverAppBar.large(
+            title: SafeArea(child: Text(routine.name)),
+            automaticallyImplyLeading: automaticallyImplyLeading,
+            shadowColor: Colors.transparent,
+          ),
         if (routine.shouldShowInfobox)
           SliverPadding(
             padding: MediaQuery.of(context).padding.onlyHorizontal,

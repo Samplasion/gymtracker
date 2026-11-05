@@ -68,3 +68,10 @@ You can run the integration tests with the following command:
 ```bash
 flutter test integration_test
 ```
+
+On macOS, run each integration suite in a separate Flutter process to avoid
+losing the debug connection after the first suite:
+
+```bash
+bash tools/test_macos.sh
+```

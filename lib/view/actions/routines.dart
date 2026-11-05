@@ -1,4 +1,3 @@
-import 'package:gymtracker/db/database.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -10,11 +9,14 @@ import 'package:gymtracker/controller/intents_controller.dart';
 import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/controller/workout_controller.dart';
+import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/exercisable.dart';
+import 'package:gymtracker/model/shared_program.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/locale.dart';
+import 'package:gymtracker/service/email_confirmation.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/protocol.dart';
 import 'package:gymtracker/service/share.dart';
@@ -25,6 +27,7 @@ import 'package:gymtracker/view/routines.dart';
 import 'package:gymtracker/view/trainer.dart';
 import 'package:gymtracker/view/utils/history_workout.dart';
 import 'package:gymtracker/view/utils/import_routine.dart';
+import 'package:gymtracker/view/utils/shared_program.dart';
 import 'package:gymtracker/view/utils/workout_navigation.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:screenshot/screenshot.dart';
@@ -217,6 +220,8 @@ extension RoutinesPresentation on RoutinesController {
   }
 
   void onProtocolUrlReceived(String url) {
+    // Handled by the email verification screen, or simply opens the app.
+    if (isEmailConfirmationLink(url)) return;
     final Uri parsed = Uri.parse(url);
     logger.i('URL received: ${parsed.scheme}://${parsed.host}');
 
@@ -232,6 +237,13 @@ extension RoutinesPresentation on RoutinesController {
   }
 
   void onRoutineUrlReceived(Uri parsed) {
+    final token = parsed.queryParameters["token"];
+    if (token != null) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (ref.mounted) Go.to(() => SharedProgramImportView(token: token));
+      });
+      return;
+    }
     final t = ref.read(translationsProvider);
     if (!parsed.queryParameters.containsKey("json")) {
       Go.dialog(
@@ -307,14 +319,10 @@ extension RoutinesPresentation on RoutinesController {
   }
 
   void shareRoutine(Workout routine) {
-    final uri = Uri(
-      scheme: "gymtracker",
-      host: "routine",
-      queryParameters: {"json": jsonEncode(routine.shareWorkout()).compressed},
-    );
-    showDialog(
-      context: Go.context!,
-      builder: (context) => ShareRoutineAlertDialog(uri: uri),
+    Go.to(
+      () => _ShareProgramLauncher(
+        program: SharedProgramV1.fromWorkouts(routine.name, [routine]),
+      ),
     );
   }
 
@@ -353,8 +361,9 @@ extension RoutinesPresentation on RoutinesController {
       (r) =>
           r.folder?.id == folder.id &&
           service.db.cachedTrainerState.controls.contains(r.id),
-    ))
+    )) {
       return;
+    }
     final t = ref.read(translationsProvider);
     final shouldDelete = await Go.confirm(
       t.routines.actions.deleteFolder.title,
@@ -490,4 +499,29 @@ class _ShareRoutineAlertDialogState extends State<ShareRoutineAlertDialog> {
 
     ShareService().shareImage(capturedImage);
   }
+}
+
+class _ShareProgramLauncher extends ConsumerStatefulWidget {
+  final SharedProgramV1 program;
+  const _ShareProgramLauncher({required this.program});
+  @override
+  ConsumerState<_ShareProgramLauncher> createState() =>
+      _ShareProgramLauncherState();
+}
+
+class _ShareProgramLauncherState extends ConsumerState<_ShareProgramLauncher> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await shareProgram(context, ref, widget.program);
+      if (mounted) Go.back();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+    appBar: AppBar(),
+    body: const Center(child: CircularProgressIndicator()),
+  );
 }

@@ -407,8 +407,9 @@ class _RoutineCreatorController {
             ? ex.copyWith(restTime: value)
             : throw AssertionError("Unreachable yet");
       } else {
-        // We don't support rest time for individual exercises in a superset
-        throw UnimplementedError();
+        // A child uses the shared recovery interval of its superset.
+        final superset = exercises[supersetIndex].data as Superset;
+        exercises[supersetIndex].data = superset.copyWith(restTime: value);
       }
       changed();
     },

@@ -195,6 +195,8 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$reports$en reports = Translations$reports$en._(_root);
 	late final Translations$plateau$en plateau = Translations$plateau$en._(_root);
 	late final Translations$progression$en progression = Translations$progression$en._(_root);
+	late final Translations$paywall$en paywall = Translations$paywall$en._(_root);
+	late final Translations$routineImport$en routineImport = Translations$routineImport$en._(_root);
 }
 
 // Path: navigation
@@ -1625,6 +1627,8 @@ class Translations$login$en {
 	late final Translations$login$buttons$en buttons = Translations$login$buttons$en._(_root);
 	late final Translations$login$upsell$en upsell = Translations$login$upsell$en._(_root);
 	late final Translations$login$verifyEmail$en verifyEmail = Translations$login$verifyEmail$en._(_root);
+	late final Translations$login$presentation$en presentation = Translations$login$presentation$en._(_root);
+	late final Translations$login$recovery$en recovery = Translations$login$recovery$en._(_root);
 }
 
 // Path: sync
@@ -2716,6 +2720,132 @@ class Translations$progression$en {
 
 	/// en: 'Advance manually'
 	String get advance => 'Advance manually';
+}
+
+// Path: paywall
+class Translations$paywall$en {
+	Translations$paywall$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'GymBro Pro'
+	String get title => 'GymBro Pro';
+
+	/// en: 'Choose a subscription to unlock Pro features.'
+	String get subtitle => 'Choose a subscription to unlock Pro features.';
+
+	/// en: 'Subscriptions could not be loaded. Please try again.'
+	String get loadError => 'Subscriptions could not be loaded. Please try again.';
+
+	/// en: 'No subscriptions are available right now. Please try again later.'
+	String get empty => 'No subscriptions are available right now. Please try again later.';
+
+	late final Translations$paywall$trialPeriod$en trialPeriod = Translations$paywall$trialPeriod$en._(_root);
+	late final Translations$paywall$autoRenewNotice$en autoRenewNotice = Translations$paywall$autoRenewNotice$en._(_root);
+	late final Translations$paywall$purchaseError$en purchaseError = Translations$paywall$purchaseError$en._(_root);
+	late final Translations$paywall$restoreError$en restoreError = Translations$paywall$restoreError$en._(_root);
+	late final Translations$paywall$actions$en actions = Translations$paywall$actions$en._(_root);
+}
+
+// Path: routineImport
+class Translations$routineImport$en {
+	Translations$routineImport$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Program contents'
+	String get summary => 'Program contents';
+
+	/// en: 'Import a personal copy. The shared program stays unchanged.'
+	String get summaryDescription => 'Import a personal copy. The shared program stays unchanged.';
+
+	/// en: '(one) {1 training day} (other) {$n training days}'
+	String days({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: '1 training day',
+		other: '${n} training days',
+	);
+
+	/// en: '(one) {1 exercise} (other) {$n exercises}'
+	String exercises({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: '1 exercise',
+		other: '${n} exercises',
+	);
+
+	/// en: '(one) {1 set} (other) {$n sets}'
+	String sets({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: '1 set',
+		other: '${n} sets',
+	);
+
+	/// en: 'Workout preview'
+	String get preview => 'Workout preview';
+
+	/// en: 'Training day'
+	String get day => 'Training day';
+
+	/// en: 'Choose a day to preview. The whole program will be imported.'
+	String get dayDescription => 'Choose a day to preview. The whole program will be imported.';
+
+	/// en: 'Program notes'
+	String get programNotes => 'Program notes';
+
+	/// en: 'Workout notes'
+	String get workoutNotes => 'Workout notes';
+
+	/// en: 'Exercises'
+	String get exerciseList => 'Exercises';
+
+	/// en: 'No exercises in this workout'
+	String get emptyTitle => 'No exercises in this workout';
+
+	/// en: 'This day has no prescribed exercises yet.'
+	String get emptyDescription => 'This day has no prescribed exercises yet.';
+
+	/// en: 'No sets prescribed'
+	String get noSets => 'No sets prescribed';
+
+	/// en: 'Custom exercise'
+	String get custom => 'Custom exercise';
+
+	/// en: 'Assistance'
+	String get assistance => 'Assistance';
+
+	/// en: '$duration rest'
+	String rest({required Object duration}) => '${duration} rest';
+
+	/// en: 'Set $number'
+	String setNumber({required Object number}) => 'Set ${number}';
+
+	/// en: '$count s'
+	String seconds({required Object count}) => '${count} s';
+
+	/// en: 'Opening shared program'
+	String get loadingTitle => 'Opening shared program';
+
+	/// en: 'Loading the workouts and their prescriptions.'
+	String get loadingDescription => 'Loading the workouts and their prescriptions.';
+
+	/// en: 'Program unavailable'
+	String get unavailableTitle => 'Program unavailable';
+
+	/// en: 'Try again'
+	String get retry => 'Try again';
+
+	/// en: 'Importing shared routines requires Gym Bro Pro.'
+	String get proRequired => 'Importing shared routines requires Gym Bro Pro.';
+
+	/// en: 'Importing…'
+	String get importing => 'Importing…';
+
+	/// en: 'Something went wrong. Please try again shortly.'
+	String get loadError => 'Something went wrong. Please try again shortly.';
+
+	/// en: 'Unable to connect. Check your connection and try again.'
+	String get networkError => 'Unable to connect. Check your connection and try again.';
 }
 
 // Path: set.kindShort
@@ -5497,6 +5627,15 @@ class Translations$login$errors$en {
 
 	/// en: 'No Internet connection.'
 	String get noInternet => 'No Internet connection.';
+
+	/// en: 'Enter your password.'
+	String get passwordRequired => 'Enter your password.';
+
+	/// en: 'Enter your password again.'
+	String get confirmPasswordRequired => 'Enter your password again.';
+
+	/// en: 'Passwords do not match.'
+	String get passwordMismatch => 'Passwords do not match.';
 }
 
 // Path: login.fields
@@ -5509,6 +5648,7 @@ class Translations$login$fields$en {
 	late final Translations$login$fields$email$en email = Translations$login$fields$email$en._(_root);
 	late final Translations$login$fields$password$en password = Translations$login$fields$password$en._(_root);
 	late final Translations$login$fields$username$en username = Translations$login$fields$username$en._(_root);
+	late final Translations$login$fields$confirmPassword$en confirmPassword = Translations$login$fields$confirmPassword$en._(_root);
 }
 
 // Path: login.buttons
@@ -5524,6 +5664,15 @@ class Translations$login$buttons$en {
 
 	/// en: 'Sign up'
 	String get signUp => 'Sign up';
+
+	/// en: 'Show password'
+	String get showPassword => 'Show password';
+
+	/// en: 'Hide password'
+	String get hidePassword => 'Hide password';
+
+	/// en: 'Dismiss keyboard'
+	String get dismissKeyboard => 'Dismiss keyboard';
 }
 
 // Path: login.upsell
@@ -5560,6 +5709,72 @@ class Translations$login$verifyEmail$en {
 
 	/// en: 'Verify your email address and try again.'
 	String get notVerified => 'Verify your email address and try again.';
+}
+
+// Path: login.presentation
+class Translations$login$presentation$en {
+	Translations$login$presentation$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Sign in to Gym Bro'
+	String get signInTitle => 'Sign in to Gym Bro';
+
+	/// en: 'Pick up your workouts and keep your progress in sync.'
+	String get signInSubtitle => 'Pick up your workouts and keep your progress in sync.';
+
+	/// en: 'Create your profile'
+	String get signUpTitle => 'Create your profile';
+
+	/// en: 'Save your progress and share workouts with your friends.'
+	String get signUpSubtitle => 'Save your progress and share workouts with your friends.';
+
+	/// en: 'At least 8 characters, with an uppercase letter, a lowercase letter, a number and a special character.'
+	String get passwordRequirements => 'At least 8 characters, with an uppercase letter, a lowercase letter, a number and a special character.';
+
+	/// en: 'Don’t have an account?'
+	String get noAccount => 'Don’t have an account?';
+
+	/// en: 'Already have an account?'
+	String get haveAccount => 'Already have an account?';
+}
+
+// Path: login.recovery
+class Translations$login$recovery$en {
+	Translations$login$recovery$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Forgot password?'
+	String get forgot => 'Forgot password?';
+
+	/// en: 'Reset your password'
+	String get title => 'Reset your password';
+
+	/// en: 'Enter your email and we’ll send you a link to choose a new password on the Gym Bro website.'
+	String get description => 'Enter your email and we’ll send you a link to choose a new password on the Gym Bro website.';
+
+	/// en: 'Send reset link'
+	String get send => 'Send reset link';
+
+	/// en: 'Check your email'
+	String get sentTitle => 'Check your email';
+
+	/// en: 'If an account exists for this address, you’ll receive a password reset link. After updating it on the website, come back here to sign in.'
+	String get sentDescription => 'If an account exists for this address, you’ll receive a password reset link. After updating it on the website, come back here to sign in.';
+
+	/// en: 'Check your spam folder too. If you can’t find the message, go back and try again.'
+	String get checkSpam => 'Check your spam folder too. If you can’t find the message, go back and try again.';
+
+	/// en: 'Back to sign in'
+	String get backToSignIn => 'Back to sign in';
+
+	/// en: 'We couldn’t send the link. Wait a few minutes and try again.'
+	String get error => 'We couldn’t send the link. Wait a few minutes and try again.';
 }
 
 // Path: sync.conflict
@@ -5599,6 +5814,9 @@ class Translations$onboarding$buttons$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Skip for now'
+	String get skip => 'Skip for now';
 
 	/// en: 'Next'
 	String get next => 'Next';
@@ -5959,6 +6177,111 @@ class Translations$profileSearch$noResults$en {
 
 	/// en: 'Try searching for a different username.'
 	String get text => 'Try searching for a different username.';
+}
+
+// Path: paywall.trialPeriod
+class Translations$paywall$trialPeriod$en {
+	Translations$paywall$trialPeriod$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: '(one) {Free trial: $n week} (other) {Free trial: $n weeks}'
+	String week({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: 'Free trial: ${n} week',
+		other: 'Free trial: ${n} weeks',
+	);
+
+	/// en: '(one) {Free trial: $n month} (other) {Free trial: $n months}'
+	String month({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: 'Free trial: ${n} month',
+		other: 'Free trial: ${n} months',
+	);
+
+	/// en: '(one) {Free trial: $n year} (other) {Free trial: $n years}'
+	String year({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: 'Free trial: ${n} year',
+		other: 'Free trial: ${n} years',
+	);
+
+	/// en: '(one) {Free trial: $n day} (other) {Free trial: $n days}'
+	String day({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n,
+		one: 'Free trial: ${n} day',
+		other: 'Free trial: ${n} days',
+	);
+}
+
+// Path: paywall.autoRenewNotice
+class Translations$paywall$autoRenewNotice$en {
+	Translations$paywall$autoRenewNotice$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Renews automatically at ${price} per week until cancelled.'
+	String week({required Object price}) => 'Renews automatically at ${price} per week until cancelled.';
+
+	/// en: 'Renews automatically at ${price} per month until cancelled.'
+	String month({required Object price}) => 'Renews automatically at ${price} per month until cancelled.';
+
+	/// en: 'Renews automatically at ${price} per year until cancelled.'
+	String year({required Object price}) => 'Renews automatically at ${price} per year until cancelled.';
+
+	/// en: 'Renews automatically at ${price} per day until cancelled.'
+	String day({required Object price}) => 'Renews automatically at ${price} per day until cancelled.';
+}
+
+// Path: paywall.purchaseError
+class Translations$paywall$purchaseError$en {
+	Translations$paywall$purchaseError$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Purchase unsuccessful'
+	String get title => 'Purchase unsuccessful';
+
+	/// en: 'The purchase could not be completed. Please try again.'
+	String get subtitle => 'The purchase could not be completed. Please try again.';
+}
+
+// Path: paywall.restoreError
+class Translations$paywall$restoreError$en {
+	Translations$paywall$restoreError$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Restore unsuccessful'
+	String get title => 'Restore unsuccessful';
+
+	/// en: 'Purchases could not be restored. Please try again.'
+	String get subtitle => 'Purchases could not be restored. Please try again.';
+}
+
+// Path: paywall.actions
+class Translations$paywall$actions$en {
+	Translations$paywall$actions$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Subscribe'
+	String get subscribe => 'Subscribe';
+
+	/// en: 'Restore purchases'
+	String get restorePurchase => 'Restore purchases';
+
+	/// en: 'Terms of service'
+	String get termsOfService => 'Terms of service';
+
+	/// en: 'Privacy policy'
+	String get privacyPolicy => 'Privacy policy';
 }
 
 // Path: exercise.chart.views
@@ -11545,6 +11868,18 @@ class Translations$login$fields$username$en {
 	String get hint => 'Username';
 }
 
+// Path: login.fields.confirmPassword
+class Translations$login$fields$confirmPassword$en {
+	Translations$login$fields$confirmPassword$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Confirm password'
+	String get label => 'Confirm password';
+}
+
 // Path: feed.workout.title
 class Translations$feed$workout$title$en {
 	Translations$feed$workout$title$en._(this._root);
@@ -13296,7 +13631,7 @@ extension on Translations {
 			'routines.editor.fields.infobox.label' => 'Notes',
 			'routines.editor.superset.title' => 'Superset',
 			'routines.editor.superset.add' => 'Add superset',
-			'routines.editor.superset.subtitle' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ), 
+			'routines.editor.superset.subtitle' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ),
 			'routines.editor.superset.addExercise' => 'Add exercises',
 			'routines.editor.superset.remove.title' => 'Remove superset',
 			'routines.editor.superset.remove.body' => 'Are you sure you want to remove this superset? This action cannot be undone.',
@@ -13319,12 +13654,12 @@ extension on Translations {
 			'routines.loadError.text' => 'Try again to load your routines and folders.',
 			'history.title' => 'History',
 			'history.empty' => 'No history',
-			'history.andMore' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '…and one more exercise', two: '…and ${n} more exercises', few: '…and ${n} more exercises', many: '…and ${n} more exercises', other: '…and ${n} more exercises', ), 
-			'history.actions.deleteMultiple.title' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Delete exercise', two: 'Delete ${n} exercises', few: 'Delete ${n} exercises', many: 'Delete ${n} exercises', other: 'Delete ${n} exercises', ), 
-			'history.actions.deleteMultiple.text' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Are you sure you want to delete this exercise from your history? This action cannot be undone.', two: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', few: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', many: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', other: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', ), 
+			'history.andMore' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '…and one more exercise', two: '…and ${n} more exercises', few: '…and ${n} more exercises', many: '…and ${n} more exercises', other: '…and ${n} more exercises', ),
+			'history.actions.deleteMultiple.title' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Delete exercise', two: 'Delete ${n} exercises', few: 'Delete ${n} exercises', many: 'Delete ${n} exercises', other: 'Delete ${n} exercises', ),
+			'history.actions.deleteMultiple.text' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Are you sure you want to delete this exercise from your history? This action cannot be undone.', two: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', few: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', many: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', other: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', ),
 			'history.actions.deleteMultiple.actions.no' => 'Cancel',
 			'history.actions.deleteMultiple.actions.yes' => 'Delete',
-			'history.actions.deleteMultiple.done' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'The exercise has been deleted from your history.', two: 'The exercises have been deleted from your history.', few: 'The exercises have been deleted from your history.', many: 'The exercises have been deleted from your history.', other: 'The exercises have been deleted from your history.', ), 
+			'history.actions.deleteMultiple.done' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'The exercise has been deleted from your history.', two: 'The exercises have been deleted from your history.', few: 'The exercises have been deleted from your history.', many: 'The exercises have been deleted from your history.', other: 'The exercises have been deleted from your history.', ),
 			'history.showAll' => 'Show all data',
 			'history.search' => 'Search workouts',
 			'settings.title' => 'Settings',
@@ -13479,10 +13814,10 @@ extension on Translations {
 			'ongoingWorkout.toolbox.title' => 'Tools',
 			'ongoingWorkout.updateRoutine.differenceTitle' => 'Change routine?',
 			'ongoingWorkout.updateRoutine.differenceText' => 'You\'ve made changes to the workout. Do you want to save them to the routine?',
-			'ongoingWorkout.updateRoutine.differences.added' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises added', one: '1 exercise added', two: '${n} exercises added', few: '${n} exercises added', many: '${n} exercises added', other: '${n} exercises added', ), 
-			'ongoingWorkout.updateRoutine.differences.removed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises removed', one: '1 exercise removed', two: '${n} exercises removed', few: '${n} exercises removed', many: '${n} exercises removed', other: '${n} exercises removed', ), 
-			'ongoingWorkout.updateRoutine.differences.changed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises changed', one: '1 exercise changed', two: '${n} exercises changed', few: '${n} exercises changed', many: '${n} exercises changed', other: '${n} exercises changed', ), 
-			'ongoingWorkout.updateRoutine.differences.reordered' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises reordered', one: '1 exercise reordered', two: '${n} exercises reordered', few: '${n} exercises reordered', many: '${n} exercises reordered', other: '${n} exercises reordered', ), 
+			'ongoingWorkout.updateRoutine.differences.added' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises added', one: '1 exercise added', two: '${n} exercises added', few: '${n} exercises added', many: '${n} exercises added', other: '${n} exercises added', ),
+			'ongoingWorkout.updateRoutine.differences.removed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises removed', one: '1 exercise removed', two: '${n} exercises removed', few: '${n} exercises removed', many: '${n} exercises removed', other: '${n} exercises removed', ),
+			'ongoingWorkout.updateRoutine.differences.changed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises changed', one: '1 exercise changed', two: '${n} exercises changed', few: '${n} exercises changed', many: '${n} exercises changed', other: '${n} exercises changed', ),
+			'ongoingWorkout.updateRoutine.differences.reordered' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises reordered', one: '1 exercise reordered', two: '${n} exercises reordered', few: '${n} exercises reordered', many: '${n} exercises reordered', other: '${n} exercises reordered', ),
 			'ongoingWorkout.updateRoutine.differences.metadata' => 'Routine name or notes changed',
 			'ongoingWorkout.goodJob.title' => 'Good job!',
 			'ongoingWorkout.goodJob.body' => 'Here\'s some statistics about the workout you\'ve just finished.',
@@ -13499,7 +13834,7 @@ extension on Translations {
 			'exerciseList.restTime' => 'Rest time: ',
 			'exerciseList.fields.weight' => ({required Object weight, required Object unit}) => '${weight} ${unit}',
 			'exerciseList.fields.time' => ({required Object time}) => '${time}',
-			'exerciseList.fields.reps' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 reps', one: '${n} rep', two: '${n} reps', few: '${n} reps', many: '${n} reps', other: '${n} reps', ), 
+			'exerciseList.fields.reps' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 reps', one: '${n} rep', two: '${n} reps', few: '${n} reps', many: '${n} reps', other: '${n} reps', ),
 			'exerciseList.fields.distance' => ({required Object distance, required Object unit}) => '${distance} ${unit}',
 			'exerciseList.fields.rpe' => ({required Object rpe}) => 'RPE ${rpe}',
 			'exerciseList.stats.time' => 'Duration',
@@ -13512,11 +13847,11 @@ extension on Translations {
 			'general.dialogs.actions.ok' => 'OK',
 			'general.dialogs.actions.cancel' => 'Cancel',
 			'general.dialogs.actions.close' => 'Close',
-			'general.exercises' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises', one: '${n} exercise', two: '${n} exercises', few: '${n} exercises', many: '${n} exercises', other: '${n} exercises', ), 
+			'general.exercises' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises', one: '${n} exercise', two: '${n} exercises', few: '${n} exercises', many: '${n} exercises', other: '${n} exercises', ),
 			'general.totalTime' => ({required Object time}) => 'Total time: ${time}',
-			'general.selected' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Nothing selected', one: '1 selected', two: '${n} selected', few: '${n} selected', many: '${n} selected', other: '${n} selected', ), 
-			'general.workouts' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No workouts', one: '${n} workout', two: '${n} workouts', few: '${n} workouts', many: '${n} workouts', other: '${n} workouts', ), 
-			'general.routines' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No routines', one: '${n} routine', two: '${n} routines', few: '${n} routines', many: '${n} routines', other: '${n} routines', ), 
+			'general.selected' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Nothing selected', one: '1 selected', two: '${n} selected', few: '${n} selected', many: '${n} selected', other: '${n} selected', ),
+			'general.workouts' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No workouts', one: '${n} workout', two: '${n} workouts', few: '${n} workouts', many: '${n} workouts', other: '${n} workouts', ),
+			'general.routines' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No routines', one: '${n} routine', two: '${n} routines', few: '${n} routines', many: '${n} routines', other: '${n} routines', ),
 			'general.optional' => '(optional)',
 			'general.unnamed' => 'Unnamed',
 			'muscleGroups.abductors' => 'Abductors',
@@ -13565,10 +13900,10 @@ extension on Translations {
 			'units.lb' => 'lbs',
 			'units.km' => 'km',
 			'units.mi' => 'mi',
-			'time.hours' => ({required num n, required Object minutes, required Object seconds, required Object hours}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '${minutes}:${seconds}', one: '${hours} hour, ${minutes}:${seconds}', two: '${hours} hours, ${minutes}:${seconds}', few: '${hours} hours, ${minutes}:${seconds}', many: '${hours} hours, ${minutes}:${seconds}', other: '${hours} hours, ${minutes}:${seconds}', ), 
-			'time.justHours' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '${n}', one: '${n} hour', two: '${n} hours', few: '${n} hours', many: '${n} hours', other: '${n} hours', ), 
-			'time.days' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 days', one: '1 day', two: '2 days', few: '${n} days', many: '${n} days', other: '${n} days', ), 
-			'time.weeks' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 weeks', one: '1 week', two: '2 weeks', few: '${n} weeks', many: '${n} weeks', other: '${n} weeks', ), 
+			'time.hours' => ({required num n, required Object minutes, required Object seconds, required Object hours}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '${minutes}:${seconds}', one: '${hours} hour, ${minutes}:${seconds}', two: '${hours} hours, ${minutes}:${seconds}', few: '${hours} hours, ${minutes}:${seconds}', many: '${hours} hours, ${minutes}:${seconds}', other: '${hours} hours, ${minutes}:${seconds}', ),
+			'time.justHours' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '${n}', one: '${n} hour', two: '${n} hours', few: '${n} hours', many: '${n} hours', other: '${n} hours', ),
+			'time.days' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 days', one: '1 day', two: '2 days', few: '${n} days', many: '${n} days', other: '${n} days', ),
+			'time.weeks' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 weeks', one: '1 week', two: '2 weeks', few: '${n} weeks', many: '${n} weeks', other: '${n} weeks', ),
 			'locales.en' => 'English',
 			'locales.it' => 'Italian',
 			'weightUnits.kg' => 'Kilograms',
@@ -14850,7 +15185,7 @@ extension on Translations {
 			'library.glutes.exercises.hipLiftWithRotation' => 'Hip lift with rotation',
 			'library.glutes.name' => 'Glutes',
 			'infobox.label' => 'Notes',
-			'superset' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ), 
+			'superset' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ),
 			'historyEditor.title' => ({required Object name}) => 'Edit: ${name}',
 			'historyEditor.exercises.addSuperset' => '+ Add superset',
 			'historyEditor.exercises.add' => '+ Add exercise',
@@ -15861,20 +16196,43 @@ extension on Translations {
 			'login.errors.password.invalid.number' => '- Contain at least one number',
 			'login.errors.password.invalid.specialCharacter' => '- Contain at least one special character',
 			'login.errors.noInternet' => 'No Internet connection.',
+			'login.errors.passwordRequired' => 'Enter your password.',
+			'login.errors.confirmPasswordRequired' => 'Enter your password again.',
+			'login.errors.passwordMismatch' => 'Passwords do not match.',
 			'login.fields.email.label' => 'Email',
 			'login.fields.email.hint' => 'john.doe@example.com',
 			'login.fields.password.label' => 'Password',
 			'login.fields.password.hint' => 'Password',
 			'login.fields.username.label' => 'Username',
 			'login.fields.username.hint' => 'Username',
+			'login.fields.confirmPassword.label' => 'Confirm password',
 			'login.buttons.signIn' => 'Sign in',
 			'login.buttons.signUp' => 'Sign up',
+			'login.buttons.showPassword' => 'Show password',
+			'login.buttons.hidePassword' => 'Hide password',
+			'login.buttons.dismissKeyboard' => 'Dismiss keyboard',
 			'login.upsell.title' => 'Not signed in',
 			'login.upsell.subtitle' => 'Sign in to gain access to group workouts, cross-device synchronization and much more.',
 			'login.verifyEmail.title' => 'We\'ve sent you a verification email',
 			'login.verifyEmail.description' => 'Check your inbox to confirm your email. Once you\'re done, come back and tap the button to sign in.',
 			'login.verifyEmail.done' => 'I\'ve verified my email',
 			'login.verifyEmail.notVerified' => 'Verify your email address and try again.',
+			'login.presentation.signInTitle' => 'Sign in to Gym Bro',
+			'login.presentation.signInSubtitle' => 'Pick up your workouts and keep your progress in sync.',
+			'login.presentation.signUpTitle' => 'Create your profile',
+			'login.presentation.signUpSubtitle' => 'Save your progress and share workouts with your friends.',
+			'login.presentation.passwordRequirements' => 'At least 8 characters, with an uppercase letter, a lowercase letter, a number and a special character.',
+			'login.presentation.noAccount' => 'Don’t have an account?',
+			'login.presentation.haveAccount' => 'Already have an account?',
+			'login.recovery.forgot' => 'Forgot password?',
+			'login.recovery.title' => 'Reset your password',
+			'login.recovery.description' => 'Enter your email and we’ll send you a link to choose a new password on the Gym Bro website.',
+			'login.recovery.send' => 'Send reset link',
+			'login.recovery.sentTitle' => 'Check your email',
+			'login.recovery.sentDescription' => 'If an account exists for this address, you’ll receive a password reset link. After updating it on the website, come back here to sign in.',
+			'login.recovery.checkSpam' => 'Check your spam folder too. If you can’t find the message, go back and try again.',
+			'login.recovery.backToSignIn' => 'Back to sign in',
+			'login.recovery.error' => 'We couldn’t send the link. Wait a few minutes and try again.',
 			'sync.conflict.title' => 'Conflicting data found',
 			'sync.conflict.message' => 'Press OK to download the data in the cloud and overwrite the local data. Press Cancel to erase the data in the cloud and upload the local data.',
 			'sync.overwrite.title' => 'Older data found',
@@ -15895,6 +16253,7 @@ extension on Translations {
 			'bodyMeasurement.rightThigh.label' => 'Right thigh',
 			'bodyMeasurement.leftCalf.label' => 'Left calf',
 			'bodyMeasurement.rightCalf.label' => 'Right calf',
+			'onboarding.buttons.skip' => 'Skip for now',
 			'onboarding.buttons.next' => 'Next',
 			'onboarding.buttons.done' => 'Let\'s start!',
 			'onboarding.welcome.title' => 'Welcome to Gym Bro',
@@ -16184,6 +16543,8 @@ extension on Translations {
 			'progression.goal' => 'Today\'s goal',
 			'progression.double' => 'Double progression',
 			'progression.cyclic' => 'Cyclic linear progression',
+			_ => null,
+		} ?? switch (path) {
 			'progression.minReps' => 'Minimum reps',
 			'progression.maxReps' => 'Maximum reps',
 			'progression.repsPerStep' => 'Reps per step',
@@ -16195,6 +16556,53 @@ extension on Translations {
 			'progression.invalid' => 'Check the values and the number of working sets',
 			'progression.step' => ({required Object cycle, required Object step}) => 'Cycle ${cycle}, step ${step}',
 			'progression.advance' => 'Advance manually',
+			'paywall.title' => 'GymBro Pro',
+			'paywall.subtitle' => 'Choose a subscription to unlock Pro features.',
+			'paywall.loadError' => 'Subscriptions could not be loaded. Please try again.',
+			'paywall.empty' => 'No subscriptions are available right now. Please try again later.',
+			'paywall.trialPeriod.week' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} week', other: 'Free trial: ${n} weeks', ),
+			'paywall.trialPeriod.month' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} month', other: 'Free trial: ${n} months', ),
+			'paywall.trialPeriod.year' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} year', other: 'Free trial: ${n} years', ),
+			'paywall.trialPeriod.day' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} day', other: 'Free trial: ${n} days', ),
+			'paywall.autoRenewNotice.week' => ({required Object price}) => 'Renews automatically at ${price} per week until cancelled.',
+			'paywall.autoRenewNotice.month' => ({required Object price}) => 'Renews automatically at ${price} per month until cancelled.',
+			'paywall.autoRenewNotice.year' => ({required Object price}) => 'Renews automatically at ${price} per year until cancelled.',
+			'paywall.autoRenewNotice.day' => ({required Object price}) => 'Renews automatically at ${price} per day until cancelled.',
+			'paywall.purchaseError.title' => 'Purchase unsuccessful',
+			'paywall.purchaseError.subtitle' => 'The purchase could not be completed. Please try again.',
+			'paywall.restoreError.title' => 'Restore unsuccessful',
+			'paywall.restoreError.subtitle' => 'Purchases could not be restored. Please try again.',
+			'paywall.actions.subscribe' => 'Subscribe',
+			'paywall.actions.restorePurchase' => 'Restore purchases',
+			'paywall.actions.termsOfService' => 'Terms of service',
+			'paywall.actions.privacyPolicy' => 'Privacy policy',
+			'routineImport.summary' => 'Program contents',
+			'routineImport.summaryDescription' => 'Import a personal copy. The shared program stays unchanged.',
+			'routineImport.days' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 training day', other: '${n} training days', ),
+			'routineImport.exercises' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 exercise', other: '${n} exercises', ),
+			'routineImport.sets' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 set', other: '${n} sets', ),
+			'routineImport.preview' => 'Workout preview',
+			'routineImport.day' => 'Training day',
+			'routineImport.dayDescription' => 'Choose a day to preview. The whole program will be imported.',
+			'routineImport.programNotes' => 'Program notes',
+			'routineImport.workoutNotes' => 'Workout notes',
+			'routineImport.exerciseList' => 'Exercises',
+			'routineImport.emptyTitle' => 'No exercises in this workout',
+			'routineImport.emptyDescription' => 'This day has no prescribed exercises yet.',
+			'routineImport.noSets' => 'No sets prescribed',
+			'routineImport.custom' => 'Custom exercise',
+			'routineImport.assistance' => 'Assistance',
+			'routineImport.rest' => ({required Object duration}) => '${duration} rest',
+			'routineImport.setNumber' => ({required Object number}) => 'Set ${number}',
+			'routineImport.seconds' => ({required Object count}) => '${count} s',
+			'routineImport.loadingTitle' => 'Opening shared program',
+			'routineImport.loadingDescription' => 'Loading the workouts and their prescriptions.',
+			'routineImport.unavailableTitle' => 'Program unavailable',
+			'routineImport.retry' => 'Try again',
+			'routineImport.proRequired' => 'Importing shared routines requires Gym Bro Pro.',
+			'routineImport.importing' => 'Importing…',
+			'routineImport.loadError' => 'Something went wrong. Please try again shortly.',
+			'routineImport.networkError' => 'Unable to connect. Check your connection and try again.',
 			_ => null,
 		};
 	}

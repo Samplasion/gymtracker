@@ -62,6 +62,14 @@ Future<void> testCreateRoutineFlow(
   expect(find.text('Select exercises'), findsNothing);
 
   final exercise = find.widgetWithText(ListTile, 'Crunches');
+  if (exercise.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(
+      exercise,
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.pumpAndSettle();
+  }
   expect(exercise, findsOneWidget);
 
   await tester.tap(exercise);

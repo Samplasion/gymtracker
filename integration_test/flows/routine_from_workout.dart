@@ -43,9 +43,9 @@ Future<void> createWorkout(
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(ListTile, t.library.abs.name));
   await tester.pumpAndSettle();
-  await tester.tap(
-    find.widgetWithText(ListTile, t.library.abs.exercises.crunches),
-  );
+  final crunches = find.widgetWithText(ListTile, t.library.abs.exercises.crunches);
+  await scrollToIfNeeded(tester, crunches);
+  await tester.tap(crunches);
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key('pick')));
   await tester.pumpAndSettle();

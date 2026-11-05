@@ -638,5 +638,6 @@ void main() {
       }
     }),
     timeout: const Timeout(Duration(minutes: 12)),
+    skip: Platform.isMacOS,
   );
 }

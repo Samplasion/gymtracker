@@ -5,6 +5,7 @@ import 'package:gymtracker/gen/assets.gen.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
+import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:markdown_widget/markdown_widget.dart';
 
@@ -77,11 +78,10 @@ class _LegalViewerPageState extends State<_LegalViewerPage> {
           if (snapshot.hasData) {
             return buildOk(context, snapshot.data!);
           } else if (snapshot.hasError) {
-            // return ErrorDisplay(error: snapshot.error);
-            return Center(
-              child: Text(
-                "Error loading document: ${snapshot.error}",
-                style: const TextStyle(color: Colors.red),
+            return SingleChildScrollView(
+              child: ErrorViewComponent(
+                error: snapshot.error,
+                retryCallback: _loadTos,
               ),
             );
           }

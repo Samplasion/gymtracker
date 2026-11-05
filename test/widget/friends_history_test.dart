@@ -146,7 +146,8 @@ void main() {
     await tester.pumpWidget(const SizedBox.shrink());
     friends = Friends(empty: true, fail: true);
     await show(tester, const FriendsPage(), friends: friends);
-    expect(find.textContaining('offline'), findsOneWidget);
+    expect(find.textContaining('offline'), findsNothing);
+    expect(find.text('An unexpected error occurred.'), findsOneWidget);
     friends.fail = false;
     await tester.tap(find.text('Try again'));
     await tester.pumpAndSettle();
@@ -185,7 +186,8 @@ void main() {
         return const AchievementHistoryPage(items: []);
       },
     );
-    expect(find.textContaining('offline'), findsOneWidget);
+    expect(find.textContaining('offline'), findsNothing);
+    expect(find.text('An unexpected error occurred.'), findsOneWidget);
     fail = false;
     await tester.tap(find.text('Try again'));
     await tester.pumpAndSettle();

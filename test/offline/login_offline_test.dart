@@ -68,7 +68,7 @@ void main() {
 
       // Tap Sign In button
       final signInButton = find.widgetWithText(
-        ElevatedButton,
+        FilledButton,
         t.login.buttons.signIn,
       );
       expect(signInButton, findsOneWidget);

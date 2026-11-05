@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/service/hydration_sync.dart';
@@ -5,7 +7,8 @@ import 'package:integration_test/integration_test.dart';
 import '../test/hydration/card_scenarios.dart';
 
 void main() {
-  IntegrationTestWidgetsFlutterBinding.ensureInitialized();
+  IntegrationTestWidgetsFlutterBinding.ensureInitialized().framePolicy =
+      LiveTestWidgetsFlutterBindingFramePolicy.onlyPumps;
   testWidgets(
     'hydration diary on iOS simulator: presets, shared goals and history',
     exerciseHydrationCard,
@@ -44,5 +47,6 @@ void main() {
         if (saved) await health.remove(id);
       }
     },
+    skip: !Platform.isIOS,
   );
 }

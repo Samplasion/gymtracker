@@ -39,7 +39,9 @@ Future<void> testCombineWorkoutsFlow(
   // Select "Abs" > "Crunches"
   await tester.tap(find.text(t.library.abs.name));
   await tester.pumpAndSettle();
-  await tester.tap(find.text(t.library.abs.exercises.crunches));
+  final crunches = find.text(t.library.abs.exercises.crunches);
+  await scrollToIfNeeded(tester, crunches);
+  await tester.tap(crunches);
   await tester.pumpAndSettle();
 
   // Pick

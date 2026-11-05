@@ -532,8 +532,14 @@ class _UserFeedSliver extends ConsumerWidget {
           ),
         ),
       ),
-      error: (error, _) =>
-          SliverFillRemaining(child: Center(child: Text("Error: $error"))),
+      error: (error, _) => SliverFillRemaining(
+        hasScrollBody: false,
+        child: ErrorViewComponent(
+          error: error,
+          retryCallback: () =>
+              ref.invalidate(friendPublicDataProvider(friendId)),
+        ),
+      ),
       data: (data) {
         final authorship = FeedAuthorshipFriend(userID: friendId);
         final List<FeedItem> items = [

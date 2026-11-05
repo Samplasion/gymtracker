@@ -328,12 +328,24 @@ class _BackupListViewState extends ConsumerState<BackupListView> {
                       ),
                       leading: const Icon(GTIcons.backup),
                       onTap: () async {
-                        await Go.futureDialog(
-                          future: () async {
-                            await controller.createBackup();
-                          },
-                          title: "settings.advanced.options.backups.creating",
-                        );
+                        try {
+                          await Go.futureDialog(
+                            future: controller.createBackup,
+                            title: context
+                                .t
+                                .settings
+                                .advanced
+                                .options
+                                .backups
+                                .create,
+                          );
+                        } catch (error) {
+                          if (!context.mounted) return;
+                          Go.dialog(
+                            context.t.settings.advanced.options.backups.title,
+                            error.toString(),
+                          );
+                        }
                       },
                     ),
                   ]),

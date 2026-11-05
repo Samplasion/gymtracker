@@ -304,6 +304,11 @@ class Online extends _$Online {
         await _service.login(email: email, password: password);
       });
 
+  Future<void> requestPasswordRecovery({
+    required String email,
+    required String locale,
+  }) => _service.requestPasswordRecovery(email: email, locale: locale);
+
   Future<void> register({
     required String email,
     required String password,

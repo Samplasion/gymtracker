@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:gymtracker/controller/health_controller.dart';
 import 'package:gymtracker/controller/notifications_controller.dart';
 import 'package:gymtracker/controller/purchases_controller.dart';
@@ -136,9 +137,16 @@ class SettingsView extends ConsumerWidget {
                     context.t.settings.logoutWarning.content,
                   );
                   if (!exit || !context.mounted) return;
-                  ref.read(onlineProvider.notifier).logout();
-                  if (context.mounted) {
-                    Go.replaceStack(() => const OnboardingScreen());
+                  final router = GoRouter.of(context);
+                  try {
+                    await ref.read(onlineProvider.notifier).logout();
+                    router.go('/onboarding');
+                  } catch (error) {
+                    if (!context.mounted) return;
+                    Go.dialog(
+                      context.t.me.profile.errors.logout.title,
+                      context.t.me.profile.errors.logout.subtitle(error: error),
+                    );
                   }
                 },
               ),

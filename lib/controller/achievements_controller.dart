@@ -1,18 +1,13 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-import 'package:gymtracker/controller/exercises_controller.dart';
-import 'package:gymtracker/controller/history_controller.dart';
-import 'package:gymtracker/controller/me_controller.dart';
-import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/controller/settings_controller.dart';
 import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/model/achievements.dart';
+import 'package:gymtracker/provider/achievement_state.dart';
 import 'package:gymtracker/provider/events.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/provider/routines.dart';
 import 'package:gymtracker/provider/settings.dart';
-import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/online.dart';
@@ -24,7 +19,6 @@ import 'package:uuid/uuid.dart';
 part 'achievements_controller.g.dart';
 
 class AchievementsController {
-  final OnlineService _onlineService;
   final DatabaseService service;
   final EventBus events;
   final bool Function() isSyncing;
@@ -36,7 +30,13 @@ class AchievementsController {
         Map<Achievement, List<AchievementCompletion>>
       >.broadcast();
   Stream<Map<Achievement, List<AchievementCompletion>>> get unlocked =>
-      _unlocked.stream;
+      _unlocked.stream.where(
+        (unlocked) =>
+            _scopeReady() &&
+            unlocked.values
+                .expand((values) => values)
+                .every((completion) => completion.userId == _owner()),
+      );
 
   bool get _disableUnlocks =>
       _disableUnlocksWillLogin || _disableUnlocksDidLogin;
@@ -50,19 +50,32 @@ class AchievementsController {
   final Map<String, Achievement> Function() _catalogResolver;
   Map<String, Achievement> get _catalog => _catalogResolver();
   final bool Function() _unlocksEnabled;
+  final bool Function() _scopeReady;
+  final String? Function() _owner;
+  final List<AchievementCompletion> Function()? _completionResolver;
+  List<AchievementCompletion> get _completions =>
+      (_completionResolver?.call() ?? _completions$.value)
+          .where((completion) => completion.userId == _owner())
+          .toList();
   final void Function(Map<Achievement, List<AchievementCompletion>>)? _present;
 
   AchievementsController(
-    this._onlineService, {
+    OnlineService onlineService, {
     required this.service,
     required this.events,
     required this.isSyncing,
     Map<String, Achievement>? catalog,
     Map<String, Achievement> Function()? catalogResolver,
     bool Function()? unlocksEnabled,
+    bool Function()? scopeReady,
+    String? Function()? owner,
+    List<AchievementCompletion> Function()? completionResolver,
     void Function(Map<Achievement, List<AchievementCompletion>>)? present,
   }) : _catalogResolver = catalogResolver ?? (() => catalog ?? achievements),
        _unlocksEnabled = unlocksEnabled ?? (() => !TestService().isTest),
+       _scopeReady = scopeReady ?? (() => true),
+       _owner = owner ?? (() => onlineService.account?.id),
+       _completionResolver = completionResolver,
        _present = present;
 
   void init() {
@@ -123,7 +136,7 @@ class AchievementsController {
   Map<Achievement, List<AchievementCompletion>> maybeUnlockAchievements(
     AchievementTrigger trigger,
   ) {
-    if (_disposed || _disableUnlocks) return {};
+    if (_disposed || _disableUnlocks || !_scopeReady()) return {};
 
     // Achievements slow tests down too much
     if (!_unlocksEnabled()) return {};
@@ -167,7 +180,7 @@ class AchievementsController {
             completedAt: DateTime.now().toUtc(),
             updatedAt: DateTime.now().toUtc(),
             deleted: false,
-            userId: _onlineService.account?.id,
+            userId: _owner(),
           );
           unlocked[achievement]!.add(c);
           completion = c;
@@ -224,12 +237,12 @@ class AchievementsController {
 
   AchievementCompletion? _getHighestLevelCompletionFor(String achievementID) {
     _pendingCompletions.removeWhere(
-      (id, _) => _completions$.value.any((completion) => completion.id == id),
+      (id, _) => _completions.any((completion) => completion.id == id),
     );
     final completions = [
-      ..._completions$.value,
+      ..._completions,
       ..._pendingCompletions.values.where(
-        (completion) => completion.userId == _onlineService.account?.id,
+        (completion) => completion.userId == _owner(),
       ),
     ].where((completion) => completion.achievementID == achievementID).toList();
     if (completions.isEmpty) return null;
@@ -248,7 +261,7 @@ class AchievementsController {
   AchievementCompletion? _getCompletionInternal(
     String achievementID,
     int level,
-  ) => _completions$.value.firstWhereOrNull(
+  ) => _completions.firstWhereOrNull(
     (completion) =>
         completion.achievementID == achievementID && completion.level == level,
   );
@@ -275,13 +288,15 @@ extension AchievementLevelDescription on Achievement {
 Map<String, Achievement> achievementCatalog(Ref ref) {
   ref.watch(appPreferencesProvider);
   final settings = ref.watch(settingsControllerProvider);
+  AchievementSnapshot? snapshot() =>
+      ref.read(achievementSnapshotProvider).asData?.value;
   return AchievementRules(
-    history: () => ref.read(historyControllerProvider).history,
-    routines: () => ref.read(routinesControllerProvider).workouts,
-    hasFolders: () => ref.read(routinesControllerProvider).folders.isNotEmpty,
-    weights: () => ref.read(meControllerProvider).weightMeasurements,
-    foods: () => ref.read(databaseServiceProvider).foods$.value,
-    customExercises: () => ref.read(exercisesControllerProvider).exercises,
+    history: () => snapshot()?.history ?? [],
+    routines: () => snapshot()?.routines ?? [],
+    hasFolders: () => snapshot()?.folders.isNotEmpty ?? false,
+    weights: () => snapshot()?.weights ?? [],
+    foods: () => snapshot()?.foods ?? [],
+    customExercises: () => snapshot()?.exercises ?? [],
     distanceUnit: settings.distanceUnit,
     weightUnit: settings.weightUnit,
   ).catalog;
@@ -295,23 +310,37 @@ AchievementsController achievementsController(Ref ref) {
     events: ref.watch(eventBusProvider),
     isSyncing: () => ref.read(onlineProvider.notifier).isSyncing,
     catalogResolver: () => ref.read(achievementCatalogProvider),
+    owner: () => ref.read(databaseServiceProvider).db.currentUserId,
+    completionResolver: () =>
+        ref.read(achievementSnapshotProvider).asData?.value.completions ?? [],
+    scopeReady: () {
+      final snapshot = ref.read(achievementSnapshotProvider).asData?.value;
+      final owner = ref.read(databaseServiceProvider).db.currentUserId;
+      return snapshot != null &&
+          snapshot.owner == owner &&
+          ref.read(onlineProvider.notifier).onlineService.account?.id == owner;
+    },
   );
   controller.init();
-  // Evaluate committed snapshots, after Riverpod has received the new data.
-  // Ignore each stream's initial load so startup does not unlock old data.
-  ref.listen(historyWorkoutsProvider, (previous, next) {
-    if (previous?.hasValue == true && next.hasValue) {
+  // Scope changes and initial loads establish a baseline. Only subsequent
+  // committed data from that same scope may unlock achievements.
+  ref.listen(achievementSnapshotProvider, (previous, next) {
+    final before = previous?.asData?.value;
+    final after = next.asData?.value;
+    if (before == null || after == null || before.scope != after.scope) return;
+    if (!identical(before.history, after.history) ||
+        !identical(before.exercises, after.exercises)) {
       controller.maybeUnlockAchievements(AchievementTrigger.workout);
     }
-  });
-  ref.listen(routinesStreamProvider, (previous, next) {
-    if (previous?.hasValue == true && next.hasValue) {
+    if (!identical(before.routines, after.routines) ||
+        !identical(before.folders, after.folders)) {
       controller.maybeUnlockAchievements(AchievementTrigger.routines);
     }
-  });
-  ref.listen(foldersStreamProvider, (previous, next) {
-    if (previous?.hasValue == true && next.hasValue) {
-      controller.maybeUnlockAchievements(AchievementTrigger.routines);
+    if (!identical(before.weights, after.weights)) {
+      controller.maybeUnlockAchievements(AchievementTrigger.weight);
+    }
+    if (!identical(before.foods, after.foods)) {
+      controller.maybeUnlockAchievements(AchievementTrigger.food);
     }
   });
   ref.onDispose(controller.dispose);

@@ -165,7 +165,15 @@ Future<void> exerciseHydrationCard(WidgetTester tester) async {
     await tester.tap(find.text('Salva'));
     await settle();
     expect(find.text('Inserisci una quantità positiva valida'), findsOneWidget);
+    await tester.tap(find.byType(TextFormField));
+    await settle();
     await tester.enterText(find.byType(TextFormField), '125,5');
+    await settle();
+    expect(
+      tester.widget<TextFormField>(find.byType(TextFormField)).controller!.text,
+      '125,5',
+      reason: 'The custom amount must reach the field before saving',
+    );
     await tester.tap(find.text('Salva'));
     await settle();
     expect(find.byType(BottomSheet), findsNothing);
@@ -204,6 +212,8 @@ Future<void> exerciseHydrationCard(WidgetTester tester) async {
     await tester.tap(find.byType(FloatingActionButton));
     await settle();
     expect(find.text('Inserisci una quantità positiva valida'), findsOneWidget);
+    await tester.tap(waterField);
+    await settle();
     await tester.enterText(waterField, '2000');
     await tester.tap(find.byType(FloatingActionButton));
     await settle();

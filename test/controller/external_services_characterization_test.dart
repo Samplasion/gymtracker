@@ -30,6 +30,16 @@ class _Boutique extends Mock implements BoutiqueRepository {}
 
 class _Purchases extends Mock implements PurchasesService {}
 
+class _Offerings extends Mock implements rc.Offerings {}
+
+class _Offering extends Mock implements rc.Offering {}
+
+class _Package extends Mock implements rc.Package {}
+
+class _Product extends Mock implements rc.StoreProduct {}
+
+class _IntroPrice extends Mock implements rc.IntroductoryPrice {}
+
 class _PurchaseResult extends Mock implements rc.PurchaseResult {}
 
 class _CustomerInfo extends Mock implements rc.CustomerInfo {}
@@ -329,6 +339,40 @@ void main() {
       addTearDown(c.dispose);
     });
     for (final native in [true, false]) {
+      for (final price in [0.0, 1.0]) {
+        test(
+          'offering maps daily free trials and excludes paid introductory prices ($price)',
+          () async {
+            final offers = _Offerings();
+            final offer = _Offering();
+            final package = _Package();
+            final product = _Product();
+            final intro = _IntroPrice();
+            when(() => service.getOfferings()).thenAnswer((_) async => offers);
+            when(() => offers.all).thenReturn({'current': offer});
+            when(() => offers.current).thenReturn(offer);
+            when(() => offer.availablePackages).thenReturn([package]);
+            when(() => package.packageType).thenReturn(rc.PackageType.monthly);
+            when(() => package.identifier).thenReturn('monthly');
+            when(() => package.storeProduct).thenReturn(product);
+            when(() => product.priceString).thenReturn('€4.99');
+            when(() => product.description).thenReturn('Monthly');
+            when(() => product.introductoryPrice).thenReturn(intro);
+            when(() => intro.price).thenReturn(price);
+            when(() => intro.periodNumberOfUnits).thenReturn(7);
+            when(() => intro.periodUnit).thenReturn(rc.PeriodUnit.day);
+            final data = await c.getPaywallData();
+            final trial = data!.subscriptions.single.trial;
+            if (price == 0) {
+              expect(trial!.duration, 7);
+              expect(trial.periodType, SubscriptionPeriod.day);
+            } else {
+              expect(trial, isNull);
+            }
+          },
+        );
+      }
+
       test(
         '${native ? "native" : "REST"} binds restored account and tracks its ID through updates and logout',
         () async {

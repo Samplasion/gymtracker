@@ -3716,7 +3716,10 @@
           "specialCharacter": "- Contain at least one special character"
         }
       },
-      "noInternet": "No Internet connection."
+      "noInternet": "No Internet connection.",
+      "passwordRequired": "Enter your password.",
+      "confirmPasswordRequired": "Enter your password again.",
+      "passwordMismatch": "Passwords do not match."
     },
     "fields": {
       "email": {
@@ -3730,11 +3733,17 @@
       "username": {
         "label": "Username",
         "hint": "Username"
+      },
+      "confirmPassword": {
+        "label": "Confirm password"
       }
     },
     "buttons": {
       "signIn": "Sign in",
-      "signUp": "Sign up"
+      "signUp": "Sign up",
+      "showPassword": "Show password",
+      "hidePassword": "Hide password",
+      "dismissKeyboard": "Dismiss keyboard"
     },
     "upsell": {
       "title": "Not signed in",
@@ -3745,6 +3754,26 @@
       "description": "Check your inbox to confirm your email. Once you're done, come back and tap the button to sign in.",
       "done": "I've verified my email",
       "notVerified": "Verify your email address and try again."
+    },
+    "presentation": {
+      "signInTitle": "Sign in to Gym Bro",
+      "signInSubtitle": "Pick up your workouts and keep your progress in sync.",
+      "signUpTitle": "Create your profile",
+      "signUpSubtitle": "Save your progress and share workouts with your friends.",
+      "passwordRequirements": "At least 8 characters, with an uppercase letter, a lowercase letter, a number and a special character.",
+      "noAccount": "Don’t have an account?",
+      "haveAccount": "Already have an account?"
+    },
+    "recovery": {
+      "forgot": "Forgot password?",
+      "title": "Reset your password",
+      "description": "Enter your email and we’ll send you a link to choose a new password on the Gym Bro website.",
+      "send": "Send reset link",
+      "sentTitle": "Check your email",
+      "sentDescription": "If an account exists for this address, you’ll receive a password reset link. After updating it on the website, come back here to sign in.",
+      "checkSpam": "Check your spam folder too. If you can’t find the message, go back and try again.",
+      "backToSignIn": "Back to sign in",
+      "error": "We couldn’t send the link. Wait a few minutes and try again."
     }
   },
   "sync": {
@@ -3807,6 +3836,7 @@
   },
   "onboarding": {
     "buttons": {
+      "skip": "Skip for now",
       "next": "Next",
       "done": "Let's start!"
     },
@@ -4200,5 +4230,87 @@
     "invalid": "Check the values and the number of working sets",
     "step": "Cycle $cycle, step $step",
     "advance": "Advance manually"
+  },
+  "paywall": {
+    "title": "GymBro Pro",
+    "subtitle": "Choose a subscription to unlock Pro features.",
+    "loadError": "Subscriptions could not be loaded. Please try again.",
+    "empty": "No subscriptions are available right now. Please try again later.",
+    "trialPeriod": {
+      "week": {
+        "one": "Free trial: $n week",
+        "other": "Free trial: $n weeks"
+      },
+      "month": {
+        "one": "Free trial: $n month",
+        "other": "Free trial: $n months"
+      },
+      "year": {
+        "one": "Free trial: $n year",
+        "other": "Free trial: $n years"
+      },
+      "day": {
+        "one": "Free trial: $n day",
+        "other": "Free trial: $n days"
+      }
+    },
+    "autoRenewNotice": {
+      "week": "Renews automatically at ${price} per week until cancelled.",
+      "month": "Renews automatically at ${price} per month until cancelled.",
+      "year": "Renews automatically at ${price} per year until cancelled.",
+      "day": "Renews automatically at ${price} per day until cancelled."
+    },
+    "purchaseError": {
+      "title": "Purchase unsuccessful",
+      "subtitle": "The purchase could not be completed. Please try again."
+    },
+    "restoreError": {
+      "title": "Restore unsuccessful",
+      "subtitle": "Purchases could not be restored. Please try again."
+    },
+    "actions": {
+      "subscribe": "Subscribe",
+      "restorePurchase": "Restore purchases",
+      "termsOfService": "Terms of service",
+      "privacyPolicy": "Privacy policy"
+    }
+  },
+  "routineImport": {
+    "summary": "Program contents",
+    "summaryDescription": "Import a personal copy. The shared program stays unchanged.",
+    "days": {
+      "one": "1 training day",
+      "other": "$n training days"
+    },
+    "exercises": {
+      "one": "1 exercise",
+      "other": "$n exercises"
+    },
+    "sets": {
+      "one": "1 set",
+      "other": "$n sets"
+    },
+    "preview": "Workout preview",
+    "day": "Training day",
+    "dayDescription": "Choose a day to preview. The whole program will be imported.",
+    "programNotes": "Program notes",
+    "workoutNotes": "Workout notes",
+    "exerciseList": "Exercises",
+    "emptyTitle": "No exercises in this workout",
+    "emptyDescription": "This day has no prescribed exercises yet.",
+    "noSets": "No sets prescribed",
+    "custom": "Custom exercise",
+    "assistance": "Assistance",
+    "rest": "$duration rest",
+    "setNumber": "Set $number",
+    "seconds": "$count s",
+    "loadingTitle": "Opening shared program",
+    "loadingDescription": "Loading the workouts and their prescriptions.",
+    "unavailableTitle": "Program unavailable",
+    "retry": "Try again",
+    "proRequired": "Importing shared routines requires Gym Bro Pro.",
+    "importing": "Importing…",
+    "loadError": "Something went wrong. Please try again shortly.",
+    "networkError": "Unable to connect. Check your connection and try again."
   }
 }

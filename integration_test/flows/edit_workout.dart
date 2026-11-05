@@ -139,6 +139,11 @@ Future<void> testEditWorkoutFlow(
 
   expect(find.byType(WorkoutFinishPage), findsNothing);
   expect(find.byType(WorkoutView), findsNothing);
+  // Saving this workout prompts whether its changed notes should update the
+  // source routine. Keep the routine unchanged before inspecting the history.
+  expect(find.widgetWithText(AlertDialog, 'Change routine?'), findsOneWidget);
+  await tester.tap(find.widgetWithText(TextButton, 'Cancel'));
+  await tester.pumpAndSettle();
   expect(find.byType(AlertDialog), findsNothing);
 
   final originalWorkout = databaseService.workoutHistory.single.clone();
@@ -201,7 +206,9 @@ Future<void> testEditWorkoutFlow(
   await tester.pumpAndSettle();
   await tester.tap(find.text("Cardio"));
   await tester.pumpAndSettle();
-  await tester.tap(find.text("Zumba"));
+  final zumba = find.text('Zumba');
+  await scrollToIfNeeded(tester, zumba);
+  await tester.tap(zumba);
   await tester.pumpAndSettle();
 
   await tester.tap(find.byKey(const Key("pick")));

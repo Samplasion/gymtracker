@@ -6,9 +6,8 @@ import 'package:gymtracker/data/achievements.dart';
 import 'package:gymtracker/db/database.dart';
 import 'package:gymtracker/model/achievements.dart';
 import 'package:gymtracker/model/workout.dart';
+import 'package:gymtracker/provider/achievement_state.dart';
 import 'package:gymtracker/provider/online.dart';
-import 'package:gymtracker/provider/routines.dart';
-import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/database.dart';
 import 'package:gymtracker/service/online.dart';
 
@@ -43,10 +42,24 @@ void main() {
           onlineProvider.overrideWith(_GuestOnline.new),
           achievementCatalogProvider.overrideWith(
             (ref) => AchievementRules(
-              history: () => ref.read(historyWorkoutsProvider).value ?? [],
-              routines: () => ref.read(routinesStreamProvider).value ?? [],
+              history: () =>
+                  ref.read(achievementSnapshotProvider).asData?.value.history ??
+                  [],
+              routines: () =>
+                  ref
+                      .read(achievementSnapshotProvider)
+                      .asData
+                      ?.value
+                      .routines ??
+                  [],
               hasFolders: () =>
-                  ref.read(foldersStreamProvider).value?.isNotEmpty ?? false,
+                  ref
+                      .read(achievementSnapshotProvider)
+                      .asData
+                      ?.value
+                      .folders
+                      .isNotEmpty ??
+                  false,
             ).catalog,
           ),
         ],
@@ -69,11 +82,9 @@ void main() {
         service.dispose();
       });
 
-      await Future.wait([
-        container.read(historyWorkoutsProvider.future),
-        container.read(routinesStreamProvider.future),
-        container.read(foldersStreamProvider.future),
-      ]);
+      await container
+          .read(achievementSnapshotProvider.future)
+          .timeout(const Duration(seconds: 5));
       expect(await db.watchAchievementCompletions().first, isEmpty);
 
       Future<List<AchievementCompletion>> unlocked(String id) => db

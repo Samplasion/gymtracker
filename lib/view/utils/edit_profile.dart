@@ -56,7 +56,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
           ),
         );
 
-        if (cropped != null) {
+        if (mounted && cropped != null) {
           setState(() {
             _pendingAvatarBytes = cropped;
             _removeAvatarPending = false;
@@ -155,11 +155,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
-    final profileAsync = ref.watch(friendPublicDataProvider(widget.userID));
+    // Editing identity must not depend on workout/achievement sync updates.
+    final profileAsync = ref.watch(userIdentityProvider(widget.userID));
 
     if (!_initialized && profileAsync.hasValue) {
       final profile = profileAsync.value!;
-      _nameController.text = profile.friend.fullName ?? "";
+      _nameController.text = profile.fullName ?? "";
       _initialized = true;
     }
 
@@ -186,6 +187,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       ),
       body: SafeArea(
         child: profileAsync.when(
+          skipLoadingOnReload: true,
           loading: () => const Center(child: GBLoadingIndicator()),
           error: (err, stack) => Center(child: Text("Error: $err")),
           data: (profile) {
@@ -229,7 +231,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                   ],
                                 ),
                                 child: ClipOval(
-                                  child: _buildAvatarPreview(profile.friend.id),
+                                  child: _buildAvatarPreview(profile.id),
                                 ),
                               ),
                               Positioned(

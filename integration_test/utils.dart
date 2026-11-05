@@ -52,6 +52,18 @@ Future<void> enterTextAndDismissKeyboard(
   await dismissKeyboard(tester);
 }
 
+Future<void> scrollToIfNeeded(WidgetTester tester, Finder finder) async {
+  if (finder.evaluate().isEmpty) {
+    await tester.scrollUntilVisible(
+      finder,
+      200,
+      scrollable: find.byType(Scrollable).last,
+    );
+    await tester.pumpAndSettle();
+  }
+  await tester.ensureVisible(finder);
+}
+
 Future<void> waitForWidget(
   WidgetTester tester,
   Finder finder, {

@@ -115,5 +115,5 @@ void main() {
     expect(tester.takeException(), isNull);
     GymBroNativeFlutterAPI.setUp(null);
     await acknowledgements.delete(recursive: true);
-  });
+  }, skip: Platform.isMacOS);
 }

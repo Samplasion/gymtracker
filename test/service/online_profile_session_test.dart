@@ -49,6 +49,8 @@ void main() {
     'remove',
     'upload-storage',
     'remove-storage',
+    'upload-metadata-error',
+    'remove-metadata-error',
     'login-auth',
     'register-auth',
     'verification',
@@ -175,8 +177,12 @@ void main() {
               email: 'a@example.test',
               username: 'New username',
             ),
-            'upload' || 'upload-storage' => service.uploadAvatar(Uint8List(1)),
-            'remove' || 'remove-storage' => service.removeAvatar(),
+            'upload' ||
+            'upload-storage' ||
+            'upload-metadata-error' => service.uploadAvatar(Uint8List(1)),
+            'remove' ||
+            'remove-storage' ||
+            'remove-metadata-error' => service.removeAvatar(),
             'verification' => service.checkEmailVerificationAndLogIn(
               email: 'a@example.test',
               password: 'password',
@@ -232,10 +238,14 @@ void main() {
           service.account = expected;
           var changes = 0;
           service.addListener(() => changes++);
-          pending.complete({
-            'username': 'New username',
-            'full_name': 'New name',
-          });
+          if (operation.endsWith('-metadata-error')) {
+            pending.completeError(StateError('Metadata request failed'));
+          } else {
+            pending.complete({
+              'username': 'New username',
+              'full_name': 'New name',
+            });
+          }
           await expectation;
           if (replacement == 'unchanged') {
             expect(service.account?.id, 'A');

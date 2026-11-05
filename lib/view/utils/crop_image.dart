@@ -26,6 +26,8 @@ class _CropImagePageState extends State<CropImagePage> {
   double? _renderedHeight;
   Rect? _cropRect;
   bool _initialized = false;
+  bool _decodeFailed = false;
+  bool _cropping = false;
 
   @override
   void initState() {
@@ -35,12 +37,21 @@ class _CropImagePageState extends State<CropImagePage> {
   }
 
   Future<void> _decodeImage() async {
-    final codec = await ui.instantiateImageCodec(widget.imageBytes);
-    final frame = await codec.getNextFrame();
-    if (mounted) {
+    ui.Codec? codec;
+    try {
+      codec = await ui.instantiateImageCodec(widget.imageBytes);
+      final frame = await codec.getNextFrame();
+      if (!mounted) {
+        frame.image.dispose();
+        return;
+      }
       setState(() {
         _decodedImage = frame.image;
       });
+    } catch (_) {
+      if (mounted) setState(() => _decodeFailed = true);
+    } finally {
+      codec?.dispose();
     }
   }
 
@@ -48,6 +59,7 @@ class _CropImagePageState extends State<CropImagePage> {
   void dispose() {
     _transformationController.removeListener(_onTransformChanged);
     _transformationController.dispose();
+    _decodedImage?.dispose();
     super.dispose();
   }
 
@@ -130,6 +142,12 @@ class _CropImagePageState extends State<CropImagePage> {
   }
 
   Future<void> _cropImage(Rect cropRect) async {
+    if (_cropping) return;
+    setState(() => _cropping = true);
+    ui.Image? fullImage;
+    ui.Image? croppedImage;
+    ui.Picture? picture;
+    var completed = false;
     try {
       final boundary =
           _repaintKey.currentContext?.findRenderObject()
@@ -138,7 +156,7 @@ class _CropImagePageState extends State<CropImagePage> {
 
       // Capture the InteractiveViewer contents at 2x resolution for better quality
       const double pixelRatio = 2.0;
-      final ui.Image fullImage = await boundary.toImage(pixelRatio: pixelRatio);
+      fullImage = await boundary.toImage(pixelRatio: pixelRatio);
 
       final double cropSize = cropRect.width * pixelRatio;
       final Rect scaledCropRect = Rect.fromLTWH(
@@ -160,16 +178,15 @@ class _CropImagePageState extends State<CropImagePage> {
         Paint()..isAntiAlias = true,
       );
 
-      final croppedImage = await recorder.endRecording().toImage(
-        cropSize.toInt(),
-        cropSize.toInt(),
-      );
+      picture = recorder.endRecording();
+      croppedImage = await picture.toImage(cropSize.toInt(), cropSize.toInt());
       final byteData = await croppedImage.toByteData(
         format: ui.ImageByteFormat.png,
       );
       if (byteData != null) {
         final croppedBytes = byteData.buffer.asUint8List();
         if (mounted) {
+          completed = true;
           Navigator.of(context).pop(croppedBytes);
         }
       }
@@ -179,6 +196,11 @@ class _CropImagePageState extends State<CropImagePage> {
           SnackBar(content: Text(context.t.userProfile.edit.error)),
         );
       }
+    } finally {
+      croppedImage?.dispose();
+      picture?.dispose();
+      fullImage?.dispose();
+      if (mounted && !completed) setState(() => _cropping = false);
     }
   }
 
@@ -191,177 +213,192 @@ class _CropImagePageState extends State<CropImagePage> {
           secondary: Colors.white,
         ),
       ),
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        appBar: AppBar(
+      child: PopScope(
+        canPop: !_cropping,
+        child: Scaffold(
           backgroundColor: Colors.black,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(GTIcons.close),
-            onPressed: () => Navigator.of(context).pop(),
-          ),
-          title: Text(context.t.userProfile.edit.cropTitle),
-          actions: [
-            IconButton(
-              icon: const Icon(Icons.refresh_rounded),
-              onPressed: _reset,
+          appBar: AppBar(
+            backgroundColor: Colors.black,
+            elevation: 0,
+            leading: IconButton(
+              icon: const Icon(GTIcons.close),
+              onPressed: _cropping ? null : () => Navigator.of(context).pop(),
             ),
-          ],
-        ),
-        body: _decodedImage == null
-            ? const Center(child: GBLoadingIndicator())
-            : LayoutBuilder(
-                builder: (context, constraints) {
-                  final double screenWidth = constraints.maxWidth;
-                  final double screenHeight = constraints.maxHeight;
-
-                  // Crop size is 80% of the smaller dimension
-                  final double cropSize = min(screenWidth, screenHeight) * 0.8;
-                  final Rect cropRect = Rect.fromCenter(
-                    center: Offset(screenWidth / 2, screenHeight / 2),
-                    width: cropSize,
-                    height: cropSize,
-                  );
-
-                  // Compute aspect ratio of image and fit dimensions
-                  final double imageRatio =
-                      _decodedImage!.width / _decodedImage!.height;
-                  final double parentRatio = screenWidth / screenHeight;
-
-                  double renderedWidth;
-                  double renderedHeight;
-
-                  if (imageRatio > parentRatio) {
-                    renderedWidth = screenWidth;
-                    renderedHeight = screenWidth / imageRatio;
-                  } else {
-                    renderedHeight = screenHeight;
-                    renderedWidth = screenHeight * imageRatio;
-                  }
-
-                  _renderedWidth = renderedWidth;
-                  _renderedHeight = renderedHeight;
-                  _cropRect = cropRect;
-
-                  final double minScaleX = cropRect.width / renderedWidth;
-                  final double minScaleY = cropRect.height / renderedHeight;
-                  final double minScale = max(minScaleX, minScaleY);
-
-                  if (!_initialized) {
-                    final double tx =
-                        cropRect.center.dx - (renderedWidth / 2) * minScale;
-                    final double ty =
-                        cropRect.center.dy - (renderedHeight / 2) * minScale;
-
-                    _transformationController.value = Matrix4.identity()
-                      ..setEntry(0, 0, minScale)
-                      ..setEntry(1, 1, minScale)
-                      ..setEntry(0, 3, tx)
-                      ..setEntry(1, 3, ty);
-
-                    _initialized = true;
-                  }
-
-                  return Stack(
-                    children: [
-                      Positioned.fill(
-                        child: RepaintBoundary(
-                          key: _repaintKey,
-                          child: InteractiveViewer(
-                            transformationController: _transformationController,
-                            minScale: minScale,
-                            maxScale: 10.0,
-                            boundaryMargin: const EdgeInsets.all(
-                              double.infinity,
-                            ),
-                            child: Align(
-                              alignment: Alignment.topLeft,
-                              child: SizedBox(
-                                width: renderedWidth,
-                                height: renderedHeight,
-                                child: Image.memory(
-                                  widget.imageBytes,
-                                  fit: BoxFit.fill,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Positioned.fill(
-                        child: IgnorePointer(
-                          child: CustomPaint(
-                            painter: _CropOverlayPainter(cropRect: cropRect),
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        bottom: 32,
-                        left: 0,
-                        right: 0,
-                        child: Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                context.t.userProfile.edit.cropInstructions,
-                                style: const TextStyle(
-                                  color: Colors.white70,
-                                  fontSize: 14,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 24),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  OutlinedButton(
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      side: const BorderSide(
-                                        color: Colors.white30,
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 24,
-                                        vertical: 12,
-                                      ),
-                                    ),
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(),
-                                    child: Text(
-                                      context.t.userProfile.crop.buttons.cancel,
-                                    ),
-                                  ),
-                                  FilledButton(
-                                    style: FilledButton.styleFrom(
-                                      backgroundColor: Colors.white,
-                                      foregroundColor: Colors.black,
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 32,
-                                        vertical: 12,
-                                      ),
-                                    ),
-                                    onPressed: () => _cropImage(cropRect),
-                                    child: Text(
-                                      context
-                                          .t
-                                          .userProfile
-                                          .crop
-                                          .buttons
-                                          .confirm,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
+            title: Text(context.t.userProfile.edit.cropTitle),
+            actions: [
+              IconButton(
+                icon: const Icon(Icons.refresh_rounded),
+                onPressed: _cropping ? null : _reset,
               ),
+            ],
+          ),
+          body: _decodeFailed
+              ? Center(child: Text(context.t.userProfile.edit.error))
+              : _decodedImage == null
+              ? const Center(child: GBLoadingIndicator())
+              : LayoutBuilder(
+                  builder: (context, constraints) {
+                    final double screenWidth = constraints.maxWidth;
+                    final double screenHeight = constraints.maxHeight;
+
+                    // Crop size is 80% of the smaller dimension
+                    final double cropSize =
+                        min(screenWidth, screenHeight) * 0.8;
+                    final Rect cropRect = Rect.fromCenter(
+                      center: Offset(screenWidth / 2, screenHeight / 2),
+                      width: cropSize,
+                      height: cropSize,
+                    );
+
+                    // Compute aspect ratio of image and fit dimensions
+                    final double imageRatio =
+                        _decodedImage!.width / _decodedImage!.height;
+                    final double parentRatio = screenWidth / screenHeight;
+
+                    double renderedWidth;
+                    double renderedHeight;
+
+                    if (imageRatio > parentRatio) {
+                      renderedWidth = screenWidth;
+                      renderedHeight = screenWidth / imageRatio;
+                    } else {
+                      renderedHeight = screenHeight;
+                      renderedWidth = screenHeight * imageRatio;
+                    }
+
+                    _renderedWidth = renderedWidth;
+                    _renderedHeight = renderedHeight;
+                    _cropRect = cropRect;
+
+                    final double minScaleX = cropRect.width / renderedWidth;
+                    final double minScaleY = cropRect.height / renderedHeight;
+                    final double minScale = max(minScaleX, minScaleY);
+
+                    if (!_initialized) {
+                      final double tx =
+                          cropRect.center.dx - (renderedWidth / 2) * minScale;
+                      final double ty =
+                          cropRect.center.dy - (renderedHeight / 2) * minScale;
+
+                      _transformationController.value = Matrix4.identity()
+                        ..setEntry(0, 0, minScale)
+                        ..setEntry(1, 1, minScale)
+                        ..setEntry(0, 3, tx)
+                        ..setEntry(1, 3, ty);
+
+                      _initialized = true;
+                    }
+
+                    return Stack(
+                      children: [
+                        Positioned.fill(
+                          child: RepaintBoundary(
+                            key: _repaintKey,
+                            child: InteractiveViewer(
+                              transformationController:
+                                  _transformationController,
+                              minScale: minScale,
+                              maxScale: 10.0,
+                              boundaryMargin: const EdgeInsets.all(
+                                double.infinity,
+                              ),
+                              child: Align(
+                                alignment: Alignment.topLeft,
+                                child: SizedBox(
+                                  width: renderedWidth,
+                                  height: renderedHeight,
+                                  child: Image.memory(
+                                    widget.imageBytes,
+                                    fit: BoxFit.fill,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Positioned.fill(
+                          child: IgnorePointer(
+                            child: CustomPaint(
+                              painter: _CropOverlayPainter(cropRect: cropRect),
+                            ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 32,
+                          left: 0,
+                          right: 0,
+                          child: Center(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  context.t.userProfile.edit.cropInstructions,
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 14,
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 24),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: Colors.white,
+                                        side: const BorderSide(
+                                          color: Colors.white30,
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 24,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                      onPressed: _cropping
+                                          ? null
+                                          : () => Navigator.of(context).pop(),
+                                      child: Text(
+                                        context
+                                            .t
+                                            .userProfile
+                                            .crop
+                                            .buttons
+                                            .cancel,
+                                      ),
+                                    ),
+                                    FilledButton(
+                                      style: FilledButton.styleFrom(
+                                        backgroundColor: Colors.white,
+                                        foregroundColor: Colors.black,
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 32,
+                                          vertical: 12,
+                                        ),
+                                      ),
+                                      onPressed: _cropping
+                                          ? null
+                                          : () => _cropImage(cropRect),
+                                      child: Text(
+                                        context
+                                            .t
+                                            .userProfile
+                                            .crop
+                                            .buttons
+                                            .confirm,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+        ),
       ),
     );
   }

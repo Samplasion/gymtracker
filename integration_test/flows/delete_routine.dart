@@ -32,7 +32,9 @@ Future<void> testDeleteRoutineFlow(
   await tester.pumpAndSettle();
   await tester.tap(find.widgetWithText(ListTile, "Abs"));
   await tester.pumpAndSettle();
-  await tester.tap(find.widgetWithText(ListTile, 'Crunches'));
+  final crunches = find.widgetWithText(ListTile, 'Crunches');
+  await scrollToIfNeeded(tester, crunches);
+  await tester.tap(crunches);
   await tester.pumpAndSettle();
   await tester.tap(find.byKey(const Key("pick")));
   await tester.pumpAndSettle();

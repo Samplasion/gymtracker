@@ -44,6 +44,10 @@ abstract class OnlineService with ChangeNotifier {
     required String password,
     required String username,
   });
+  Future<void> requestPasswordRecovery({
+    required String email,
+    required String locale,
+  });
   Future<void> updateAccount({required String email, required String username});
   Future<void> updateProfile({String? fullName});
   Future<void> uploadAvatar(Uint8List bytes);
@@ -178,6 +182,15 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
         _authGeneration > generation + 1) {
       throw StateError('The account changed during authentication');
     }
+    // The SDK saves currentUser before its asynchronous signedIn event arrives.
+    // Adopt that verified identity now so the event cannot invalidate the
+    // profile request belonging to this very sign-in. Real logout/account
+    // changes still advance the generation and fence pending requests.
+    if (_authUserId != user.id) {
+      _authGeneration++;
+      _accounts.clear();
+      _authUserId = user.id;
+    }
   }
 
   OnlineAccount? _mapAccount(User? user, Map<String, dynamic> data) {
@@ -257,13 +270,25 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
 
     _ensureAuthenticationResult(response.user!, generation);
     final profileGeneration = _authGeneration;
-    final row = await _db
-        .from("profiles")
-        .select()
-        .eq('id', response.user!.id)
-        .limit(1);
+    // Reuse startup's bounded profile load and session-backed offline fallback.
+    // A profile network failure must not turn a successful login into an error.
+    await getAccount();
     _ensureSession(response.user!.id, profileGeneration);
-    _setAccount(_mapAccount(response.user, row.first));
+  }
+
+  @override
+  Future<void> requestPasswordRecovery({
+    required String email,
+    required String locale,
+  }) {
+    final language = locale == 'it' ? 'it' : 'en';
+    // Same recovery destination as the website. The existing Supabase auth
+    // provider sends the email; the website verifies it and updates the password.
+    return _client.resetPasswordForEmail(
+      email,
+      redirectTo:
+          'https://gym-bro.techtonicfault.com/$language/auth/reset-password',
+    );
   }
 
   @override
@@ -300,13 +325,8 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
     }
     _ensureAuthenticationResult(response.user!, generation);
     final profileGeneration = _authGeneration;
-    final row = await _db
-        .from("profiles")
-        .select()
-        .eq('id', response.user!.id)
-        .limit(1);
+    await getAccount();
     _ensureSession(response.user!.id, profileGeneration);
-    _setAccount(_mapAccount(response.user, row.first));
   }
 
   @override
@@ -386,14 +406,42 @@ class OnlineServiceImpl with ChangeNotifier implements OnlineService {
 
   Future<void> _touchProfile(User user, int generation) async {
     _ensureSession(user.id, generation);
-    final row = await _db
-        .from('profiles')
-        .update({'updated_at': DateTime.now().toUtc().toIso8601String()})
-        .eq('id', user.id)
-        .select()
-        .single();
+    final revision = DateTime.now().toUtc().toIso8601String();
+    Map<String, dynamic>? row;
+    try {
+      row = await _db
+          .from('profiles')
+          .update({'updated_at': revision})
+          .eq('id', user.id)
+          .select()
+          .single();
+    } catch (error, stack) {
+      // Storage has already committed. Do not report the avatar as unsaved or
+      // keep displaying its old cached version if the metadata request fails.
+      _ensureSession(user.id, generation);
+      logger.w(
+        'Avatar saved; profile timestamp refresh failed',
+        error: error,
+        stackTrace: stack,
+      );
+    }
     _ensureSession(user.id, generation);
-    _setAccount(_mapAccount(user, row));
+    final previous = _account?.id == user.id ? _account : null;
+    _setAccount(
+      row != null
+          ? _mapAccount(user, row)
+          : OnlineAccount(
+              id: user.id,
+              name:
+                  previous?.name ??
+                  user.userMetadata?['username'] as String? ??
+                  user.email ??
+                  user.id,
+              email: user.email,
+              fullName: previous?.fullName,
+              updatedAt: revision,
+            ),
+    );
   }
 
   @override
@@ -601,6 +649,11 @@ class TestOnlineServiceImpl extends OnlineService {
   Future<void> login({required String email, required String password}) async {}
   @override
   Future<void> logout() async {}
+  @override
+  Future<void> requestPasswordRecovery({
+    required String email,
+    required String locale,
+  }) async {}
   @override
   Future<void> register({
     required String email,

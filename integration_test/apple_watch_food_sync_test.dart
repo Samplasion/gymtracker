@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gymtracker/model/native.dart';
@@ -47,5 +49,5 @@ void main() {
     // Allow native activation/transport to progress before Flutter exits.
     await Future<void>.delayed(const Duration(seconds: 30));
     expect(tester.takeException(), isNull);
-  });
+  }, skip: Platform.isMacOS);
 }

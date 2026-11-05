@@ -41,7 +41,7 @@ class ErrorViewComponent extends StatelessWidget {
                 const SizedBox(height: 16),
 
                 Text(
-                  error.toString(),
+                  context.t.errorView.subtitle,
                   style: Theme.of(context).textTheme.bodyLarge,
                   textAlign: TextAlign.center,
                 ),

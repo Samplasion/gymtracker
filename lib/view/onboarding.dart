@@ -25,22 +25,73 @@ class OnboardingScreen extends ConsumerStatefulWidget {
 class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   final _introKey = GlobalKey<IntroductionScreenState>();
 
+  bool _busy = false;
+
+  Future<void> _advance() async {
+    final intro = _introKey.currentState;
+    if (intro == null) return;
+    await intro.animateScroll(intro.getCurrentPage() + 1);
+  }
+
+  Future<void> _next({Future<void> Function()? requestPermissions}) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await requestPermissions?.call();
+      if (!mounted) return;
+      await _advance();
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _requestNotifications() async {
+    final controller = ref.read(notificationControllerProvider);
+    await controller.requestPermission();
+    if (!mounted) return;
+    await controller.androidRequestExactAlarmsPermission();
+  }
+
+  Future<void> _requestCameraAndPhotos() async {
+    final permissions = await ref.read(foodPermissionsProvider.future);
+    if (!mounted) return;
+    final controller = ref.read(foodPermissionsProvider.notifier);
+    if (!permissions.camera) {
+      await controller.requestPermission(Permission.camera);
+    }
+    if (!mounted) return;
+    if (defaultTargetPlatform != TargetPlatform.android &&
+        !permissions.gallery) {
+      await controller.requestPermission(Permission.photos);
+    }
+  }
+
+  Future<void> _signIn() async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      await Go.to(() => AuthScreen());
+      if (!mounted) return;
+      if (ref.read(onlineProvider).value != null) {
+        await _advance();
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final notificationController = ref.read(notificationControllerProvider);
-    ref.watch(notificationPermissionsProvider);
-    final foodPerms =
-        ref.watch(foodPermissionsProvider).asData?.value ??
-        (camera: false, gallery: false);
+    // Keep the permission provider alive while native permission dialogs are open.
+    ref.watch(foodPermissionsProvider);
 
-    nextButton(bool enabled) => ElevatedButton(
-      onPressed: () {
-        _introKey.currentState?.next();
-      },
-      child: Text(context.t.onboarding.buttons.next),
-    );
-    permIcon(IconData defaultValue, bool granted) =>
-        Icon(granted ? Icons.check_rounded : defaultValue, size: 24);
+    Widget nextButton({Future<void> Function()? requestPermissions}) =>
+        ElevatedButton(
+          onPressed: _busy
+              ? null
+              : () => _next(requestPermissions: requestPermissions),
+          child: Text(context.t.onboarding.buttons.next),
+        );
     return Builder(
       builder: (context) {
         final onlineAccount = ref.watch(onlineProvider).value;
@@ -58,7 +109,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   overflowAlignment: OverflowBarAlignment.center,
                   spacing: 8,
                   overflowSpacing: 8,
-                  children: [nextButton(true)],
+                  children: [nextButton()],
                 ),
               ),
             ),
@@ -74,42 +125,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   spacing: 8,
                   overflowSpacing: 8,
                   children: [
-                    ElevatedButton.icon(
-                      icon: permIcon(
-                        Icons.notifications,
-                        notificationController.hasPermission,
-                      ),
-                      label: Text(
-                        context.t.onboarding.notifications.notifications,
-                      ),
-                      onPressed: notificationController.hasPermission
-                          ? null
-                          : () {
-                              // Request permission
-                              notificationController.requestPermission();
-                            },
-                    ),
-                    if (notificationController.usesAndroidExactAlarmPermission)
-                      ElevatedButton.icon(
-                        icon: permIcon(
-                          Icons.notifications_active,
-                          notificationController
-                              .hasAndroidScheduleExactAlarmPermission,
-                        ),
-                        label: Text(
-                          context.t.onboarding.notifications.exactAlarm,
-                        ),
-                        onPressed:
-                            !notificationController
-                                .shouldShowAndroidExactAlarmPermissionRequest
-                            ? null
-                            : () {
-                                // Request permission
-                                notificationController
-                                    .androidRequestExactAlarmsPermission();
-                              },
-                      ),
-                    nextButton(true),
+                    nextButton(requestPermissions: _requestNotifications),
                   ],
                 ),
               ),
@@ -128,32 +144,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                   spacing: 8,
                   overflowSpacing: 8,
                   children: [
-                    ElevatedButton.icon(
-                      icon: permIcon(Icons.camera_alt, foodPerms.camera),
-                      label: Text(context.t.onboarding.camera.camera),
-                      onPressed: foodPerms.camera
-                          ? null
-                          : () {
-                              // Request permission
-                              ref
-                                  .read(foodPermissionsProvider.notifier)
-                                  .requestPermission(Permission.camera);
-                            },
-                    ),
-                    if (defaultTargetPlatform != TargetPlatform.android)
-                      ElevatedButton.icon(
-                        icon: permIcon(Icons.photo, foodPerms.gallery),
-                        label: Text(context.t.onboarding.camera.gallery),
-                        onPressed: foodPerms.gallery
-                            ? null
-                            : () {
-                                // Request permission
-                                ref
-                                    .read(foodPermissionsProvider.notifier)
-                                    .requestPermission(Permission.photos);
-                              },
-                      ),
-                    nextButton(true),
+                    nextButton(requestPermissions: _requestCameraAndPhotos),
                   ],
                 ),
               ),
@@ -166,32 +157,31 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                 padding: const EdgeInsets.all(16).copyWith(bottom: 0),
                 child: Column(
                   children: [
-                    OverflowBar(
-                      alignment: MainAxisAlignment.center,
-                      overflowAlignment: OverflowBarAlignment.center,
-                      spacing: 8,
-                      overflowSpacing: 8,
-                      children: [
-                        ElevatedButton.icon(
-                          icon: permIcon(
-                            GTIcons.account,
-                            onlineAccount != null,
-                          ),
-                          label: Text(context.t.login.title),
-                          onPressed: onlineAccount != null
-                              ? null
-                              : () {
-                                  Go.to(() => AuthScreen());
-                                },
+                    SizedBox(
+                      width: double.infinity,
+                      child: FilledButton.icon(
+                        icon: Icon(
+                          onlineAccount != null
+                              ? Icons.check_rounded
+                              : GTIcons.account,
                         ),
-                      ],
+                        label: Text(
+                          onlineAccount != null
+                              ? context.t.onboarding.buttons.next
+                              : context.t.login.title,
+                        ),
+                        onPressed: _busy
+                            ? null
+                            : onlineAccount != null
+                            ? () => _next()
+                            : _signIn,
+                      ),
                     ),
-                    TextButton(
-                      onPressed: () {
-                        _introKey.currentState?.next();
-                      },
-                      child: Text(context.t.onboarding.buttons.next),
-                    ),
+                    if (onlineAccount == null)
+                      TextButton(
+                        onPressed: _busy ? null : () => _next(),
+                        child: Text(context.t.onboarding.buttons.skip),
+                      ),
                   ],
                 ),
               ),
@@ -224,7 +214,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
               ),
             ),
           ],
-          freeze: false,
+          freeze: _busy,
           showNextButton: false,
           showDoneButton: false,
           isProgressTap: false,

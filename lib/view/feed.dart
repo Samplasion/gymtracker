@@ -16,6 +16,7 @@ import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
+import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/icon_grid.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/retry_view.dart';
@@ -538,7 +539,14 @@ class ProfileSearchDelegate extends SearchDelegate<Friend?> {
           .watch(userSearchProvider(query.trim().toLowerCase()))
           .when(
             loading: () => const Center(child: GBLoadingIndicator()),
-            error: (error, _) => Center(child: Text('Error: $error')),
+            error: (error, _) => SingleChildScrollView(
+              child: ErrorViewComponent(
+                error: error,
+                retryCallback: () => ref.invalidate(
+                  userSearchProvider(query.trim().toLowerCase()),
+                ),
+              ),
+            ),
             data: (results) {
               if (results.isEmpty) {
                 return Center(

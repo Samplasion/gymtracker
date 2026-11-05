@@ -230,7 +230,7 @@ class PurchasesController {
               PackageType.weekly => SubscriptionPeriod.week,
               _ => SubscriptionPeriod.year,
             },
-            trial: package.storeProduct.introductoryPrice != null
+            trial: package.storeProduct.introductoryPrice?.price == 0
                 ? SubscriptionTrial(
                     duration: package
                         .storeProduct
@@ -240,7 +240,7 @@ class PurchasesController {
                         .storeProduct
                         .introductoryPrice!
                         .periodUnit) {
-                      PeriodUnit.day => SubscriptionPeriod.week,
+                      PeriodUnit.day => SubscriptionPeriod.day,
                       PeriodUnit.week => SubscriptionPeriod.week,
                       PeriodUnit.month => SubscriptionPeriod.month,
                       PeriodUnit.year => SubscriptionPeriod.year,

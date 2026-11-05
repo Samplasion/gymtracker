@@ -77,6 +77,28 @@ void main() {
   });
 
   test(
+    'missing backup refuses restore without deleting current records',
+    () async {
+      await db.insertCustomBarcodeFood('keep', food);
+      final before = (await db.select(db.customBarcodeFoods).get())
+          .map((row) => row.toJson())
+          .toList();
+      expect(before, isNotEmpty);
+      final missing = DatabaseBackup(day, File('${temp.path}/missing.db'));
+      await expectLater(
+        service.restoreBackup(missing, mode: RestoreMode.replace),
+        throwsStateError,
+      );
+      expect(
+        (await db.select(db.customBarcodeFoods).get())
+            .map((row) => row.toJson())
+            .toList(),
+        before,
+      );
+    },
+  );
+
+  test(
     'restore drains in-flight uploads and reconciles restored values',
     () async {
       await db.insertCustomBarcodeFood(

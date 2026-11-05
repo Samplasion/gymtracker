@@ -80,7 +80,7 @@ class Offering extends Equatable {
   bool get stringify => true;
 }
 
-enum SubscriptionPeriod { week, month, year }
+enum SubscriptionPeriod { day, week, month, year }
 
 class SubscriptionTrial extends Equatable {
   final int duration;

@@ -498,6 +498,9 @@ class _SkeletonViewState extends ConsumerState<SkeletonView>
                 firstChild: SizedBox(
                   height: MediaQuery.sizeOf(context).height,
                   child: NavigationDrawer(
+                    // Keep the persistent drawer's animated selection aligned
+                    // with the section displayed by the router.
+                    key: ValueKey(expanded ? _selectedIndex : null),
                     selectedIndex: expanded ? _selectedIndex : null,
                     onDestinationSelected: (i) {
                       if (!expanded) {

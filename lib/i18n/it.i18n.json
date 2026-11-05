@@ -3716,7 +3716,10 @@
           "specialCharacter": "- Contenere almeno un carattere speciale"
         }
       },
-      "noInternet": "Nessuna connessione a Internet."
+      "noInternet": "Nessuna connessione a Internet.",
+      "passwordRequired": "Inserisci la tua password.",
+      "confirmPasswordRequired": "Ripeti la tua password.",
+      "passwordMismatch": "Le password non coincidono."
     },
     "fields": {
       "email": {
@@ -3730,11 +3733,17 @@
       "username": {
         "label": "Username",
         "hint": "Username"
+      },
+      "confirmPassword": {
+        "label": "Conferma password"
       }
     },
     "buttons": {
       "signIn": "Accedi",
-      "signUp": "Registrati"
+      "signUp": "Registrati",
+      "showPassword": "Mostra password",
+      "hidePassword": "Nascondi password",
+      "dismissKeyboard": "Chiudi tastiera"
     },
     "upsell": {
       "title": "Accesso non effettuato",
@@ -3745,6 +3754,26 @@
       "done": "Ho verificato la mia email",
       "description": "Controlla la tua casella di posta elettronica per confermare la tua email. Dopodiché tocca il pulsante sottostante per accedere.",
       "notVerified": "Verifica il tuo indirizzo email e riprova."
+    },
+    "presentation": {
+      "signInTitle": "Accedi a Gym Bro",
+      "signInSubtitle": "Ritrova i tuoi allenamenti e mantieni i tuoi progressi sincronizzati.",
+      "signUpTitle": "Crea il tuo profilo",
+      "signUpSubtitle": "Salva i tuoi progressi e condividi gli allenamenti con i tuoi amici.",
+      "passwordRequirements": "Almeno 8 caratteri, con una maiuscola, una minuscola, un numero e un carattere speciale.",
+      "noAccount": "Non hai un account?",
+      "haveAccount": "Hai già un account?"
+    },
+    "recovery": {
+      "forgot": "Password dimenticata?",
+      "title": "Recupera la password",
+      "description": "Inserisci la tua email: ti invieremo un link per scegliere una nuova password sul sito di Gym Bro.",
+      "send": "Invia il link",
+      "sentTitle": "Controlla la tua email",
+      "sentDescription": "Se esiste un account associato a questo indirizzo, riceverai un link per reimpostare la password. Dopo averla aggiornata sul sito, torna qui per accedere.",
+      "checkSpam": "Controlla anche la cartella spam. Se non trovi il messaggio, puoi tornare indietro e riprovare.",
+      "backToSignIn": "Torna ad accedere",
+      "error": "Non siamo riusciti a inviare il link. Attendi qualche minuto e riprova."
     }
   },
   "sync": {
@@ -3807,6 +3836,7 @@
   },
   "onboarding": {
     "buttons": {
+      "skip": "Salta per ora",
       "next": "Avanti",
       "done": "Iniziamo!"
     },
@@ -4200,5 +4230,87 @@
     "invalid": "Controlla i valori e il numero di serie normali",
     "step": "Ciclo $cycle, passo $step",
     "advance": "Avanza manualmente"
+  },
+  "paywall": {
+    "title": "GymBro Pro",
+    "subtitle": "Scegli un abbonamento per sbloccare le funzionalità Pro.",
+    "loadError": "Impossibile caricare gli abbonamenti. Riprova.",
+    "empty": "Nessun abbonamento disponibile al momento. Riprova più tardi.",
+    "trialPeriod": {
+      "week": {
+        "one": "Prova gratuita: $n settimana",
+        "other": "Prova gratuita: $n settimane"
+      },
+      "month": {
+        "one": "Prova gratuita: $n mese",
+        "other": "Prova gratuita: $n mesi"
+      },
+      "year": {
+        "one": "Prova gratuita: $n anno",
+        "other": "Prova gratuita: $n anni"
+      },
+      "day": {
+        "one": "Prova gratuita: $n giorno",
+        "other": "Prova gratuita: $n giorni"
+      }
+    },
+    "autoRenewNotice": {
+      "week": "Rinnovo automatico a ${price} a settimana fino alla disdetta.",
+      "month": "Rinnovo automatico a ${price} al mese fino alla disdetta.",
+      "year": "Rinnovo automatico a ${price} all’anno fino alla disdetta.",
+      "day": "Rinnovo automatico a ${price} al giorno fino alla disdetta."
+    },
+    "purchaseError": {
+      "title": "Acquisto non riuscito",
+      "subtitle": "Impossibile completare l’acquisto. Riprova."
+    },
+    "restoreError": {
+      "title": "Ripristino non riuscito",
+      "subtitle": "Impossibile ripristinare gli acquisti. Riprova."
+    },
+    "actions": {
+      "subscribe": "Abbonati",
+      "restorePurchase": "Ripristina acquisti",
+      "termsOfService": "Termini di servizio",
+      "privacyPolicy": "Informativa sulla privacy"
+    }
+  },
+  "routineImport": {
+    "summary": "Contenuto da importare",
+    "summaryDescription": "Importa una copia personale. Il programma condiviso rimarrà invariato.",
+    "days": {
+      "one": "1 giornata",
+      "other": "$n giornate"
+    },
+    "exercises": {
+      "one": "1 esercizio",
+      "other": "$n esercizi"
+    },
+    "sets": {
+      "one": "1 serie",
+      "other": "$n serie"
+    },
+    "preview": "Anteprima allenamento",
+    "day": "Giornata",
+    "dayDescription": "Scegli una giornata da consultare. Verrà importato il programma completo.",
+    "programNotes": "Note del programma",
+    "workoutNotes": "Note dell’allenamento",
+    "exerciseList": "Esercizi",
+    "emptyTitle": "Nessun esercizio in questa giornata",
+    "emptyDescription": "Questa giornata non contiene ancora esercizi da svolgere.",
+    "noSets": "Nessuna serie prescritta",
+    "custom": "Esercizio personalizzato",
+    "assistance": "Assistenza",
+    "rest": "Recupero $duration",
+    "setNumber": "Serie $number",
+    "seconds": "$count s",
+    "loadingTitle": "Apertura del programma condiviso",
+    "loadingDescription": "Caricamento delle giornate e delle prescrizioni.",
+    "unavailableTitle": "Programma non disponibile",
+    "retry": "Riprova",
+    "proRequired": "Per importare le schede condivise è necessario Gym Bro Pro.",
+    "importing": "Importazione…",
+    "loadError": "Si è verificato un problema. Riprova tra poco.",
+    "networkError": "Impossibile connettersi. Controlla la connessione e riprova."
   }
 }

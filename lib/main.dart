@@ -27,6 +27,7 @@ import 'package:gymtracker/provider/bootstrap.dart';
 import 'package:gymtracker/provider/router.dart';
 import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/service/color.dart';
+import 'package:gymtracker/service/diagnostics.dart';
 import 'package:gymtracker/service/env.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/notifications.dart';
@@ -46,6 +47,7 @@ import 'package:gymtracker/view/utils/achievements.dart';
 import 'package:relative_time/relative_time.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:sentry_logging/sentry_logging.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -88,20 +90,40 @@ void main() async {
   tz.initializeTimeZones();
   tz.setLocalLocation(tz.getLocation(currentTimeZone.identifier));
 
-  await SentryFlutter.init(
-    _sentryInit,
-    appRunner: () => runApp(
-      SentryWidget(
-        child: ProviderScope(child: TranslationProvider(child: MainApp())),
-      ),
+  await diagnosticsService.initialize(
+    preferences: await SharedPreferences.getInstance(),
+    start: () => SentryFlutter.init(_sentryInit),
+    stop: Sentry.close,
+  );
+
+  void launchApp() => runApp(
+    SentryWidget(
+      child: ProviderScope(child: TranslationProvider(child: MainApp())),
     ),
   );
+
+  if (diagnosticsService.enabled) {
+    await SentryFlutter.init(_sentryInit, appRunner: launchApp);
+  } else {
+    launchApp();
+  }
 }
 
 FutureOr<void> _sentryInit(SentryFlutterOptions options) {
   options.dsn =
       'https://7d93abf745f54d8f8edb3812690bbbac@o1165851.ingest.us.sentry.io/6256038';
   options.sendDefaultPii = false;
+  options.addIntegration(DiagnosticsIntegration(diagnosticsService));
+  // Drop queued Dart telemetry as soon as the user opts out, including
+  // telemetry flushed while closing the SDK.
+  options.beforeSend = (event, hint) =>
+      diagnosticsService.enabled ? event : null;
+  options.beforeSendTransaction = (event, hint) =>
+      diagnosticsService.enabled ? event : null;
+  options.beforeSendFeedback = (event, hint) =>
+      diagnosticsService.enabled ? event : null;
+  options.beforeSendMetric = (metric) =>
+      diagnosticsService.enabled ? metric : null;
   options.tracesSampleRate = kDebugMode ? 1.0 : 0.2;
   options.profilesSampleRate = 1.0;
 
@@ -146,8 +168,9 @@ FutureOr<void> _sentryInit(SentryFlutterOptions options) {
 
   options.enableLogs = true;
   options.beforeSendLog = (log) {
-    if (log.level.toSeverityNumber() <=
-        SentryLogLevel.warn.toSeverityNumber()) {
+    if (!diagnosticsService.enabled ||
+        log.level.toSeverityNumber() <=
+            SentryLogLevel.warn.toSeverityNumber()) {
       return null;
     }
     return log;

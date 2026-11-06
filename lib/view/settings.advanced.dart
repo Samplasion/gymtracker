@@ -91,6 +91,7 @@ class AdvancedSettingsView extends ConsumerWidget {
                 ),
                 const SyncRecoveryActions(),
                 const Divider(),
+                const DiagnosticsSettingsTile(),
                 ListTile(
                   title: Text(context.t.settings.advanced.options.logs.title),
                   leading: const Icon(GTIcons.logs),
@@ -205,6 +206,37 @@ class AdvancedSettingsView extends ConsumerWidget {
             const SliverBottomSafeArea(),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class DiagnosticsSettingsTile extends ConsumerWidget {
+  const DiagnosticsSettingsTile({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final service = ref.watch(diagnosticsServiceProvider);
+    final strings = context.t.settings.diagnostics;
+    return ListenableBuilder(
+      listenable: service,
+      builder: (context, _) => SwitchListTile(
+        secondary: const Icon(Icons.bug_report_outlined),
+        title: Text(strings.title),
+        subtitle: Text(strings.description),
+        value: service.enabled,
+        onChanged: !service.initialized || service.busy
+            ? null
+            : (value) async {
+                try {
+                  await service.setEnabled(value);
+                } catch (_) {
+                  if (!context.mounted) return;
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(strings.saveError)));
+                }
+              },
       ),
     );
   }

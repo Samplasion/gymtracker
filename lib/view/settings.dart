@@ -20,6 +20,7 @@ import 'package:gymtracker/provider/settings.dart';
 import 'package:gymtracker/provider/sync_status.dart';
 import 'package:gymtracker/service/color.dart';
 import 'package:gymtracker/service/database.dart';
+import 'package:gymtracker/service/diagnostics.dart';
 import 'package:gymtracker/service/push.dart';
 import 'package:gymtracker/service/version.dart';
 import 'package:gymtracker/utils/extensions.dart';

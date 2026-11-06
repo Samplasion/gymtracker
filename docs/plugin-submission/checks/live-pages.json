@@ -1,0 +1,26 @@
+[
+  {
+    "url": "https://gym-bro.techtonicfault.com/en/support",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://gym-bro.techtonicfault.com/it/support",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://gym-bro.techtonicfault.com/en/terms/privacy-notice.md",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://gym-bro.techtonicfault.com/en/terms/terms-of-service.md",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://gym-bro.techtonicfault.com/it/terms/privacy-notice.md",
+    "error": "HTTP Error 403: Forbidden"
+  },
+  {
+    "url": "https://gym-bro.techtonicfault.com/it/terms/terms-of-service.md",
+    "error": "HTTP Error 403: Forbidden"
+  }
+]

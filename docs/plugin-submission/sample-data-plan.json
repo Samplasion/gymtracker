@@ -1,0 +1,41 @@
+{
+  "status": "Executed November 6, 2026 after dedicated website identity and empty Free connector usage checks. Routine creation and read-back succeeded. Reuse the exact original payload/key for retries; do not seed again with a new key.",
+  "routine": {
+    "tool": "create_routines",
+    "arguments": {
+      "idempotencyKey": "ad27a2ba-c105-4f99-a4ea-afe3bd246009",
+      "routines": [
+        {
+          "name": "Review - Upper body",
+          "notes": "Synthetic plugin review fixture; not a prescription.",
+          "weightUnit": "kg",
+          "distanceUnit": "km",
+          "exercises": [
+            {
+              "exerciseRef": {
+                "source": "standard",
+                "id": "library.chest.exercises.barbellBenchPressFlat"
+              },
+              "restSeconds": 90,
+              "sets": [
+                {
+                  "kind": "normal",
+                  "reps": 8,
+                  "weight": 20
+                },
+                {
+                  "kind": "normal",
+                  "reps": 8,
+                  "weight": 20
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "result": {
+    "routineId": "84e2f828-11ed-420f-b362-bdb802c6ce73"
+  }
+}

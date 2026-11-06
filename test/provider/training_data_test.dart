@@ -159,6 +159,41 @@ void main() {
   );
 
   test(
+    'suggestions preserve persisted folders and follow folder changes',
+    () async {
+      container.listen(routineSuggestionsProvider, (_, _) {});
+      const folder = GTRoutineFolder(
+        id: 'folder',
+        name: 'Strength',
+        sortOrder: 0,
+        notes: '',
+      );
+      await db.insertRoutineFolder(folder);
+      await db.insertRoutine(
+        Workout(id: 'r', name: 'Routine', exercises: [], folder: folder),
+      );
+      await db.insertHistoryWorkout(performed('w', 5).copyWith(parentID: 'r'));
+      await waitFor(container, routinesStreamProvider, (v) => v.length == 1);
+      await waitFor(container, historyWorkoutsProvider, (v) => v.length == 1);
+      expect(
+        container.read(routineSuggestionsProvider).single.routine.folder,
+        folder,
+      );
+
+      await db.updateRoutineFolder(folder.copyWith(name: 'Renamed'));
+      await waitFor(
+        container,
+        routinesStreamProvider,
+        (v) => v.single.folder?.name == 'Renamed',
+      );
+      expect(
+        container.read(routineSuggestionsProvider).single.routine.folder?.name,
+        'Renamed',
+      );
+    },
+  );
+
+  test(
     'disposing and recreating a scope reloads persisted data independently',
     () async {
       await db.insertHistoryWorkout(performed('w', 1));

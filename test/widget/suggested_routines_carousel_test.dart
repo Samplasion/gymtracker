@@ -22,6 +22,7 @@ void main() {
       'pull',
       'Pull · Control',
       description: '[{"insert":"Technique and control\\n"}]',
+      folderName: '  Strength\n  training  ',
     ),
     exerciseRoutine('legs', 'Legs · Power'),
   ];
@@ -86,12 +87,14 @@ void main() {
   }
 
   testWidgets(
-    'assigned trainer, rich description and emphasis use real routine data',
+    'assigned trainer, folder name and emphasis use real routine data',
     (tester) async {
       await mount(tester);
       expect(find.text('Suggested routines'), findsOneWidget);
       expect(find.text('Assigned by Alex Morgan'), findsOneWidget);
-      expect(find.text('Technique and control'), findsOneWidget);
+      expect(find.text('Strength training'), findsOneWidget);
+      expect(find.text('Technique and control'), findsNothing);
+      expect(find.text('Home'), findsOneWidget);
       expect(find.textContaining('"insert"'), findsNothing);
       final first = tester.widget<Material>(
         find
@@ -112,6 +115,16 @@ void main() {
       expect(first.color, isNot(next.color));
     },
   );
+
+  testWidgets('blank folder names fall back to the root folder', (
+    tester,
+  ) async {
+    await mount(
+      tester,
+      items: [exerciseRoutine('blank', 'Blank folder', folderName: ' \n\t ')],
+    );
+    expect(find.text('Home'), findsOneWidget);
+  });
 
   testWidgets(
     'Start uses the matching routine and the card opens its details',
@@ -225,10 +238,22 @@ void main() {
   }
 }
 
-Workout exerciseRoutine(String id, String name, {String? description}) =>
-    Workout(
-      id: id,
-      name: name,
-      infobox: description,
-      exercises: [exerciseHelper('exercise-$id', 'Bench press')],
-    );
+Workout exerciseRoutine(
+  String id,
+  String name, {
+  String? description,
+  String? folderName,
+}) => Workout(
+  id: id,
+  name: name,
+  infobox: description,
+  folder: folderName == null
+      ? null
+      : GTRoutineFolder(
+          id: 'folder-$id',
+          name: folderName,
+          sortOrder: 0,
+          notes: '',
+        ),
+  exercises: [exerciseHelper('exercise-$id', 'Bench press')],
+);

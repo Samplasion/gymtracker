@@ -499,6 +499,20 @@ void main() {
         if (id == '01' || id == '09') {
           expect(find.text(t.ongoingWorkout.title), findsOneWidget);
         }
+        if (id == '03') {
+          // Capture the populated historical metrics, independent of the
+          // locale's first weekday in the default weekly overview.
+          await tester.tap(find.text(t.me.stats.metrics));
+          await tester.pumpAndSettle(
+            const Duration(milliseconds: 100),
+            EnginePhase.sendSemanticsUpdate,
+            const Duration(seconds: 25),
+          );
+          expect(
+            tester.widget<TabBar>(find.byType(TabBar)).controller!.index,
+            1,
+          );
+        }
         if (id == '04') {
           expect(container.read(foodsForSelectedDateProvider), hasLength(4));
           await tester.drag(

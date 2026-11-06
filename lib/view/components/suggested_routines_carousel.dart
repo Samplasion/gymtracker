@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/model/trainer.dart';
 import 'package:gymtracker/model/workout.dart';
-import 'package:gymtracker/utils/extensions.dart';
 
 /// Feed recommendations retain their ranking; the first card gets emphasis.
 class SuggestedRoutinesCarousel extends StatelessWidget {
@@ -85,14 +84,13 @@ class SuggestedRoutinesCarousel extends StatelessWidget {
           ? context.t.feed.suggestions.assignedByTrainer
           : context.t.feed.suggestions.assignedBy(name: name);
     }
-    final description = routine.infobox
-        ?.asQuillDocument()
-        .toPlainText()
-        .trim()
-        .replaceAll(RegExp(r'\s+'), ' ');
-    return description == null || description.isEmpty
-        ? context.t.general.exercises(n: routine.displayExerciseCount)
-        : description;
+    final folderName = routine.folder?.name.trim().replaceAll(
+      RegExp(r'\s+'),
+      ' ',
+    );
+    return folderName == null || folderName.isEmpty
+        ? context.t.routines.rootFolder
+        : folderName;
   }
 }
 

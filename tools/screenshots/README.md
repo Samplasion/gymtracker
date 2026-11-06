@@ -261,6 +261,10 @@ Fonti ufficiali:
 
 ### Navigazione nelle catture
 
+La schermata Progressi (03) seleziona esplicitamente la scheda Metriche, con
+lo storico degli ultimi 30 giorni, per mostrare dati in entrambe le lingue
+anche quando il riepilogo settimanale predefinito inizia in giorni diversi.
+
 La suite riusa `appRouterProvider` e la `ShellRoute` di produzione: routine (02),
 alimentazione (04) e feed (07) includono la barra inferiore o la navigazione
 laterale in base alla larghezza effettiva del dispositivo. Il drawer sui telefoni rimane chiuso,

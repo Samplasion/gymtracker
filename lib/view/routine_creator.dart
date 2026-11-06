@@ -83,17 +83,18 @@ class _RoutineCreatorState extends ConsumerState<RoutineCreator> {
   @override
   void initState() {
     super.initState();
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      if (widget.base != null) {
-        _titleIsTouched = true;
-        _controller.exercises = widget.base!.exercises
-            .map((e) => e.clone())
-            .toList()
-            .wrap();
-      } else {
+    if (widget.base != null) {
+      _titleIsTouched = true;
+      _controller.exercises = widget.base!.exercises
+          .map((e) => e.clone())
+          .toList()
+          .wrap();
+    } else {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         titleController.text = generateWorkoutTitle(context.t, {});
-      }
-    });
+      });
+    }
   }
 
   @override

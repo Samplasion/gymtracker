@@ -5,6 +5,7 @@ import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/service/feed.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
+import 'package:gymtracker/view/components/section_card.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/social.dart';
 import 'package:gymtracker/view/utils/achievements.dart';
@@ -29,8 +30,9 @@ class FeedItemWorkoutCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final account = ref.watch(onlineProvider).value;
-    return Card.outlined(
+    return GTSectionCard(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -133,8 +135,9 @@ class FeedItemAchievementCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card.outlined(
+    return GTSectionCard(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
       child: Column(
         children: [
           ListTile(

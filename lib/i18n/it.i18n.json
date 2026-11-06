@@ -685,6 +685,20 @@
       "reset": "Resetta"
     },
     "simple": {
+      "completedTitle": "Allenamento completato",
+      "completedDescription": "Hai completato tutte le serie. Salva il tuo allenamento o aggiungi un esercizio.",
+      "emptyTitle": "Pronto ad allenarti?",
+      "emptyDescription": "Aggiungi un esercizio per iniziare la tua sessione.",
+      "exercisePosition": "$current di $total",
+      "setPosition": "Serie $current di $total",
+      "customExercise": "Personalizzato",
+      "completeSet": "Completa serie",
+      "repUnit": "rep",
+      "decreaseValue": "Diminuisci $field",
+      "increaseValue": "Aumenta $field",
+      "historyAndProgression": "Storico e progressione",
+      "historySummary": "Consulta l’ultima sessione e gli obiettivi",
+      "progressionSummary": "Progressione attiva · consulta gli obiettivi",
       "nextUp": "Prossimo:",
       "switchToFull": "Passa alla vista completa",
       "restTimer": "Avvia timer di recupero",
@@ -2444,6 +2458,18 @@
       "muscleCategory": "Gruppi muscolari",
       "gymEquipment": "Attrezzatura",
       "atAGlance": "Colpo d'occhio",
+      "metrics": "Metriche",
+      "overview": {
+        "thisWeek": "Questa settimana",
+        "title": "Progressi",
+        "volume": "Volume sollevato",
+        "personalRecords": "Record personali",
+        "recordCriteria": "Record di carico: a parità di peso, vale la serie con più ripetizioni.",
+        "emptyRecords": "Completa una serie con peso e ripetizioni per vedere i tuoi record personali.",
+        "emptyWeek": "Nessun volume registrato questa settimana.",
+        "loadError": "Impossibile caricare i progressi",
+        "retryDescription": "Riprova per caricare i tuoi allenamenti."
+      },
       "mainThree": {
         "label": "I big 3",
         "description": "Visualizza l'evoluzione dei tuoi massimali (1RM) per i \"Big 3\" nell'intervallo di tempo selezionato. Il grafico utilizza il massimale più alto di ogni settimana per visualizzare l'andamento complessivo dei carichi nei tre esercizi fondamentali del powerlifting.",
@@ -3920,6 +3946,11 @@
     "noMoreData": "Hai raggiunto la fine del feed :)",
     "loadMore": "Carica altro",
     "suggestedRoutines": "Routine suggerite",
+    "suggestions": {
+      "start": "Inizia",
+      "assignedBy": "Assegnata da $name",
+      "assignedByTrainer": "Assegnata dal tuo trainer"
+    },
     "loadError": {
       "title": "Impossibile caricare le attività",
       "text": "Controlla la connessione e riprova."

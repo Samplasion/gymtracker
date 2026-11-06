@@ -1631,6 +1631,7 @@ class Translations$feed$it implements Translations$feed$en {
 	@override String get noMoreData => 'Hai raggiunto la fine del feed :)';
 	@override String get loadMore => 'Carica altro';
 	@override String get suggestedRoutines => 'Routine suggerite';
+	@override late final Translations$feed$suggestions$it suggestions = Translations$feed$suggestions$it._(_root);
 	@override late final Translations$feed$loadError$it loadError = Translations$feed$loadError$it._(_root);
 }
 
@@ -2471,6 +2472,20 @@ class Translations$ongoingWorkout$simple$it implements Translations$ongoingWorko
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
+	@override String get completedTitle => 'Allenamento completato';
+	@override String get completedDescription => 'Hai completato tutte le serie. Salva il tuo allenamento o aggiungi un esercizio.';
+	@override String get emptyTitle => 'Pronto ad allenarti?';
+	@override String get emptyDescription => 'Aggiungi un esercizio per iniziare la tua sessione.';
+	@override String exercisePosition({required Object current, required Object total}) => '${current} di ${total}';
+	@override String setPosition({required Object current, required Object total}) => 'Serie ${current} di ${total}';
+	@override String get customExercise => 'Personalizzato';
+	@override String get completeSet => 'Completa serie';
+	@override String get repUnit => 'rep';
+	@override String decreaseValue({required Object field}) => 'Diminuisci ${field}';
+	@override String increaseValue({required Object field}) => 'Aumenta ${field}';
+	@override String get historyAndProgression => 'Storico e progressione';
+	@override String get historySummary => 'Consulta l’ultima sessione e gli obiettivi';
+	@override String get progressionSummary => 'Progressione attiva · consulta gli obiettivi';
 	@override String get nextUp => 'Prossimo:';
 	@override String get switchToFull => 'Passa alla vista completa';
 	@override String get restTimer => 'Avvia timer di recupero';
@@ -2970,6 +2985,8 @@ class Translations$me$stats$it implements Translations$me$stats$en {
 	@override String get muscleCategory => 'Gruppi muscolari';
 	@override String get gymEquipment => 'Attrezzatura';
 	@override String get atAGlance => 'Colpo d\'occhio';
+	@override String get metrics => 'Metriche';
+	@override late final Translations$me$stats$overview$it overview = Translations$me$stats$overview$it._(_root);
 	@override late final Translations$me$stats$mainThree$it mainThree = Translations$me$stats$mainThree$it._(_root);
 }
 
@@ -4196,6 +4213,18 @@ class Translations$feed$noSync$it implements Translations$feed$noSync$en {
 
 	// Translations
 	@override String get text => 'La sincronizzazione è in pausa: non sei connesso a Internet. Potrebbero volerci alcuni minuti. Non preoccuparti, i dati verranno mantenuti in locale e trasferiti in un secondo momento.';
+}
+
+// Path: feed.suggestions
+class Translations$feed$suggestions$it implements Translations$feed$suggestions$en {
+	Translations$feed$suggestions$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get start => 'Inizia';
+	@override String assignedBy({required Object name}) => 'Assegnata da ${name}';
+	@override String get assignedByTrainer => 'Assegnata dal tuo trainer';
 }
 
 // Path: feed.loadError
@@ -6643,6 +6672,24 @@ class Translations$me$stats$sets$it implements Translations$me$stats$sets$en {
 	@override String get label => 'Serie';
 }
 
+// Path: me.stats.overview
+class Translations$me$stats$overview$it implements Translations$me$stats$overview$en {
+	Translations$me$stats$overview$it._(this._root);
+
+	final TranslationsIt _root; // ignore: unused_field
+
+	// Translations
+	@override String get thisWeek => 'Questa settimana';
+	@override String get title => 'Progressi';
+	@override String get volume => 'Volume sollevato';
+	@override String get personalRecords => 'Record personali';
+	@override String get recordCriteria => 'Record di carico: a parità di peso, vale la serie con più ripetizioni.';
+	@override String get emptyRecords => 'Completa una serie con peso e ripetizioni per vedere i tuoi record personali.';
+	@override String get emptyWeek => 'Nessun volume registrato questa settimana.';
+	@override String get loadError => 'Impossibile caricare i progressi';
+	@override String get retryDescription => 'Riprova per caricare i tuoi allenamenti.';
+}
+
 // Path: me.stats.mainThree
 class Translations$me$stats$mainThree$it implements Translations$me$stats$mainThree$en {
 	Translations$me$stats$mainThree$it._(this._root);
@@ -8645,6 +8692,20 @@ extension on TranslationsIt {
 			'ongoingWorkout.stopwatch.start' => 'Avvia',
 			'ongoingWorkout.stopwatch.pause' => 'Pausa',
 			'ongoingWorkout.stopwatch.reset' => 'Resetta',
+			'ongoingWorkout.simple.completedTitle' => 'Allenamento completato',
+			'ongoingWorkout.simple.completedDescription' => 'Hai completato tutte le serie. Salva il tuo allenamento o aggiungi un esercizio.',
+			'ongoingWorkout.simple.emptyTitle' => 'Pronto ad allenarti?',
+			'ongoingWorkout.simple.emptyDescription' => 'Aggiungi un esercizio per iniziare la tua sessione.',
+			'ongoingWorkout.simple.exercisePosition' => ({required Object current, required Object total}) => '${current} di ${total}',
+			'ongoingWorkout.simple.setPosition' => ({required Object current, required Object total}) => 'Serie ${current} di ${total}',
+			'ongoingWorkout.simple.customExercise' => 'Personalizzato',
+			'ongoingWorkout.simple.completeSet' => 'Completa serie',
+			'ongoingWorkout.simple.repUnit' => 'rep',
+			'ongoingWorkout.simple.decreaseValue' => ({required Object field}) => 'Diminuisci ${field}',
+			'ongoingWorkout.simple.increaseValue' => ({required Object field}) => 'Aumenta ${field}',
+			'ongoingWorkout.simple.historyAndProgression' => 'Storico e progressione',
+			'ongoingWorkout.simple.historySummary' => 'Consulta l’ultima sessione e gli obiettivi',
+			'ongoingWorkout.simple.progressionSummary' => 'Progressione attiva · consulta gli obiettivi',
 			'ongoingWorkout.simple.nextUp' => 'Prossimo:',
 			'ongoingWorkout.simple.switchToFull' => 'Passa alla vista completa',
 			'ongoingWorkout.simple.restTimer' => 'Avvia timer di recupero',
@@ -8804,6 +8865,8 @@ extension on TranslationsIt {
 			'library.cardio.exercises.skiergDoublePolePull' => 'Tirate a doppio bastoncino allo SkiErg',
 			'library.cardio.exercises.alternatingSkiSteps' => 'Passi alternati da sci',
 			'library.cardio.exercises.explosiveStarJumps' => 'Salti esplosivi a stella',
+			_ => null,
+		} ?? switch (path) {
 			'library.cardio.exercises.kettlebellCircularSwing' => 'Swing circolare con kettlebell',
 			'library.cardio.exercises.ellipticalTrainerWalking' => 'Camminata sull’ellittica',
 			'library.cardio.exercises.lungeWalkingHighKnee' => 'Affondo (camminato, ginocchia alte)',
@@ -8818,8 +8881,6 @@ extension on TranslationsIt {
 			'library.chest.exercises.barbellBenchPressDecline' => 'Panca declinata (bilanciere)',
 			'library.chest.exercises.dumbbellBenchPressFlat' => 'Panca piana (manubri)',
 			'library.chest.exercises.dumbbellBenchPressIncline' => 'Panca inclinata (manubri)',
-			_ => null,
-		} ?? switch (path) {
 			'library.chest.exercises.dumbbellBenchPressDecline' => 'Panca declinata (manubri)',
 			'library.chest.exercises.smithMachineBenchPressFlat' => 'Panca piana (Multipower)',
 			'library.chest.exercises.smithMachineBenchPressIncline' => 'Panca inclinata (Multipower)',
@@ -9318,6 +9379,8 @@ extension on TranslationsIt {
 			'library.quadriceps.exercises.stepUps' => 'Step-up (manubri)',
 			'library.quadriceps.exercises.gobletSquats' => 'Goblet squat (manubrio)',
 			'library.quadriceps.exercises.squatsBarbell' => 'Squat (bilanciere)',
+			_ => null,
+		} ?? switch (path) {
 			'library.quadriceps.exercises.legPress' => 'Leg press',
 			'library.quadriceps.exercises.legExtension' => 'Leg extension',
 			'library.quadriceps.exercises.smithMachineLunges' => 'Affondi al Multipower',
@@ -9332,8 +9395,6 @@ extension on TranslationsIt {
 			'library.quadriceps.exercises.backwardJump' => 'Salto all’indietro',
 			'library.quadriceps.exercises.balanceBoardStance' => 'Equilibrio sulla tavoletta',
 			'library.quadriceps.exercises.splitSquatBandOneArmOneLeg' => 'Split squat (elastico, a un braccio, a una gamba)',
-			_ => null,
-		} ?? switch (path) {
 			'library.quadriceps.exercises.splitSquatBandOneLeg' => 'Split squat (elastico, a una gamba)',
 			'library.quadriceps.exercises.squatBand' => 'Squat (elastico)',
 			'library.quadriceps.exercises.squatRowBand' => 'Squat e rematore (elastico)',
@@ -9832,6 +9893,8 @@ extension on TranslationsIt {
 			'library.triceps.exercises.tricepsKickbackCableTwoArm' => 'Kickback per i tricipiti (cavo, a due braccia)',
 			'library.triceps.exercises.pushUpCloseGrip' => 'Piegamenti sulle braccia (presa stretta)',
 			'library.triceps.exercises.pushUpCloseGripKnee' => 'Piegamenti sulle braccia (presa stretta, sulle ginocchia)',
+			_ => null,
+		} ?? switch (path) {
 			'library.triceps.exercises.pressDumbbellCloseGrip' => 'Distensioni (manubri, presa stretta)',
 			'library.triceps.exercises.pressDumbbellDeclineOneArmNeutralGrip' => 'Distensioni (manubri, su panca declinata, a un braccio, presa neutra)',
 			'library.triceps.exercises.tricepsExtensionDumbbellDecline' => 'Estensioni per i tricipiti (manubri, su panca declinata)',
@@ -9846,8 +9909,6 @@ extension on TranslationsIt {
 			'library.triceps.exercises.extensionDumbbellLyingAlternate' => 'Estensioni per i tricipiti (manubri, da sdraiati, alternato)',
 			'library.triceps.exercises.tricepsExtensionDumbbellLying' => 'Estensioni per i tricipiti (manubri, da sdraiati)',
 			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArmPronated' => 'Estensioni per i tricipiti (manubri, da sdraiati, a un braccio, presa prona)',
-			_ => null,
-		} ?? switch (path) {
 			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArmSupinated' => 'Estensioni per i tricipiti (manubri, da sdraiati, a un braccio, presa supina)',
 			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArm' => 'Estensioni per i tricipiti (manubri, da sdraiati, a un braccio)',
 			'library.triceps.exercises.frenchPressDumbbellOneArmExerciseBall' => 'French press (manubri, a un braccio, fitball)',
@@ -10096,6 +10157,16 @@ extension on TranslationsIt {
 			'me.stats.muscleCategory' => 'Gruppi muscolari',
 			'me.stats.gymEquipment' => 'Attrezzatura',
 			'me.stats.atAGlance' => 'Colpo d\'occhio',
+			'me.stats.metrics' => 'Metriche',
+			'me.stats.overview.thisWeek' => 'Questa settimana',
+			'me.stats.overview.title' => 'Progressi',
+			'me.stats.overview.volume' => 'Volume sollevato',
+			'me.stats.overview.personalRecords' => 'Record personali',
+			'me.stats.overview.recordCriteria' => 'Record di carico: a parità di peso, vale la serie con più ripetizioni.',
+			'me.stats.overview.emptyRecords' => 'Completa una serie con peso e ripetizioni per vedere i tuoi record personali.',
+			'me.stats.overview.emptyWeek' => 'Nessun volume registrato questa settimana.',
+			'me.stats.overview.loadError' => 'Impossibile caricare i progressi',
+			'me.stats.overview.retryDescription' => 'Riprova per caricare i tuoi allenamenti.',
 			'me.stats.mainThree.label' => 'I big 3',
 			'me.stats.mainThree.description' => 'Visualizza l\'evoluzione dei tuoi massimali (1RM) per i "Big 3" nell\'intervallo di tempo selezionato. Il grafico utilizza il massimale più alto di ogni settimana per visualizzare l\'andamento complessivo dei carichi nei tre esercizi fondamentali del powerlifting.',
 			'me.stats.mainThree.warning.title' => 'Nota sul grafico',
@@ -10336,6 +10407,8 @@ extension on TranslationsIt {
 			'food.nutritionGoals.change.carbsPercentage.invalid' => 'Inserisci un numero valido tra 0 e 100.',
 			'food.nutritionGoals.change.proteinPercentage.label' => 'Proteine (%)',
 			'food.nutritionGoals.change.proteinPercentage.empty' => 'Questo valore non può essere vuoto.',
+			_ => null,
+		} ?? switch (path) {
 			'food.nutritionGoals.change.proteinPercentage.invalid' => 'Inserisci un numero valido tra 0 e 100.',
 			'food.nutritionGoals.change.save' => 'Salva modifiche',
 			'food.nutritionGoals.history.title' => 'Cronologia obiettivi',
@@ -10360,8 +10433,6 @@ extension on TranslationsIt {
 			'food.languages.ba' => 'Bashkir',
 			'food.languages.be' => 'Bielorusso',
 			'food.languages.bg' => 'Bulgaro',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.bh' => 'Bihari',
 			'food.languages.bi' => 'Bislama',
 			'food.languages.bm' => 'Bambara',
@@ -10850,6 +10921,8 @@ extension on TranslationsIt {
 			'food.picker.recent' => 'Recenti',
 			'food.picker.results' => 'Catalogo',
 			'food.picker.empty' => 'Nessun alimento trovato',
+			_ => null,
+		} ?? switch (path) {
 			'food.picker.retry' => 'Riprova',
 			'food.picker.failed' => 'Operazione non riuscita. Riprova.',
 			'food.picker.withBarcode' => 'Personalizzato con codice a barre',
@@ -10874,8 +10947,6 @@ extension on TranslationsIt {
 			'food.recipes.empty' => 'Nessuna ricetta salvata',
 			'food.recipes.search' => 'Cerca ricette',
 			'food.recipes.name' => 'Nome',
-			_ => null,
-		} ?? switch (path) {
 			'food.recipes.description' => 'Descrizione',
 			'food.recipes.instructions' => 'Istruzioni di cucina',
 			'food.recipes.servings' => 'Porzioni',
@@ -11141,6 +11212,9 @@ extension on TranslationsIt {
 			'feed.noMoreData' => 'Hai raggiunto la fine del feed :)',
 			'feed.loadMore' => 'Carica altro',
 			'feed.suggestedRoutines' => 'Routine suggerite',
+			'feed.suggestions.start' => 'Inizia',
+			'feed.suggestions.assignedBy' => ({required Object name}) => 'Assegnata da ${name}',
+			'feed.suggestions.assignedByTrainer' => 'Assegnata dal tuo trainer',
 			'feed.loadError.title' => 'Impossibile caricare le attività',
 			'feed.loadError.text' => 'Controlla la connessione e riprova.',
 			'workoutPage.title' => 'Allenati',
@@ -11361,6 +11435,8 @@ extension on TranslationsIt {
 			'plateau.title' => 'Possibili plateau',
 			'plateau.intro' => 'Ultime 8 settimane, considerando solo le serie normali completate. A seguire sono riportati suggerimenti basati sull\'analisi dei dati, che non vanno presi come certezza.',
 			'plateau.criteria' => 'Servono 6 sedute confrontabili in almeno 28 giorni e 4 settimane di calendario, di cui l’ultima entro 14 giorni, senza pause oltre i 21 giorni. Il riferimento è la mediana delle prime 3 sedute. Viene considerato progresso: +2,5% di carico senza perdere ripetizioni, +1 ripetizione a carico equivalente (±1%) oppure +5% di volume. A corpo libero: +1 ripetizione nella serie migliore o +5% di ripetizioni totali.',
+			_ => null,
+		} ?? switch (path) {
 			'plateau.possiblePlateau' => 'Possibile plateau',
 			'plateau.progressing' => 'Nessun possibile plateau rilevato',
 			'plateau.insufficientData' => 'Servono più dati: registra almeno 6 sedute confrontabili distribuite su 4 settimane.',
@@ -11388,8 +11464,6 @@ extension on TranslationsIt {
 			'progression.goal' => 'Obiettivo di oggi',
 			'progression.double' => 'Doppia progressione',
 			'progression.cyclic' => 'Progressione lineare ciclica',
-			_ => null,
-		} ?? switch (path) {
 			'progression.minReps' => 'Ripetizioni minime',
 			'progression.maxReps' => 'Ripetizioni massime',
 			'progression.repsPerStep' => 'Ripetizioni per passo',

@@ -1930,6 +1930,7 @@ class Translations$feed$en {
 	/// en: 'Suggested routines'
 	String get suggestedRoutines => 'Suggested routines';
 
+	late final Translations$feed$suggestions$en suggestions = Translations$feed$suggestions$en._(_root);
 	late final Translations$feed$loadError$en loadError = Translations$feed$loadError$en._(_root);
 }
 
@@ -3457,6 +3458,48 @@ class Translations$ongoingWorkout$simple$en {
 
 	// Translations
 
+	/// en: 'Workout complete'
+	String get completedTitle => 'Workout complete';
+
+	/// en: 'All sets are complete. Save your workout or add another exercise.'
+	String get completedDescription => 'All sets are complete. Save your workout or add another exercise.';
+
+	/// en: 'Ready to train?'
+	String get emptyTitle => 'Ready to train?';
+
+	/// en: 'Add an exercise to start your session.'
+	String get emptyDescription => 'Add an exercise to start your session.';
+
+	/// en: '$current of $total'
+	String exercisePosition({required Object current, required Object total}) => '${current} of ${total}';
+
+	/// en: 'Set $current of $total'
+	String setPosition({required Object current, required Object total}) => 'Set ${current} of ${total}';
+
+	/// en: 'Custom'
+	String get customExercise => 'Custom';
+
+	/// en: 'Complete set'
+	String get completeSet => 'Complete set';
+
+	/// en: 'reps'
+	String get repUnit => 'reps';
+
+	/// en: 'Decrease $field'
+	String decreaseValue({required Object field}) => 'Decrease ${field}';
+
+	/// en: 'Increase $field'
+	String increaseValue({required Object field}) => 'Increase ${field}';
+
+	/// en: 'History and progression'
+	String get historyAndProgression => 'History and progression';
+
+	/// en: 'View your last session and targets'
+	String get historySummary => 'View your last session and targets';
+
+	/// en: 'Active progression · view targets'
+	String get progressionSummary => 'Active progression · view targets';
+
 	/// en: 'Next up:'
 	String get nextUp => 'Next up:';
 
@@ -4135,6 +4178,10 @@ class Translations$me$stats$en {
 	/// en: 'At a glance'
 	String get atAGlance => 'At a glance';
 
+	/// en: 'Metrics'
+	String get metrics => 'Metrics';
+
+	late final Translations$me$stats$overview$en overview = Translations$me$stats$overview$en._(_root);
 	late final Translations$me$stats$mainThree$en mainThree = Translations$me$stats$mainThree$en._(_root);
 }
 
@@ -5974,6 +6021,24 @@ class Translations$feed$noSync$en {
 
 	/// en: 'Syncing is paused: you are not connected to the Internet. It may take a few minutes. Don't worry, the data will be kept locally and transferred later.'
 	String get text => 'Syncing is paused: you are not connected to the Internet. It may take a few minutes. Don\'t worry, the data will be kept locally and transferred later.';
+}
+
+// Path: feed.suggestions
+class Translations$feed$suggestions$en {
+	Translations$feed$suggestions$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Start'
+	String get start => 'Start';
+
+	/// en: 'Assigned by $name'
+	String assignedBy({required Object name}) => 'Assigned by ${name}';
+
+	/// en: 'Assigned by your trainer'
+	String get assignedByTrainer => 'Assigned by your trainer';
 }
 
 // Path: feed.loadError
@@ -11244,6 +11309,42 @@ class Translations$me$stats$sets$en {
 	String get label => 'Sets';
 }
 
+// Path: me.stats.overview
+class Translations$me$stats$overview$en {
+	Translations$me$stats$overview$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'This week'
+	String get thisWeek => 'This week';
+
+	/// en: 'Progress'
+	String get title => 'Progress';
+
+	/// en: 'Lifted volume'
+	String get volume => 'Lifted volume';
+
+	/// en: 'Personal records'
+	String get personalRecords => 'Personal records';
+
+	/// en: 'Load records: at the same weight, the set with more repetitions wins.'
+	String get recordCriteria => 'Load records: at the same weight, the set with more repetitions wins.';
+
+	/// en: 'Complete a set with weight and repetitions to see your personal records.'
+	String get emptyRecords => 'Complete a set with weight and repetitions to see your personal records.';
+
+	/// en: 'No volume recorded this week.'
+	String get emptyWeek => 'No volume recorded this week.';
+
+	/// en: 'Unable to load progress'
+	String get loadError => 'Unable to load progress';
+
+	/// en: 'Try again to load your workouts.'
+	String get retryDescription => 'Try again to load your workouts.';
+}
+
 // Path: me.stats.mainThree
 class Translations$me$stats$mainThree$en {
 	Translations$me$stats$mainThree$en._(this._root);
@@ -13800,6 +13901,20 @@ extension on Translations {
 			'ongoingWorkout.stopwatch.start' => 'Start',
 			'ongoingWorkout.stopwatch.pause' => 'Pause',
 			'ongoingWorkout.stopwatch.reset' => 'Reset',
+			'ongoingWorkout.simple.completedTitle' => 'Workout complete',
+			'ongoingWorkout.simple.completedDescription' => 'All sets are complete. Save your workout or add another exercise.',
+			'ongoingWorkout.simple.emptyTitle' => 'Ready to train?',
+			'ongoingWorkout.simple.emptyDescription' => 'Add an exercise to start your session.',
+			'ongoingWorkout.simple.exercisePosition' => ({required Object current, required Object total}) => '${current} of ${total}',
+			'ongoingWorkout.simple.setPosition' => ({required Object current, required Object total}) => 'Set ${current} of ${total}',
+			'ongoingWorkout.simple.customExercise' => 'Custom',
+			'ongoingWorkout.simple.completeSet' => 'Complete set',
+			'ongoingWorkout.simple.repUnit' => 'reps',
+			'ongoingWorkout.simple.decreaseValue' => ({required Object field}) => 'Decrease ${field}',
+			'ongoingWorkout.simple.increaseValue' => ({required Object field}) => 'Increase ${field}',
+			'ongoingWorkout.simple.historyAndProgression' => 'History and progression',
+			'ongoingWorkout.simple.historySummary' => 'View your last session and targets',
+			'ongoingWorkout.simple.progressionSummary' => 'Active progression · view targets',
 			'ongoingWorkout.simple.nextUp' => 'Next up:',
 			'ongoingWorkout.simple.switchToFull' => 'Switch to full view',
 			'ongoingWorkout.simple.restTimer' => 'Start rest timer',
@@ -13959,6 +14074,8 @@ extension on Translations {
 			'library.cardio.exercises.skiergDoublePolePull' => 'SkiErg double-pole pull',
 			'library.cardio.exercises.alternatingSkiSteps' => 'Alternating ski steps',
 			'library.cardio.exercises.explosiveStarJumps' => 'Explosive star jumps',
+			_ => null,
+		} ?? switch (path) {
 			'library.cardio.exercises.kettlebellCircularSwing' => 'Kettlebell circular swing',
 			'library.cardio.exercises.ellipticalTrainerWalking' => 'Elliptical trainer walking',
 			'library.cardio.exercises.lungeWalkingHighKnee' => 'Lunge (walking, high knee)',
@@ -13973,8 +14090,6 @@ extension on Translations {
 			'library.chest.exercises.barbellBenchPressDecline' => 'Bench press (barbell, decline)',
 			'library.chest.exercises.dumbbellBenchPressFlat' => 'Bench press (dumbbell)',
 			'library.chest.exercises.dumbbellBenchPressIncline' => 'Bench press (dumbbell, incline)',
-			_ => null,
-		} ?? switch (path) {
 			'library.chest.exercises.dumbbellBenchPressDecline' => 'Bench press (dumbbell, decline)',
 			'library.chest.exercises.smithMachineBenchPressFlat' => 'Bench press (Smith machine)',
 			'library.chest.exercises.smithMachineBenchPressIncline' => 'Bench press (Smith machine, incline)',
@@ -14473,6 +14588,8 @@ extension on Translations {
 			'library.quadriceps.exercises.stepUps' => 'Step-ups (dumbbells)',
 			'library.quadriceps.exercises.gobletSquats' => 'Goblet squat (dumbbell)',
 			'library.quadriceps.exercises.squatsBarbell' => 'Squats (barbell)',
+			_ => null,
+		} ?? switch (path) {
 			'library.quadriceps.exercises.legPress' => 'Leg press',
 			'library.quadriceps.exercises.legExtension' => 'Leg extension',
 			'library.quadriceps.exercises.smithMachineLunges' => 'Smith machine lunges',
@@ -14487,8 +14604,6 @@ extension on Translations {
 			'library.quadriceps.exercises.backwardJump' => 'Backward jump',
 			'library.quadriceps.exercises.balanceBoardStance' => 'Balance-board stance',
 			'library.quadriceps.exercises.splitSquatBandOneArmOneLeg' => 'Split squat (band, one arm, one leg)',
-			_ => null,
-		} ?? switch (path) {
 			'library.quadriceps.exercises.splitSquatBandOneLeg' => 'Split squat (band, one leg)',
 			'library.quadriceps.exercises.squatBand' => 'Squat (band)',
 			'library.quadriceps.exercises.squatRowBand' => 'Squat row (band)',
@@ -14987,6 +15102,8 @@ extension on Translations {
 			'library.triceps.exercises.tricepsKickbackCableTwoArm' => 'Triceps kickback (cable, two arm)',
 			'library.triceps.exercises.pushUpCloseGrip' => 'Push-up (close grip)',
 			'library.triceps.exercises.pushUpCloseGripKnee' => 'Push-up (close grip, knee)',
+			_ => null,
+		} ?? switch (path) {
 			'library.triceps.exercises.pressDumbbellCloseGrip' => 'Press (dumbbell, close grip)',
 			'library.triceps.exercises.pressDumbbellDeclineOneArmNeutralGrip' => 'Press (dumbbell, decline, one arm, neutral grip)',
 			'library.triceps.exercises.tricepsExtensionDumbbellDecline' => 'Triceps extension (dumbbell, decline)',
@@ -15001,8 +15118,6 @@ extension on Translations {
 			'library.triceps.exercises.extensionDumbbellLyingAlternate' => 'Extension (dumbbell, lying, alternate)',
 			'library.triceps.exercises.tricepsExtensionDumbbellLying' => 'Triceps extension (dumbbell, lying)',
 			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArmPronated' => 'Triceps extension (dumbbell, lying, one arm, pronated)',
-			_ => null,
-		} ?? switch (path) {
 			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArmSupinated' => 'Triceps extension (dumbbell, lying, one arm, supinated)',
 			'library.triceps.exercises.tricepsExtensionDumbbellLyingOneArm' => 'Triceps extension (dumbbell, lying, one arm)',
 			'library.triceps.exercises.frenchPressDumbbellOneArmExerciseBall' => 'French press (dumbbell, one arm, exercise ball)',
@@ -15251,6 +15366,16 @@ extension on Translations {
 			'me.stats.muscleCategory' => 'Muscle groups',
 			'me.stats.gymEquipment' => 'Equipment',
 			'me.stats.atAGlance' => 'At a glance',
+			'me.stats.metrics' => 'Metrics',
+			'me.stats.overview.thisWeek' => 'This week',
+			'me.stats.overview.title' => 'Progress',
+			'me.stats.overview.volume' => 'Lifted volume',
+			'me.stats.overview.personalRecords' => 'Personal records',
+			'me.stats.overview.recordCriteria' => 'Load records: at the same weight, the set with more repetitions wins.',
+			'me.stats.overview.emptyRecords' => 'Complete a set with weight and repetitions to see your personal records.',
+			'me.stats.overview.emptyWeek' => 'No volume recorded this week.',
+			'me.stats.overview.loadError' => 'Unable to load progress',
+			'me.stats.overview.retryDescription' => 'Try again to load your workouts.',
 			'me.stats.mainThree.label' => 'The Main Three',
 			'me.stats.mainThree.description' => 'View the evolution of your 1RM for the "Main Three" over the selected time frame. The chart uses the highest 1RM of each week to display the overall trend of loads in the three fundamental exercises of powerlifting.',
 			'me.stats.mainThree.warning.title' => 'A note on the chart',
@@ -15491,6 +15616,8 @@ extension on Translations {
 			'food.nutritionGoals.change.carbsPercentage.invalid' => 'You must enter a valid number 0-100.',
 			'food.nutritionGoals.change.proteinPercentage.label' => 'Protein (%)',
 			'food.nutritionGoals.change.proteinPercentage.empty' => 'This value must not be empty.',
+			_ => null,
+		} ?? switch (path) {
 			'food.nutritionGoals.change.proteinPercentage.invalid' => 'You must enter a valid number 0-100.',
 			'food.nutritionGoals.change.save' => 'Save changes',
 			'food.nutritionGoals.history.title' => 'Goal history',
@@ -15515,8 +15642,6 @@ extension on Translations {
 			'food.languages.ba' => 'Bashkir',
 			'food.languages.be' => 'Belarusian',
 			'food.languages.bg' => 'Bulgarian',
-			_ => null,
-		} ?? switch (path) {
 			'food.languages.bh' => 'Bihari',
 			'food.languages.bi' => 'Bislama',
 			'food.languages.bm' => 'Bambara',
@@ -16005,6 +16130,8 @@ extension on Translations {
 			'food.picker.recent' => 'Recent',
 			'food.picker.results' => 'Catalog',
 			'food.picker.empty' => 'No foods found',
+			_ => null,
+		} ?? switch (path) {
 			'food.picker.retry' => 'Retry',
 			'food.picker.failed' => 'Operation failed. Please try again.',
 			'food.picker.withBarcode' => 'Custom food with barcode',
@@ -16029,8 +16156,6 @@ extension on Translations {
 			'food.recipes.empty' => 'No saved recipes',
 			'food.recipes.search' => 'Search recipes',
 			'food.recipes.name' => 'Name',
-			_ => null,
-		} ?? switch (path) {
 			'food.recipes.description' => 'Description',
 			'food.recipes.instructions' => 'Cooking instructions',
 			'food.recipes.servings' => 'Servings',
@@ -16296,6 +16421,9 @@ extension on Translations {
 			'feed.noMoreData' => 'You\'ve reached the end of your feed :)',
 			'feed.loadMore' => 'Load more',
 			'feed.suggestedRoutines' => 'Suggested routines',
+			'feed.suggestions.start' => 'Start',
+			'feed.suggestions.assignedBy' => ({required Object name}) => 'Assigned by ${name}',
+			'feed.suggestions.assignedByTrainer' => 'Assigned by your trainer',
 			'feed.loadError.title' => 'Unable to load activities',
 			'feed.loadError.text' => 'Check your connection and try again.',
 			'workoutPage.title' => 'Work Out',
@@ -16516,6 +16644,8 @@ extension on Translations {
 			'plateau.title' => 'Possible plateaus',
 			'plateau.intro' => 'Last 8 weeks, only considering completed normal sets. The following are suggestions based on your data, but they may not be accurate.',
 			'plateau.criteria' => 'Requires 6 comparable sessions over at least 28 days and 4 calendar weeks, the latest within 14 days, with no gaps over 21 days. The first 3 sessions provide the median reference. Progress means +2.5% load without fewer reps, +1 rep at equivalent load (±1%), or +5% volume. For bodyweight: +1 best-set rep or +5% total reps.',
+			_ => null,
+		} ?? switch (path) {
 			'plateau.possiblePlateau' => 'Possible plateau',
 			'plateau.progressing' => 'No possible plateau detected',
 			'plateau.insufficientData' => 'More data needed: record at least 6 comparable sessions over 4 weeks.',
@@ -16543,8 +16673,6 @@ extension on Translations {
 			'progression.goal' => 'Today\'s goal',
 			'progression.double' => 'Double progression',
 			'progression.cyclic' => 'Cyclic linear progression',
-			_ => null,
-		} ?? switch (path) {
 			'progression.minReps' => 'Minimum reps',
 			'progression.maxReps' => 'Maximum reps',
 			'progression.repsPerStep' => 'Reps per step',

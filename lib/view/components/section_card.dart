@@ -12,6 +12,7 @@ class GTSectionCard extends StatelessWidget {
     this.onTap,
     this.color,
     this.margin = EdgeInsets.zero,
+    this.padding = const EdgeInsets.all(20),
   });
 
   final String? title;
@@ -21,6 +22,7 @@ class GTSectionCard extends StatelessWidget {
   final Widget? child;
   final VoidCallback? onTap;
   final Color? color;
+  final EdgeInsetsGeometry padding;
   final EdgeInsetsGeometry margin;
 
   @override
@@ -28,7 +30,7 @@ class GTSectionCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final content = Padding(
-      padding: const EdgeInsets.all(20),
+      padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         mainAxisSize: MainAxisSize.min,

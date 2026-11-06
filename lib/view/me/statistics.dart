@@ -32,6 +32,7 @@ import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/muscles.dart';
 import 'package:gymtracker/view/components/tweened_builder.dart';
 import 'package:gymtracker/view/me/plateau.dart';
+import 'package:gymtracker/view/me/statistics_overview.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:gymtracker/view/utils/timer.dart';
@@ -61,7 +62,7 @@ class MeStatisticsPage extends ConsumerStatefulWidget {
 class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
     with SingleTickerProviderStateMixin {
   HistoryController get controller => ref.read(historyControllerProvider);
-  late final _controller = TabController(length: 5, vsync: this);
+  late final _controller = TabController(length: 6, vsync: this);
 
   TimeFrame timeFrame = TimeFrame.thirtyDays;
 
@@ -100,6 +101,12 @@ class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
     }
 
     return (workouts, duration, volume, sets, distance);
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   @override
@@ -143,6 +150,10 @@ class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
               text: context.t.me.stats.atAGlance,
             ),
             Tab(
+              icon: const Icon(GTIcons.volume),
+              text: context.t.me.stats.metrics,
+            ),
+            Tab(
               icon: const Icon(GTIcons.muscle_groups),
               text: context.t.me.stats.muscleCategory,
             ),
@@ -167,6 +178,7 @@ class _MeStatisticsPageState extends ConsumerState<MeStatisticsPage>
       body: TabBarView(
         controller: _controller,
         children: [
+          const StatisticsOverviewTab(),
           SingleChildScrollView(
             padding:
                 const EdgeInsets.all(16) +

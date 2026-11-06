@@ -6,21 +6,25 @@ import 'package:gymtracker/controller/routines_controller.dart';
 import 'package:gymtracker/i18n/strings.g.dart';
 import 'package:gymtracker/icons/gymtracker_icons.dart';
 import 'package:gymtracker/model/friend.dart';
+import 'package:gymtracker/model/trainer.dart';
 import 'package:gymtracker/model/workout.dart';
 import 'package:gymtracker/provider/connectivity.dart';
 import 'package:gymtracker/provider/feed.dart';
 import 'package:gymtracker/provider/friend.dart';
 import 'package:gymtracker/provider/online.dart';
 import 'package:gymtracker/provider/social.dart';
+import 'package:gymtracker/provider/trainer.dart';
+import 'package:gymtracker/provider/training_data.dart';
 import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/utils/go.dart';
 import 'package:gymtracker/utils/skeletons.dart';
+import 'package:gymtracker/view/actions/routines.dart';
 import 'package:gymtracker/view/components/content_unavailable.dart';
 import 'package:gymtracker/view/components/error_view.dart';
 import 'package:gymtracker/view/components/icon_grid.dart';
 import 'package:gymtracker/view/components/loading_indicator.dart';
 import 'package:gymtracker/view/components/retry_view.dart';
-import 'package:gymtracker/view/components/routines.dart';
+import 'package:gymtracker/view/components/suggested_routines_carousel.dart';
 import 'package:gymtracker/view/exercises.dart';
 import 'package:gymtracker/view/login.dart';
 import 'package:gymtracker/view/skeleton.dart';
@@ -30,7 +34,7 @@ import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/feed_items.dart';
 import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/social.dart';
-import 'package:sliver_tools/sliver_tools.dart';
+import 'package:m3e_core/m3e_core.dart';
 
 class FeedView extends ConsumerStatefulWidget {
   const FeedView({super.key});
@@ -90,10 +94,7 @@ class _FeedViewState extends ConsumerState<FeedView>
     final feedNotifier = ref.watch(feedProvider.notifier);
     _feedNotifier = feedNotifier;
     feedNotifier.setVisible(ModalRoute.of(context)?.isCurrent ?? true);
-    final routinesController = ref.watch(routinesControllerProvider);
-    final List<RoutineSuggestion> suggested = routinesController.suggestions
-        .take(3)
-        .toList();
+    final suggested = ref.watch(routineSuggestionsProvider).take(3).toList();
     final account = ref.watch(onlineProvider);
     final pendingRequestCount = account.value == null
         ? 0
@@ -218,82 +219,44 @@ class _FeedViewState extends ConsumerState<FeedView>
                 ),
               ],
             ),
-            SliverToBoxAdapter(
-              child: SafeArea(
-                top: false,
-                bottom: false,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: FilledButton.icon(
-                    onPressed: () {
-                      SkeletonView.of(context)?.goToRoutines();
-                    },
-                    icon: const Icon(GTIcons.workout),
-                    label: Text(context.t.feed.startWorkout),
+            if (suggested.isEmpty)
+              SliverToBoxAdapter(
+                child: SafeArea(
+                  top: false,
+                  bottom: false,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: M3EButton.icon(
+                      style: .filled,
+                      onPressed: () {
+                        SkeletonView.of(context)?.goToRoutines();
+                      },
+                      icon: const Icon(GTIcons.workout),
+                      label: Text(context.t.feed.startWorkout),
+                    ),
                   ),
                 ),
               ),
-            ),
-            if (suggested.isNotEmpty) ...[
-              SliverToBoxAdapter(child: SizedBox(height: 4)),
-              SliverPadding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-                sliver: SliverStack(
-                  children: [
-                    SliverPositioned.fill(
-                      child: Card.outlined(
-                        clipBehavior: Clip.none,
-                        margin: EdgeInsets.zero,
-                      ),
-                    ),
-                    MultiSliver(
-                      children: [
-                        SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 16,
-                            ).copyWith(bottom: 8),
-                            child: Text(
-                              context.t.feed.suggestedRoutines,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                          ),
-                        ),
-                        SliverList(
-                          delegate: SliverChildBuilderDelegate((
-                            context,
-                            index,
-                          ) {
-                            final (routine: workout, score: _) =
-                                suggested[index];
-                            return Material(
-                              type: MaterialType.transparency,
-                              key: ValueKey(workout.id),
-                              child: ListTile(
-                                leading: WorkoutIcon(workout: workout),
-                                title: Text(workout.name),
-                                subtitle: Text(
-                                  context.t.general.exercises(
-                                    n: workout.displayExerciseCount,
-                                  ),
-                                ),
-                                onTap: () {
-                                  Go.to(() => ExercisesView(workout: workout));
-                                },
-                              ),
-                            );
-                          }, childCount: suggested.length),
-                        ),
-                      ],
-                    ),
+            if (suggested.isNotEmpty)
+              SliverToBoxAdapter(
+                child: SuggestedRoutinesCarousel(
+                  routines: [
+                    for (final suggestion in suggested) suggestion.routine,
                   ],
+                  trainer:
+                      ref.watch(trainerStateProvider).value ??
+                      TrainerState.empty,
+                  onOpen: (routine) =>
+                      Go.to(() => ExercisesView(workout: routine)),
+                  onStart: (routine) {
+                    unawaited(
+                      ref
+                          .read(routinesControllerProvider)
+                          .startRoutine(context, routine),
+                    );
+                  },
                 ),
               ),
-            ],
             SliverToBoxAdapter(child: _NoSyncCard()),
             feed.when(
               data: (feedItems) {

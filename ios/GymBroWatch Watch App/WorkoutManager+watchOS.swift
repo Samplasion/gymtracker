@@ -57,6 +57,7 @@ extension WorkoutManager {
             guard fence.prepare(id: id, revision: (command["revision"] as? NSNumber)?.int64Value ?? 0) else { throw WorkoutOperationError.stale }
             UserDefaults.standard.set(try? JSONEncoder().encode(fence), forKey: "workout.commandFence.v2")
             if session == nil, let recovered = try? await healthStore.recoverActiveWorkoutSession() {
+                diagnostic("workout=\(id) Watch recovering existing HealthKit session")
                 try await recoverWorkout(with: recovered)
             }
             if request?.id == id, let metrics = command["metrics"] as? [String: Any],
@@ -82,12 +83,20 @@ extension WorkoutManager {
                 try handleReceivedData(data)
             }
             attachPrimary(primary, request: request, generation: token)
+            diagnostic("workout=\(id) Watch HealthKit session created; adding metadata")
             try await builder?.addMetadata([HKMetadataKeyExternalUUID: id, "gymbro.segmentId": token])
             persistWatchIdentity()
             primary.prepare()
+            diagnostic("workout=\(id) Watch HealthKit prepare requested")
             if #available(watchOS 10, *) {
-                do { try await workoutDeadline(5) { try await primary.startMirroringToCompanionDevice() } }
-                catch { Logger.shared.error("Mirroring unavailable; using WatchConnectivity: \(error)") }
+                do {
+                    try await workoutDiagnosticOperation("Watch mirroring workout=\(id)", diagnostic: diagnostic) {
+                        try await workoutDeadline(5) { try await primary.startMirroringToCompanionDevice() }
+                    }
+                }
+                catch {
+                    diagnostic("workout=\(id) mirroring unavailable; using WatchConnectivity: \(error.localizedDescription)")
+                }
             }
             // A prepared session must never linger after a timed-out phone launch.
             Task { @MainActor in
@@ -105,6 +114,7 @@ extension WorkoutManager {
             try handleReceivedData(data)
         }
         persistWatchIdentity()
+        diagnostic("workout=\(id) Watch committing HealthKit recording")
         try await commitPrimary(at: Date())
         phase = .active
         return ["success": true]

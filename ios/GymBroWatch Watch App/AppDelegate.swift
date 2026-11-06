@@ -21,6 +21,7 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
         super.init()
         
         WorkoutManager.shared.onMetricsPacket = { [weak self] packet in self?.sendMetrics(packet) }
+        WorkoutManager.shared.onDiagnostic = { [weak self] message in self?.log(message) }
         WorkoutManager.shared.onSensorSessionEnded = { [weak self] in
             if self?.workoutViewModel.isWorkoutRunning == true { self?.workoutViewModel.requestFreshData() }
         }
@@ -42,6 +43,7 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
     
     // HealthKit launch only wakes the UI; the phone handshake owns sensor creation.
     func handle(_ workoutConfiguration: HKWorkoutConfiguration) {
+        log("[WorkoutSync] HealthKit launch received on Watch")
         Task { @MainActor in workoutViewModel.requestFreshData() }
     }
 
@@ -60,7 +62,7 @@ class GBAppDelegate: NSObject, WKApplicationDelegate {
 
 extension GBAppDelegate: WCSessionDelegate {
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: (any Error)?) {
-        log("GBAppDelegate: WCsession activationDidCompleteWith activationState: \(activationState)")
+        log("[WorkoutSync] Watch activation=\(activationState.rawValue) reachable=\(session.isReachable) error=\(String(describing: error))")
         Task { @MainActor in
             if let packet = WorkoutManager.shared.metricsPacket() { self.sendMetrics(packet) }
             self.workoutViewModel.requestFreshData()
@@ -69,7 +71,7 @@ extension GBAppDelegate: WCSessionDelegate {
     }
     
     func log(_ message: String) {
-        NSLog(message)
+        NSLog("%@", message)
         session?.sendMessage(["method": "log", "message": message], replyHandler: nil);
     }
     
@@ -82,6 +84,7 @@ extension GBAppDelegate: WCSessionDelegate {
     }
     
     func sessionReachabilityDidChange(_ session: WCSession) {
+        log("[WorkoutSync] Watch reachability changed: activation=\(session.activationState.rawValue) reachable=\(session.isReachable)")
         PhoneMessageResponder.shared.sessionReachabilityDidChange(session)
         Task { @MainActor in
             if session.isReachable, let packet = WorkoutManager.shared.metricsPacket() { self.sendMetrics(packet) }

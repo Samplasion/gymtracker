@@ -43,13 +43,23 @@ final class PhoneMessageResponder: NSObject {
 
     nonisolated func receiveCommand(_ message: [String: Any], reply: @escaping ([String: Any]) -> Void) {
         Task { @MainActor in
+            let action = message["action"] as? String ?? "unknown"
+            let id = message["workoutId"] as? String ?? "unknown"
+            let manager = WorkoutManager.shared
+            manager.diagnostic("Watch received command=\(action) workout=\(id) generation=\(String(describing: message["generation"])) sensorState=\(manager.sessionState.rawValue); queued")
             if ScreenshotMode.enabled {
                 reply(["success": false, "error": "HealthKit recording is disabled during screenshots"])
                 return
             }
             guard message["method"] as? String == "workoutSensor" else { reply(["success": false]); return }
             WorkoutManager.shared.enqueue {
-                do { reply(try await WorkoutManager.shared.handleSensorCommand(message)) }
+                do {
+                    let response = try await workoutDiagnosticOperation("Watch command=\(action) workout=\(id)", diagnostic: manager.diagnostic) {
+                        try await manager.handleSensorCommand(message)
+                    }
+                    manager.diagnostic("Watch replying command=\(action) workout=\(id) success=\(String(describing: response["success"])) running=\(String(describing: response["running"])) sensorState=\(manager.sessionState.rawValue)")
+                    reply(response)
+                }
                 catch {
                     let id = message["workoutId"] as? String ?? ""
                     if WorkoutManager.shared.request?.id == id {

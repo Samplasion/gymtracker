@@ -158,12 +158,17 @@ extension WorkoutManager {
         configuration.locationType = .indoor
         var command: [String: Any] = ["method": "workoutSensor", "action": "prepare", "workoutId": request.id,
             "generation": token, "start": request.start.timeIntervalSince1970]
-        let prepared = try await prepareWorkoutAfterLaunch(launch: {
+        let attempt = token
+        let trace: (String) -> Void = { self.diagnostic("workout=\(request.id) attempt=\(attempt) \($0)") }
+        trace("connection attempt configured=\(self.watchConfigured?() == true) reachable=\(self.watchAvailable?() == true)")
+        let prepared = try await prepareWorkoutAfterLaunch(diagnostic: trace, launch: {
             try await self.healthStore.startWatchApp(toHandle: configuration)
+            trace("Watch app launch returned; waiting for reachability")
             while self.watchAvailable?() != true {
                 try Task.checkCancellation()
                 try await Task.sleep(nanoseconds: 100_000_000)
             }
+            trace("Watch reachable")
         }, prepare: { deadline in
             guard self.desiredRequest == request else { throw WorkoutOperationError.stale }
             // Apply pending save/discard dispositions before replacing an old recording.
@@ -198,12 +203,16 @@ extension WorkoutManager {
                 commit["generation"] = token
                 commit["metrics"] = self.metricsPacket()?.dictionary
                 commit["deadline"] = Date().addingTimeInterval(10).timeIntervalSince1970
-                let result = try await workoutDeadline(10) { try await remoteCommand(commit) }
+                let result = try await workoutDiagnosticOperation("commit", diagnostic: trace) {
+                    try await workoutDeadline(10) { try await remoteCommand(commit) }
+                }
                 guard result["success"] as? Bool == true else { throw WorkoutOperationError.unavailable }
             },
             abort: {
-                let response = try await workoutDeadline(10) {
-                    try await remoteCommand(["method": "workoutSensor", "action": "abort", "workoutId": request.id, "generation": token])
+                let response = try await workoutDiagnosticOperation("abort", diagnostic: trace) {
+                    try await workoutDeadline(10) {
+                        try await remoteCommand(["method": "workoutSensor", "action": "abort", "workoutId": request.id, "generation": token])
+                    }
                 }
                 guard response["success"] as? Bool == true else { throw WorkoutOperationError.unavailable }
             }
@@ -225,7 +234,7 @@ extension WorkoutManager {
         summary = nil
         reportedWatchStartFailure = nil
         phase = .active
-
+        trace("Watch recording confirmed")
     }
 
     @available(iOS 26, *)
@@ -249,6 +258,7 @@ extension WorkoutManager {
 
     private func startLocal(_ request: WorkoutRequest) async {
         guard desiredRequest == request else { return }
+        diagnostic("workout=\(request.id) attempting iPhone recording fallback")
         guard #available(iOS 26, *) else {
             device = "none"
             phase = .failed("Sensor recording is unavailable. Your workout remains available in the iPhone app.")
@@ -268,6 +278,7 @@ extension WorkoutManager {
     }
 
     private func reportWatchStartFailure(_ request: WorkoutRequest, message: String) {
+        diagnostic("workout=\(request.id) Watch recording unconfirmed: \(message)")
         Logger.shared.error("Watch workout start \(request.id): \(message)")
         guard desiredRequest == request, watchConfigured?() == true,
               reportedWatchStartFailure != request.id else { return }

@@ -39,6 +39,13 @@ final class WorkoutManager: NSObject, ObservableObject {
         #endif
     }
     var onMetricsPacket: ((WorkoutMetricsPacket) -> Void)?
+    var onDiagnostic: ((String) -> Void)?
+
+    func diagnostic(_ message: String) {
+        let line = "[WorkoutSync] \(message)"
+        Logger.shared.info("\(line, privacy: .public)")
+        onDiagnostic?(line)
+    }
     var onSensorSessionEnded: (() -> Void)?
     private var metricsMonitor: Task<Void, Never>?
     private var heartRateInvalidatedAt = Date()

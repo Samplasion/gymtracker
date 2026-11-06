@@ -71,17 +71,29 @@ import flutter_app_intents
             #endif
             
             workout.listener = self
+            workout.onDiagnostic = { [weak self] message in self?.logger?.log(message) }
             workout.onMetricsPacket = { [weak self] packet in self?.publishPhoneMetrics(packet) }
             workout.watchAvailable = { [weak self] in self?.session?.isReachable == true }
             workout.watchConfigured = { [weak self] in
                 self?.session?.isPaired == true && self?.session?.isWatchAppInstalled == true
             }
             workout.remoteCommand = { [weak self] command in
+                let action = command["action"] as? String ?? "unknown"
+                let id = command["workoutId"] as? String ?? "unknown"
+                let state = self?.session.map { "activation=\($0.activationState.rawValue) paired=\($0.isPaired) installed=\($0.isWatchAppInstalled) reachable=\($0.isReachable)" } ?? "session=nil"
+                self?.logger?.log("[WorkoutSync] command=\(action) workout=\(id) \(state)")
                 guard let session = self?.session, session.isReachable else { throw WorkoutOperationError.unavailable }
                 return try await withCheckedThrowingContinuation { continuation in
                     var command = command
                     command["revision"] = self?.watchSnapshot.revision ?? 0
-                    session.sendMessage(command, replyHandler: { continuation.resume(returning: $0) }, errorHandler: { continuation.resume(throwing: $0) })
+                    session.sendMessage(command, replyHandler: { response in
+                        self?.logger?.log("[WorkoutSync] reply command=\(action) workout=\(id) success=\(String(describing: response["success"])) running=\(String(describing: response["running"])) generation=\(String(describing: response["generation"])) error=\(String(describing: response["error"]))")
+                        continuation.resume(returning: response)
+                    }, errorHandler: { error in
+                        let nsError = error as NSError
+                        self?.logger?.log("[WorkoutSync] transport failed command=\(action) workout=\(id): \(nsError.domain)/\(nsError.code) \(error.localizedDescription)")
+                        continuation.resume(throwing: error)
+                    })
                 }
             }
             workout.onError = { [weak self] id, message in self?.showWorkoutError(id: id, message: message) }
@@ -462,6 +474,7 @@ extension AppDelegate: WCSessionDelegate {
     }
     
     func sessionReachabilityDidChange(_ session: WCSession) {
+        logger?.log("[WorkoutSync] reachability changed: activation=\(session.activationState.rawValue) paired=\(session.isPaired) installed=\(session.isWatchAppInstalled) reachable=\(session.isReachable)")
         Task { @MainActor in
             if !session.isReachable {
                 if #available(iOS 17, *) {

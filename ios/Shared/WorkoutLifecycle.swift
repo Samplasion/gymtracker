@@ -29,12 +29,37 @@ enum WorkoutRecordingStatus: Equatable {
 @MainActor
 func prepareWorkoutAfterLaunch<T>(
     timeout: Double = 10,
+    diagnostic: @escaping (String) -> Void = { _ in },
     launch: @escaping @MainActor () async throws -> Void,
     prepare: @escaping @MainActor (Date) async throws -> T
 ) async throws -> T {
-    try await workoutDeadline(timeout, operation: launch)
+    try await workoutDiagnosticOperation("launch", diagnostic: diagnostic) {
+        try await workoutDeadline(timeout, operation: launch)
+    }
     let deadline = Date().addingTimeInterval(timeout)
-    return try await workoutDeadline(timeout) { try await prepare(deadline) }
+    return try await workoutDiagnosticOperation("prepare", diagnostic: diagnostic) {
+        try await workoutDeadline(timeout) { try await prepare(deadline) }
+    }
+}
+
+/// Keep timing and failures visible without changing the operation's result.
+@MainActor
+func workoutDiagnosticOperation<T>(
+    _ stage: String,
+    diagnostic: (String) -> Void,
+    operation: () async throws -> T
+) async throws -> T {
+    let started = Date()
+    diagnostic("\(stage) started")
+    do {
+        let result = try await operation()
+        diagnostic("\(stage) succeeded after \(String(format: "%.2f", Date().timeIntervalSince(started)))s")
+        return result
+    } catch {
+        let nsError = error as NSError
+        diagnostic("\(stage) failed after \(String(format: "%.2f", Date().timeIntervalSince(started)))s: \(nsError.domain)/\(nsError.code) \(error.localizedDescription)")
+        throw error
+    }
 }
 
 /// A persisted, monotonically increasing revision shared by immediate and deferred delivery.

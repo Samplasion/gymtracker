@@ -1,9 +1,8 @@
 # Termini di Servizio
 
-**Data di Efficacia:** 27 luglio 2026  
-**Ultimo Aggiornamento:** 27 luglio 2026  
+**Ultimo Aggiornamento:** 6 novembre 2026
 
-Benvenuto/a in **Gym Bro**. Scaricando, installando o utilizzando l'applicazione Gym Bro (l'"App"), accetti di essere vincolato/a dai presenti Termini di Servizio ("Termini").
+Benvenuto/a in **Gym Bro**. Scaricando, installando o utilizzando l’applicazione Gym Bro (l’"App"), il suo sito web o le integrazioni ufficialmente supportate, accetti di essere vincolato/a dai presenti Termini di Servizio ("Termini").
 
 ---
 
@@ -28,22 +27,31 @@ Gym Bro offre sia modelli di abbonamento ricorrente sia licenze perpetue (a vita
 ## 3. Condotta dell'Utente e Uso Accettabile
 Utilizzando Gym Bro — comprese le funzionalità interattive presenti o future, i testi personalizzati o le funzioni di condivisione social — accetti di **non**:
 * Inserire o condividere contenuti illegali, diffamatori, abusivi, offensivi o che violino i diritti di proprietà intellettuale altrui.
-* Effettuare reverse engineering, decompilare o tentare di estrarre il codice sorgente dell'App.
-* Utilizzare script automatizzati o bot per raccogliere dati o interagire con i server dell'App.
+* Effettuare reverse engineering, decompilare o tentare di estrarre il codice sorgente dell’App, salvo quanto consentito dalle norme imperative o da una licenza open source applicabile.
+* Utilizzare script automatizzati o bot per raccogliere dati o interagire con i server dell’App, salvo tramite integrazioni ufficialmente supportate che autorizzi per il tuo account e utilizzi nei limiti documentati.
 
 I termini e le restrizioni di cui sopra si aggiungono alle leggi e alle normative vigenti nella tua giurisdizione. Ci riserviamo il diritto di sospendere o interrompere l'accesso alle future funzionalità cloud o social per gli utenti che violano queste regole di condotta o le leggi applicabili.
+
+### Integrazioni Ufficiali e Assistenti IA
+Puoi collegare un assistente IA supportato, come ChatGPT, al tuo account Gym Bro e autorizzare le azioni supportate. Il collegamento può recuperare informazioni dell’account e salvare i dati supportati quando lo richiedi. La disponibilità dipende dalle funzionalità dell’integrazione e dai limiti Free o Pro del tuo account. Gli acquisti Pro e la gestione degli abbonamenti rimangono nell’app mobile e nel relativo store; collegare un assistente non comporta di per sé un acquisto o il passaggio a un piano superiore.
+
+Controlla le informazioni e le azioni proposte prima di chiedere a un assistente di salvarle. Le informazioni generate dall’IA possono essere inesatte o incomplete e le limitazioni mediche e relative al fitness previste dai presenti Termini si applicano anche alle integrazioni. Non fare affidamento su un assistente per eseguire azioni che Gym Bro non supporta.
+
+I dati recuperati tramite un collegamento vengono condivisi con il fornitore dell’assistente, come descritto nella nostra Informativa sulla Privacy. Al suo servizio si applicano anche i termini, l’informativa sulla privacy e le impostazioni dell’account di tale fornitore. Puoi revocare un collegamento tramite i controlli disponibili nell’account o nel servizio collegato. La revoca ha effetto secondo il ciclo di validità dell’autorizzazione; i token di accesso già emessi possono rimanere validi fino alla scadenza. La revoca non cancella i dati già salvati o condivisi.
+
+Questa autorizzazione non consente di accedere agli account altrui, aggirare l’autenticazione o i limiti dell’account, né effettuare altri accessi automatizzati al di fuori di un’integrazione ufficialmente supportata.
 
 ---
 
 ## 4. Proprietà Intellettuale
-Tutti i diritti, titoli e interessi relativi all'App Gym Bro — inclusi codice, design, loghi, grafica ed elementi dell'interfaccia — rimangono di esclusiva proprietà di Gym Bro. Ti viene concessa una licenza limitata, revocabile e non trasferibile per l'utilizzo dell'App per scopi personali e non commerciali.
+Tutti i diritti, titoli e interessi relativi all'App Gym Bro — inclusi il codice originale, il design, i loghi, la grafica e gli elementi dell’interfaccia — restano dei rispettivi titolari. I tuoi contenuti e i componenti di terzi restano soggetti ai rispettivi diritti e licenze. Ti viene concessa una licenza limitata, revocabile e non trasferibile per usare l’App per le tue attività personali di fitness e, ove disponibili, per usare le funzionalità trainer supportate con i tuoi clienti, nei limiti documentati del servizio.
 
 ---
 
 ## 5. Limitazione di Responsabilità
 Nella misura massima consentita dalla legge applicabile:
 * Gym Bro viene fornita **"COSÌ COM'È"** e **"COME DISPONIBILE"**, senza garanzie di alcun tipo.
-* Non saremo responsabili per alcun danno indiretto, incidentale, speciale o consequenziale, inclusi perdita di dati, lesioni personali o interruzione degli allenamenti derivanti dall'uso o dall'impossibilità di utilizzare l'App.
+* Nei limiti della legge applicabile, escludiamo la responsabilità per perdite indirette, incidentali, speciali o consequenziali derivanti dall’uso dell’App. Nessuna disposizione dei presenti Termini esclude o limita responsabilità che non possono essere escluse o limitate per legge, comprese quelle per frode, dolo, colpa grave o morte e lesioni personali quando la legge vieta tale limitazione. Restano impregiudicati i tuoi diritti inderogabili di consumatore, inclusi quelli applicabili ai servizi digitali, ai rimedi e ai rimborsi.
 
 ---
 

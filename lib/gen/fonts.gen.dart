@@ -11,4 +11,7 @@
 abstract final class FontFamily {
   /// Font family: GymTracker
   static const String gymTracker = 'GymTracker';
+
+  /// Font family: Manrope
+  static const String manrope = 'Manrope';
 }

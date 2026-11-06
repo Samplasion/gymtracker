@@ -84,8 +84,8 @@ class CustomExerciseBadge extends StatefulWidget {
 
 class _CustomExerciseBadgeState extends State<CustomExerciseBadge> {
   String get text {
-    final str = context.t.exercise.custom.toUpperCase();
-    if (widget.short) return str[0];
+    final str = context.t.exercise.custom;
+    if (widget.short) return str.characters.firstOrNull?.toUpperCase() ?? "C";
     return str;
   }
 

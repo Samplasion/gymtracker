@@ -3,6 +3,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:gymtracker/gen/fonts.gen.dart';
 import 'package:gymtracker/utils/constants.dart';
 import 'package:gymtracker/utils/extensions.dart';
 import 'package:gymtracker/utils/go.dart';
@@ -85,6 +86,7 @@ ThemeData getGymTrackerThemeFor(
 
   return switch (brightness) {
     Brightness.light => FlexThemeData.light(
+      fontFamily: FontFamily.manrope,
       colors: FlexSchemeColor.from(
         primary: seedColor,
         secondary: seedColor,
@@ -113,6 +115,7 @@ ThemeData getGymTrackerThemeFor(
       splashFactory: platformDependentSplashFactory,
     ),
     Brightness.dark => FlexThemeData.dark(
+      fontFamily: FontFamily.manrope,
       colors: FlexSchemeColor.from(
         primary: seedColor,
         secondary: seedColor,

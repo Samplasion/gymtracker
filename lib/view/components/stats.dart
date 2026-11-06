@@ -50,7 +50,10 @@ class Stats extends StatelessWidget {
           ),
           Text(
             value,
-            style: context.theme.textTheme.bodyLarge,
+            style: context.theme.textTheme.bodyLarge?.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 20,
+            ),
             textAlign: TextAlign.center,
           ),
         ],

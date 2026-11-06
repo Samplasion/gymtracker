@@ -191,7 +191,7 @@ class ExerciseListTile extends ConsumerWidget {
         ref.watch(settingsControllerProvider).distanceUnit,
       );
 
-  Text? _buildSubtitle(BuildContext context, WidgetRef ref) {
+  Widget? _buildSubtitle(BuildContext context, WidgetRef ref) {
     final exercise = this.exercise;
     if (exercise is Superset) {
       if (exercise.exercises.isEmpty) return null;

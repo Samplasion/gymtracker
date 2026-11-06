@@ -736,7 +736,7 @@ class OngoingWorkoutBar extends ConsumerWidget {
                       sigmaY: 16,
                     ),
                     child: Card(
-                      elevation: 1,
+                      elevation: 0,
                       color: context.colorScheme.surfaceContainerHighest
                           .withAlpha(128),
                       margin: EdgeInsets.zero,

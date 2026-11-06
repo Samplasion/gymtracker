@@ -1,7 +1,7 @@
 name: gymtracker
 description: A new Flutter project.
 publish_to: "none"
-version: 1.0.0+1793111138
+version: 1.0.0+1793111144
 
 environment:
   sdk: ">=3.11.0 <4.0.0"
@@ -149,6 +149,9 @@ flutter_gen:
 
 flutter:
   fonts:
+    - family: Manrope
+      fonts:
+        - asset: fonts/Manrope.ttf
     - family: GymTracker
       fonts:
         - asset: fonts/GymTracker.ttf

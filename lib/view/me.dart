@@ -35,7 +35,6 @@ import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/online_profile_card.dart';
 import 'package:gymtracker/view/utils/section_title.dart';
-import 'package:gymtracker/view/utils/sliver_utils.dart';
 import 'package:gymtracker/view/utils/speed_dial.dart';
 import 'package:intl/intl.dart';
 
@@ -49,8 +48,43 @@ class MeView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     ref.watch(historyWorkoutsProvider);
     final workoutsByDay = ref.watch(workoutsByDayProvider);
-    final hasMeasurements =
-        ref.watch(weightMeasurementsProvider).value?.isNotEmpty ?? false;
+    final history = ref.watch(historyControllerProvider).history;
+    final firstDay = history.firstOrNull?.startingDate;
+    final now = DateTime.now();
+    final values = firstDay == null
+        ? <int>[]
+        : [
+            for (
+              var i = 0;
+              i < math.max(1, now.difference(firstDay).inDays);
+              i++
+            )
+              workoutsByDay[now.subtract(Duration(days: i)).startOfDay]
+                      ?.length ??
+                  0,
+          ];
+    final destinations = [
+      (
+        GTIcons.calendar,
+        context.t.me.calendar.label,
+        () => Go.to(() => const MeCalendarPage()),
+      ),
+      (
+        GTIcons.stats,
+        context.t.me.stats.label,
+        () => Go.to(() => const MeStatisticsPage()),
+      ),
+      (
+        Icons.picture_as_pdf_outlined,
+        context.t.reports.title,
+        () => Go.to(() => const ProgressReportsView()),
+      ),
+      (
+        GTIcons.achievements,
+        context.t.achievements.title,
+        () => Go.to(() => const AchievementsView()),
+      ),
+    ];
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -58,173 +92,74 @@ class MeView extends ConsumerWidget {
             title: Text(context.t.me.title),
             leading: const SkeletonDrawerButton(),
           ),
-          const SliverPadding(
-            padding: EdgeInsets.only(top: 16, left: 16, right: 16),
-            sliver: SliverToBoxAdapter(child: OnlineProfileCard()),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.only(top: 16),
-            sliver: SliverList(
-              delegate: SliverChildListDelegate([
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SafeArea(
-                    top: false,
-                    bottom: false,
-                    child: SpeedDial(
-                      crossAxisCountBuilder: (breakpoint) =>
-                          switch (breakpoint) {
-                            Breakpoints.xxs => 1,
-                            _ => 2,
-                          },
-                      buttonHeight: (_) => kSpeedDialButtonHeight / 1.3,
-                      buttons: [
-                        SpeedDialButton(
-                          icon: const Icon(GTIcons.calendar),
-                          text: Text(
-                            context.t.me.calendar.label,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          onTap: () {
-                            Go.to(() => const MeCalendarPage());
-                          },
-                        ),
-                        SpeedDialButton(
-                          icon: const Icon(GTIcons.stats),
-                          text: Text(
-                            context.t.me.stats.label,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          onTap: () {
-                            Go.to(() => const MeStatisticsPage());
-                          },
-                        ),
-                        SpeedDialButton(
-                          icon: const Icon(Icons.picture_as_pdf),
-                          text: Text(
-                            context.t.reports.title,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          onTap: () {
-                            Go.to(() => const ProgressReportsView());
-                          },
-                        ),
-                        SpeedDialButton(
-                          icon: const Icon(GTIcons.achievements),
-                          text: Text(
-                            context.t.achievements.title,
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                          onTap: () {
-                            Go.to(() => const AchievementsView());
-                          },
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Builder(
-                  builder: (context) {
-                    final historyController = ref.watch(
-                      historyControllerProvider,
-                    );
-                    if (historyController.history.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-                    final firstDay =
-                        historyController.history.first.startingDate!;
-                    final now = DateTime.now();
-                    final allDays = math.max(
-                      1,
-                      now.difference(firstDay).inDays,
-                    );
-                    final values = [
-                      for (int i = 0; i < allDays; i++)
-                        workoutsByDay[now
-                                    .subtract(Duration(days: i))
-                                    .startOfDay]
-                                ?.length ??
-                            0,
-                    ];
-                    if (values.isEmpty) {
-                      return const SizedBox.shrink();
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.all(16).copyWith(top: 0),
-                      child: SafeArea(
-                        top: false,
-                        bottom: false,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            SectionTitle(
-                              context.t.me.workoutDistribution.label,
-                            ),
-                            const SizedBox(height: 16),
-                            Card(
-                              clipBehavior: Clip.hardEdge,
-                              margin: EdgeInsets.zero,
-                              child: Padding(
-                                padding: const EdgeInsets.all(16),
-                                child: Column(
-                                  children: [
-                                    DensityCalendarChart(
-                                      tooltipBuilder: (now, daysBeforeNow, value) {
-                                        return "${DateFormat.yMEd(Localizations.localeOf(context).languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${context.t.general.workouts(n: value)}";
-                                      },
-                                      values: values,
-                                    ),
-                                    ListTile(
-                                      title: Text(context.t.history.title),
-                                      onTap: () {
-                                        Go.to(() => const HistoryView());
-                                      },
-                                      trailing: const Icon(GTIcons.lt_chevron),
-                                    ),
-                                  ],
-                                ),
+          SliverToBoxAdapter(
+            child: SafeArea(
+              top: false,
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 760),
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const OnlineProfileCard(),
+                        const SizedBox(height: 16),
+                        SpeedDial(
+                          crossAxisCountBuilder: (breakpoint) =>
+                              switch (breakpoint) {
+                                Breakpoints.xxs => 1,
+                                _ => 2,
+                              },
+                          buttonHeight: (_) =>
+                              kSpeedDialButtonHeight /
+                              1.3 *
+                              math.max(
+                                1,
+                                MediaQuery.textScalerOf(context).scale(14) / 14,
                               ),
-                            ),
+                          buttons: [
+                            for (final (icon, title, onTap) in destinations)
+                              SpeedDialButton(
+                                icon: Icon(icon),
+                                text: Text(
+                                  title,
+                                  style: Theme.of(context).textTheme.bodySmall,
+                                ),
+                                onTap: onTap,
+                              ),
                           ],
                         ),
-                      ),
-                    );
-                  },
-                ),
-                const SizedBox(height: 8),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SafeArea(
-                    top: false,
-                    bottom: false,
-                    child: SectionTitle(context.t.me.bodyMeasurements),
-                  ),
-                ),
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: WeightCard(),
-                ),
-                Builder(
-                  builder: (context) => ListTile(
-                    title: Text(context.t.me.weight.allData.label),
-                    trailing: const Icon(GTIcons.lt_chevron),
-                    enabled: hasMeasurements,
-                    onTap: () {
-                      Go.to(() => const WeightMeasurementDataPage());
-                    },
-                  ),
-                ),
-                if (ref.watch(currentUserIdProvider) != null)
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-                    child: SafeArea(
-                      top: false,
-                      bottom: false,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
+                        if (values.isNotEmpty) ...[
+                          const SizedBox(height: 16),
+                          GTSectionCard(
+                            icon: Icons.calendar_month_rounded,
+                            title: context.t.me.workoutDistribution.label,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                DensityCalendarChart(
+                                  tooltipBuilder: (now, daysBeforeNow, value) =>
+                                      "${DateFormat.yMEd(Localizations.localeOf(context).languageCode).format(now.subtract(Duration(days: daysBeforeNow)))}: ${context.t.general.workouts(n: value)}",
+                                  values: values,
+                                ),
+                                const SizedBox(height: 16),
+                                OutlinedButton.icon(
+                                  onPressed: () =>
+                                      Go.to(() => const HistoryView()),
+                                  icon: const Icon(Icons.history_rounded),
+                                  label: Text(context.t.history.title),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                        const SizedBox(height: 24),
+                        SectionTitle(context.t.me.bodyMeasurements),
+                        const SizedBox(height: 12),
+                        const WeightCard(),
+                        if (ref.watch(currentUserIdProvider) != null) ...[
+                          const SizedBox(height: 24),
                           SectionTitle(context.t.me.trainer.heading),
                           const SizedBox(height: 12),
                           GTSectionCard(
@@ -235,14 +170,13 @@ class MeView extends ConsumerWidget {
                             onTap: () => Go.to(() => const TrainerView()),
                           ),
                         ],
-                      ),
+                      ],
                     ),
                   ),
-              ]),
+                ),
+              ),
             ),
           ),
-          const SliverToBoxAdapter(child: SizedBox(height: 8)),
-          const SliverBottomSafeArea(),
         ],
       ),
     );

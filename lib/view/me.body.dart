@@ -6,123 +6,99 @@ class WeightCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final controller = ref.read(meControllerProvider);
-    ref.watch(weightMeasurementsProvider);
-    ref.watch(bodyMeasurementsProvider);
-    ref.watch(measurementWeightUnitProvider);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
-      child: SafeArea(
-        top: false,
-        bottom: false,
-        child: Card(
-          clipBehavior: Clip.hardEdge,
-          margin: EdgeInsets.zero,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              Builder(
-                builder: (context) {
-                  if (controller.weightMeasurements.length < 2) {
-                    return const SizedBox.shrink();
-                  }
-                  return Positioned.fill(
-                    child: WeightChart(
-                      weights: controller.weightMeasurements
-                          .map(
-                            (element) => Weights.convert(
-                              value: element.weight,
-                              from: element.weightUnit,
-                              to: ref
-                                  .watch(settingsControllerProvider)
-                                  .weightUnit,
-                            ),
-                          )
-                          .toList(),
-                    ),
-                  );
-                },
-              ),
-              Positioned.fill(
-                child: DecoratedBox(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        context.cardColor().withAlpha((0.99 * 255).round()),
-                        context.cardColor().withAlpha((0.8 * 255).round()),
-                        context.cardColor().withAlpha((0.5 * 255).round()),
-                      ],
-                    ),
+    final measurements = ref.watch(weightMeasurementsProvider);
+    final unit = ref.watch(settingsControllerProvider).weightUnit;
+    final weights = measurements.value ?? const <WeightMeasurement>[];
+    final latest = weights.lastOrNull;
+    final theme = Theme.of(context);
+    return GTSectionCard(
+      icon: Icons.monitor_weight_outlined,
+      title: context.t.me.weight.label,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (measurements.isLoading) const LinearProgressIndicator(),
+          if (measurements.hasError)
+            Semantics(
+              liveRegion: true,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(context.t.errorView.subtitle),
+                  TextButton.icon(
+                    onPressed: () => ref.invalidate(weightMeasurementsProvider),
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: Text(context.t.error.retry),
                   ),
-                ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Builder(
-                  builder: (context) {
-                    final latestMeasurement =
-                        controller.latestWeightMeasurement;
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          latestMeasurement == null
-                              ? context.t.me.weight.none
-                              : latestMeasurement
-                                    .convertedWeightTo(
-                                      ref
-                                          .watch(settingsControllerProvider)
-                                          .weightUnit,
-                                    )
-                                    .getUserFacingWeight(
-                                      context.t,
-                                      ref
-                                          .watch(settingsControllerProvider)
-                                          .weightUnit,
-                                    ),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.displaySmall,
-                        ),
-                        Text(
-                          latestMeasurement == null
-                              ? context.t.me.weight.measured.never
-                              : context.t.me.weight.measured.date(
-                                  date: DateFormat.yMMMMd(
-                                    context.locale.languageCode,
-                                  ).format(latestMeasurement.time),
-                                ),
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                        const SizedBox(height: 16),
-                        TextButton(
-                          onPressed: () async {
-                            var measurement =
-                                await Go.showBottomModalScreen<
-                                  (WeightMeasurement, List<BodyMeasurement>)
-                                >((context, controller) {
-                                  return WeightMeasurementAddSheet(
-                                    controller: controller,
-                                  );
-                                });
-
-                            if (measurement != null) {
-                              controller.addWeightMeasurement(measurement.$1);
-                              for (final body in measurement.$2) {
-                                controller.addBodyMeasurement(body);
-                              }
-                            }
-                          },
-                          child: Text(context.t.me.weight.addMeasurement),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+            ),
+          if (latest != null ||
+              (!measurements.isLoading && !measurements.hasError)) ...[
+            Text(
+              latest == null
+                  ? context.t.me.weight.none
+                  : latest
+                        .convertedWeightTo(unit)
+                        .getUserFacingWeight(context.t, unit),
+              style: latest == null
+                  ? theme.textTheme.titleMedium
+                  : theme.textTheme.headlineMedium,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              latest == null
+                  ? context.t.me.weight.measured.never
+                  : context.t.me.weight.measured.date(
+                      date: DateFormat.yMMMMd(
+                        context.locale.languageCode,
+                      ).format(latest.time),
+                    ),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
               ),
-            ],
+            ),
+          ],
+          if (weights.length >= 2) ...[
+            const SizedBox(height: 20),
+            SizedBox(
+              height: 120,
+              child: WeightChart(
+                weights: weights
+                    .map((element) => element.convertedWeightTo(unit))
+                    .toList(),
+              ),
+            ),
+          ],
+          const SizedBox(height: 20),
+          FilledButton.tonalIcon(
+            onPressed: () async {
+              final measurement =
+                  await Go.showBottomModalScreen<
+                    (WeightMeasurement, List<BodyMeasurement>)
+                  >(
+                    (context, controller) =>
+                        WeightMeasurementAddSheet(controller: controller),
+                  );
+              if (measurement != null) {
+                controller.addWeightMeasurement(measurement.$1);
+                for (final body in measurement.$2) {
+                  controller.addBodyMeasurement(body);
+                }
+              }
+            },
+            icon: const Icon(GTIcons.add_measurement),
+            label: Text(context.t.me.weight.addMeasurement),
           ),
-        ),
+          const SizedBox(height: 8),
+          OutlinedButton.icon(
+            onPressed: weights.isEmpty
+                ? null
+                : () => Go.to(() => const WeightMeasurementDataPage()),
+            icon: const Icon(Icons.chevron_right_rounded),
+            label: Text(context.t.me.weight.allData.label),
+          ),
+        ],
       ),
     );
   }

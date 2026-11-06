@@ -412,6 +412,7 @@ class Translations$settings$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+	late final Translations$settings$diagnostics$en diagnostics = Translations$settings$diagnostics$en._(_root);
 
 	/// en: 'Settings'
 	String get title => 'Settings';
@@ -3148,6 +3149,24 @@ class Translations$history$actions$en {
 	late final Translations$history$actions$deleteMultiple$en deleteMultiple = Translations$history$actions$deleteMultiple$en._(_root);
 }
 
+// Path: settings.diagnostics
+class Translations$settings$diagnostics$en {
+	Translations$settings$diagnostics$en._(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Send diagnostic data'
+	String get title => 'Send diagnostic data';
+
+	/// en: 'Share errors, performance data, logs and sampled session recordings to help us improve the app. You can turn this off at any time.'
+	String get description => 'Share errors, performance data, logs and sampled session recordings to help us improve the app. You can turn this off at any time.';
+
+	/// en: 'Unable to update your preference. Please try again.'
+	String get saveError => 'Unable to update your preference. Please try again.';
+}
+
 // Path: settings.options
 class Translations$settings$options$en {
 	Translations$settings$options$en._(this._root);
@@ -3338,6 +3357,12 @@ class Translations$ongoingWorkout$info$en {
 	final Translations _root; // ignore: unused_field
 
 	// Translations
+
+	/// en: 'Recording awaiting confirmation'
+	String get recordingPending => 'Recording awaiting confirmation';
+
+	/// en: 'Recording unavailable'
+	String get recordingUnavailable => 'Recording unavailable';
 
 	/// en: 'Time'
 	String get time => 'Time';
@@ -13732,7 +13757,7 @@ extension on Translations {
 			'routines.editor.fields.infobox.label' => 'Notes',
 			'routines.editor.superset.title' => 'Superset',
 			'routines.editor.superset.add' => 'Add superset',
-			'routines.editor.superset.subtitle' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ),
+			'routines.editor.superset.subtitle' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ), 
 			'routines.editor.superset.addExercise' => 'Add exercises',
 			'routines.editor.superset.remove.title' => 'Remove superset',
 			'routines.editor.superset.remove.body' => 'Are you sure you want to remove this superset? This action cannot be undone.',
@@ -13755,14 +13780,17 @@ extension on Translations {
 			'routines.loadError.text' => 'Try again to load your routines and folders.',
 			'history.title' => 'History',
 			'history.empty' => 'No history',
-			'history.andMore' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '…and one more exercise', two: '…and ${n} more exercises', few: '…and ${n} more exercises', many: '…and ${n} more exercises', other: '…and ${n} more exercises', ),
-			'history.actions.deleteMultiple.title' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Delete exercise', two: 'Delete ${n} exercises', few: 'Delete ${n} exercises', many: 'Delete ${n} exercises', other: 'Delete ${n} exercises', ),
-			'history.actions.deleteMultiple.text' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Are you sure you want to delete this exercise from your history? This action cannot be undone.', two: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', few: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', many: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', other: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', ),
+			'history.andMore' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '…and one more exercise', two: '…and ${n} more exercises', few: '…and ${n} more exercises', many: '…and ${n} more exercises', other: '…and ${n} more exercises', ), 
+			'history.actions.deleteMultiple.title' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Delete exercise', two: 'Delete ${n} exercises', few: 'Delete ${n} exercises', many: 'Delete ${n} exercises', other: 'Delete ${n} exercises', ), 
+			'history.actions.deleteMultiple.text' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Are you sure you want to delete this exercise from your history? This action cannot be undone.', two: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', few: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', many: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', other: 'Are you sure you want to delete these ${n} exercises from your history? This action cannot be undone.', ), 
 			'history.actions.deleteMultiple.actions.no' => 'Cancel',
 			'history.actions.deleteMultiple.actions.yes' => 'Delete',
-			'history.actions.deleteMultiple.done' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'The exercise has been deleted from your history.', two: 'The exercises have been deleted from your history.', few: 'The exercises have been deleted from your history.', many: 'The exercises have been deleted from your history.', other: 'The exercises have been deleted from your history.', ),
+			'history.actions.deleteMultiple.done' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'The exercise has been deleted from your history.', two: 'The exercises have been deleted from your history.', few: 'The exercises have been deleted from your history.', many: 'The exercises have been deleted from your history.', other: 'The exercises have been deleted from your history.', ), 
 			'history.showAll' => 'Show all data',
 			'history.search' => 'Search workouts',
+			'settings.diagnostics.title' => 'Send diagnostic data',
+			'settings.diagnostics.description' => 'Share errors, performance data, logs and sampled session recordings to help us improve the app. You can turn this off at any time.',
+			'settings.diagnostics.saveError' => 'Unable to update your preference. Please try again.',
 			'settings.title' => 'Settings',
 			'settings.options.useDynamicColor.label' => 'Use dynamic color',
 			'settings.options.color.label' => 'App color',
@@ -13863,6 +13891,8 @@ extension on Translations {
 			'ongoingWorkout.exercises.rpeBadge' => ({required Object rpe}) => 'RPE ${rpe}',
 			'ongoingWorkout.exercises.setRPE' => 'Set RPE',
 			'ongoingWorkout.exercises.generate' => 'Generate',
+			'ongoingWorkout.info.recordingPending' => 'Recording awaiting confirmation',
+			'ongoingWorkout.info.recordingUnavailable' => 'Recording unavailable',
 			'ongoingWorkout.info.time' => 'Time',
 			'ongoingWorkout.info.reps' => 'Reps',
 			'ongoingWorkout.info.volume' => 'Lifted weight',
@@ -13929,10 +13959,10 @@ extension on Translations {
 			'ongoingWorkout.toolbox.title' => 'Tools',
 			'ongoingWorkout.updateRoutine.differenceTitle' => 'Change routine?',
 			'ongoingWorkout.updateRoutine.differenceText' => 'You\'ve made changes to the workout. Do you want to save them to the routine?',
-			'ongoingWorkout.updateRoutine.differences.added' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises added', one: '1 exercise added', two: '${n} exercises added', few: '${n} exercises added', many: '${n} exercises added', other: '${n} exercises added', ),
-			'ongoingWorkout.updateRoutine.differences.removed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises removed', one: '1 exercise removed', two: '${n} exercises removed', few: '${n} exercises removed', many: '${n} exercises removed', other: '${n} exercises removed', ),
-			'ongoingWorkout.updateRoutine.differences.changed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises changed', one: '1 exercise changed', two: '${n} exercises changed', few: '${n} exercises changed', many: '${n} exercises changed', other: '${n} exercises changed', ),
-			'ongoingWorkout.updateRoutine.differences.reordered' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises reordered', one: '1 exercise reordered', two: '${n} exercises reordered', few: '${n} exercises reordered', many: '${n} exercises reordered', other: '${n} exercises reordered', ),
+			'ongoingWorkout.updateRoutine.differences.added' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises added', one: '1 exercise added', two: '${n} exercises added', few: '${n} exercises added', many: '${n} exercises added', other: '${n} exercises added', ), 
+			'ongoingWorkout.updateRoutine.differences.removed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises removed', one: '1 exercise removed', two: '${n} exercises removed', few: '${n} exercises removed', many: '${n} exercises removed', other: '${n} exercises removed', ), 
+			'ongoingWorkout.updateRoutine.differences.changed' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises changed', one: '1 exercise changed', two: '${n} exercises changed', few: '${n} exercises changed', many: '${n} exercises changed', other: '${n} exercises changed', ), 
+			'ongoingWorkout.updateRoutine.differences.reordered' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises reordered', one: '1 exercise reordered', two: '${n} exercises reordered', few: '${n} exercises reordered', many: '${n} exercises reordered', other: '${n} exercises reordered', ), 
 			'ongoingWorkout.updateRoutine.differences.metadata' => 'Routine name or notes changed',
 			'ongoingWorkout.goodJob.title' => 'Good job!',
 			'ongoingWorkout.goodJob.body' => 'Here\'s some statistics about the workout you\'ve just finished.',
@@ -13949,7 +13979,7 @@ extension on Translations {
 			'exerciseList.restTime' => 'Rest time: ',
 			'exerciseList.fields.weight' => ({required Object weight, required Object unit}) => '${weight} ${unit}',
 			'exerciseList.fields.time' => ({required Object time}) => '${time}',
-			'exerciseList.fields.reps' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 reps', one: '${n} rep', two: '${n} reps', few: '${n} reps', many: '${n} reps', other: '${n} reps', ),
+			'exerciseList.fields.reps' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 reps', one: '${n} rep', two: '${n} reps', few: '${n} reps', many: '${n} reps', other: '${n} reps', ), 
 			'exerciseList.fields.distance' => ({required Object distance, required Object unit}) => '${distance} ${unit}',
 			'exerciseList.fields.rpe' => ({required Object rpe}) => 'RPE ${rpe}',
 			'exerciseList.stats.time' => 'Duration',
@@ -13962,11 +13992,11 @@ extension on Translations {
 			'general.dialogs.actions.ok' => 'OK',
 			'general.dialogs.actions.cancel' => 'Cancel',
 			'general.dialogs.actions.close' => 'Close',
-			'general.exercises' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises', one: '${n} exercise', two: '${n} exercises', few: '${n} exercises', many: '${n} exercises', other: '${n} exercises', ),
+			'general.exercises' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No exercises', one: '${n} exercise', two: '${n} exercises', few: '${n} exercises', many: '${n} exercises', other: '${n} exercises', ), 
 			'general.totalTime' => ({required Object time}) => 'Total time: ${time}',
-			'general.selected' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Nothing selected', one: '1 selected', two: '${n} selected', few: '${n} selected', many: '${n} selected', other: '${n} selected', ),
-			'general.workouts' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No workouts', one: '${n} workout', two: '${n} workouts', few: '${n} workouts', many: '${n} workouts', other: '${n} workouts', ),
-			'general.routines' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No routines', one: '${n} routine', two: '${n} routines', few: '${n} routines', many: '${n} routines', other: '${n} routines', ),
+			'general.selected' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Nothing selected', one: '1 selected', two: '${n} selected', few: '${n} selected', many: '${n} selected', other: '${n} selected', ), 
+			'general.workouts' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No workouts', one: '${n} workout', two: '${n} workouts', few: '${n} workouts', many: '${n} workouts', other: '${n} workouts', ), 
+			'general.routines' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'No routines', one: '${n} routine', two: '${n} routines', few: '${n} routines', many: '${n} routines', other: '${n} routines', ), 
 			'general.optional' => '(optional)',
 			'general.unnamed' => 'Unnamed',
 			'muscleGroups.abductors' => 'Abductors',
@@ -14015,10 +14045,10 @@ extension on Translations {
 			'units.lb' => 'lbs',
 			'units.km' => 'km',
 			'units.mi' => 'mi',
-			'time.hours' => ({required num n, required Object minutes, required Object seconds, required Object hours}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '${minutes}:${seconds}', one: '${hours} hour, ${minutes}:${seconds}', two: '${hours} hours, ${minutes}:${seconds}', few: '${hours} hours, ${minutes}:${seconds}', many: '${hours} hours, ${minutes}:${seconds}', other: '${hours} hours, ${minutes}:${seconds}', ),
-			'time.justHours' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '${n}', one: '${n} hour', two: '${n} hours', few: '${n} hours', many: '${n} hours', other: '${n} hours', ),
-			'time.days' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 days', one: '1 day', two: '2 days', few: '${n} days', many: '${n} days', other: '${n} days', ),
-			'time.weeks' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 weeks', one: '1 week', two: '2 weeks', few: '${n} weeks', many: '${n} weeks', other: '${n} weeks', ),
+			'time.hours' => ({required num n, required Object minutes, required Object seconds, required Object hours}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '${minutes}:${seconds}', one: '${hours} hour, ${minutes}:${seconds}', two: '${hours} hours, ${minutes}:${seconds}', few: '${hours} hours, ${minutes}:${seconds}', many: '${hours} hours, ${minutes}:${seconds}', other: '${hours} hours, ${minutes}:${seconds}', ), 
+			'time.justHours' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '${n}', one: '${n} hour', two: '${n} hours', few: '${n} hours', many: '${n} hours', other: '${n} hours', ), 
+			'time.days' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 days', one: '1 day', two: '2 days', few: '${n} days', many: '${n} days', other: '${n} days', ), 
+			'time.weeks' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: '0 weeks', one: '1 week', two: '2 weeks', few: '${n} weeks', many: '${n} weeks', other: '${n} weeks', ), 
 			'locales.en' => 'English',
 			'locales.it' => 'Italian',
 			'weightUnits.kg' => 'Kilograms',
@@ -14069,13 +14099,13 @@ extension on Translations {
 			'library.cardio.exercises.jumpingJackHops' => 'Jumping-jack hops',
 			'library.cardio.exercises.pushUpIntoRunningStart' => 'Push-up into running start',
 			'library.cardio.exercises.scissorJumps' => 'Scissor jumps',
+			_ => null,
+		} ?? switch (path) {
 			'library.cardio.exercises.squatSemiJump' => 'Squat (semi, jump)',
 			'library.cardio.exercises.shortStrideRunning' => 'Short-stride running',
 			'library.cardio.exercises.skiergDoublePolePull' => 'SkiErg double-pole pull',
 			'library.cardio.exercises.alternatingSkiSteps' => 'Alternating ski steps',
 			'library.cardio.exercises.explosiveStarJumps' => 'Explosive star jumps',
-			_ => null,
-		} ?? switch (path) {
 			'library.cardio.exercises.kettlebellCircularSwing' => 'Kettlebell circular swing',
 			'library.cardio.exercises.ellipticalTrainerWalking' => 'Elliptical trainer walking',
 			'library.cardio.exercises.lungeWalkingHighKnee' => 'Lunge (walking, high knee)',
@@ -14583,13 +14613,13 @@ extension on Translations {
 			'library.quadriceps.exercises.walkingDumbbellLunges' => 'Walking dumbbell lunges',
 			'library.quadriceps.exercises.lateralDumbbellLunges' => 'Lateral dumbbell lunges',
 			'library.quadriceps.exercises.sumoDumbbellSquat' => 'Dumbbell sumo squat',
+			_ => null,
+		} ?? switch (path) {
 			'library.quadriceps.exercises.singleLegLegPress' => 'Single-leg leg press',
 			'library.quadriceps.exercises.smithMachineSquats' => 'Smith machine squat',
 			'library.quadriceps.exercises.stepUps' => 'Step-ups (dumbbells)',
 			'library.quadriceps.exercises.gobletSquats' => 'Goblet squat (dumbbell)',
 			'library.quadriceps.exercises.squatsBarbell' => 'Squats (barbell)',
-			_ => null,
-		} ?? switch (path) {
 			'library.quadriceps.exercises.legPress' => 'Leg press',
 			'library.quadriceps.exercises.legExtension' => 'Leg extension',
 			'library.quadriceps.exercises.smithMachineLunges' => 'Smith machine lunges',
@@ -15097,13 +15127,13 @@ extension on Translations {
 			'library.triceps.exercises.tricepsExtensionCableRopeLyingFloor' => 'Triceps extension (cable, rope, lying, floor)',
 			'library.triceps.exercises.tricepsExtensionCableStandingOneArm' => 'Triceps extension (cable, standing, one arm)',
 			'library.triceps.exercises.tricepsExtensionCableStandingReverseGripOneArmOverhead' => 'Triceps extension (cable, standing, reverse grip, one arm, overhead)',
+			_ => null,
+		} ?? switch (path) {
 			'library.triceps.exercises.tricepsPushdownCableVBar' => 'Triceps pushdown (cable, v bar)',
 			'library.triceps.exercises.tricepsPushdownCableVBarArmBlaster' => 'Triceps pushdown (cable, v bar, arm blaster)',
 			'library.triceps.exercises.tricepsKickbackCableTwoArm' => 'Triceps kickback (cable, two arm)',
 			'library.triceps.exercises.pushUpCloseGrip' => 'Push-up (close grip)',
 			'library.triceps.exercises.pushUpCloseGripKnee' => 'Push-up (close grip, knee)',
-			_ => null,
-		} ?? switch (path) {
 			'library.triceps.exercises.pressDumbbellCloseGrip' => 'Press (dumbbell, close grip)',
 			'library.triceps.exercises.pressDumbbellDeclineOneArmNeutralGrip' => 'Press (dumbbell, decline, one arm, neutral grip)',
 			'library.triceps.exercises.tricepsExtensionDumbbellDecline' => 'Triceps extension (dumbbell, decline)',
@@ -15300,7 +15330,7 @@ extension on Translations {
 			'library.glutes.exercises.hipLiftWithRotation' => 'Hip lift with rotation',
 			'library.glutes.name' => 'Glutes',
 			'infobox.label' => 'Notes',
-			'superset' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ),
+			'superset' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, zero: 'Superset without exercises', one: 'Superset with ${n} exercise', two: 'Superset with ${n} exercises', few: 'Superset with ${n} exercises', many: 'Superset with ${n} exercises', other: 'Superset with ${n} exercises', ), 
 			'historyEditor.title' => ({required Object name}) => 'Edit: ${name}',
 			'historyEditor.exercises.addSuperset' => '+ Add superset',
 			'historyEditor.exercises.add' => '+ Add exercise',
@@ -15611,13 +15641,13 @@ extension on Translations {
 			'food.nutritionGoals.change.fatPercentage.label' => 'Fat (%)',
 			'food.nutritionGoals.change.fatPercentage.empty' => 'This value must not be empty.',
 			'food.nutritionGoals.change.fatPercentage.invalid' => 'You must enter a valid number 0-100.',
+			_ => null,
+		} ?? switch (path) {
 			'food.nutritionGoals.change.carbsPercentage.label' => 'Carbs (%)',
 			'food.nutritionGoals.change.carbsPercentage.empty' => 'This value must not be empty.',
 			'food.nutritionGoals.change.carbsPercentage.invalid' => 'You must enter a valid number 0-100.',
 			'food.nutritionGoals.change.proteinPercentage.label' => 'Protein (%)',
 			'food.nutritionGoals.change.proteinPercentage.empty' => 'This value must not be empty.',
-			_ => null,
-		} ?? switch (path) {
 			'food.nutritionGoals.change.proteinPercentage.invalid' => 'You must enter a valid number 0-100.',
 			'food.nutritionGoals.change.save' => 'Save changes',
 			'food.nutritionGoals.history.title' => 'Goal history',
@@ -16125,13 +16155,13 @@ extension on Translations {
 			'food.picker.search' => 'Search',
 			'food.picker.barcode' => 'Barcode',
 			'food.picker.more' => 'More',
+			_ => null,
+		} ?? switch (path) {
 			'food.picker.added' => 'Added',
 			'food.picker.done' => 'Done',
 			'food.picker.recent' => 'Recent',
 			'food.picker.results' => 'Catalog',
 			'food.picker.empty' => 'No foods found',
-			_ => null,
-		} ?? switch (path) {
 			'food.picker.retry' => 'Retry',
 			'food.picker.failed' => 'Operation failed. Please try again.',
 			'food.picker.withBarcode' => 'Custom food with barcode',
@@ -16639,13 +16669,13 @@ extension on Translations {
 			'reports.includedPeriod' => 'Period included in the report',
 			'reports.weekReferenceHint' => 'Choose any day in the week to include.',
 			'reports.monthReferenceHint' => 'Choose any day in the month to include.',
+			_ => null,
+		} ?? switch (path) {
 			'reports.selectionHint' => 'Choose one or more sections to include in the PDF.',
 			'reports.previewTitle' => 'PDF preview',
 			'plateau.title' => 'Possible plateaus',
 			'plateau.intro' => 'Last 8 weeks, only considering completed normal sets. The following are suggestions based on your data, but they may not be accurate.',
 			'plateau.criteria' => 'Requires 6 comparable sessions over at least 28 days and 4 calendar weeks, the latest within 14 days, with no gaps over 21 days. The first 3 sessions provide the median reference. Progress means +2.5% load without fewer reps, +1 rep at equivalent load (±1%), or +5% volume. For bodyweight: +1 best-set rep or +5% total reps.',
-			_ => null,
-		} ?? switch (path) {
 			'plateau.possiblePlateau' => 'Possible plateau',
 			'plateau.progressing' => 'No possible plateau detected',
 			'plateau.insufficientData' => 'More data needed: record at least 6 comparable sessions over 4 weeks.',
@@ -16688,10 +16718,10 @@ extension on Translations {
 			'paywall.subtitle' => 'Choose a subscription to unlock Pro features.',
 			'paywall.loadError' => 'Subscriptions could not be loaded. Please try again.',
 			'paywall.empty' => 'No subscriptions are available right now. Please try again later.',
-			'paywall.trialPeriod.week' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} week', other: 'Free trial: ${n} weeks', ),
-			'paywall.trialPeriod.month' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} month', other: 'Free trial: ${n} months', ),
-			'paywall.trialPeriod.year' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} year', other: 'Free trial: ${n} years', ),
-			'paywall.trialPeriod.day' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} day', other: 'Free trial: ${n} days', ),
+			'paywall.trialPeriod.week' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} week', other: 'Free trial: ${n} weeks', ), 
+			'paywall.trialPeriod.month' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} month', other: 'Free trial: ${n} months', ), 
+			'paywall.trialPeriod.year' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} year', other: 'Free trial: ${n} years', ), 
+			'paywall.trialPeriod.day' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Free trial: ${n} day', other: 'Free trial: ${n} days', ), 
 			'paywall.autoRenewNotice.week' => ({required Object price}) => 'Renews automatically at ${price} per week until cancelled.',
 			'paywall.autoRenewNotice.month' => ({required Object price}) => 'Renews automatically at ${price} per month until cancelled.',
 			'paywall.autoRenewNotice.year' => ({required Object price}) => 'Renews automatically at ${price} per year until cancelled.',
@@ -16706,9 +16736,9 @@ extension on Translations {
 			'paywall.actions.privacyPolicy' => 'Privacy policy',
 			'routineImport.summary' => 'Program contents',
 			'routineImport.summaryDescription' => 'Import a personal copy. The shared program stays unchanged.',
-			'routineImport.days' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 training day', other: '${n} training days', ),
-			'routineImport.exercises' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 exercise', other: '${n} exercises', ),
-			'routineImport.sets' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 set', other: '${n} sets', ),
+			'routineImport.days' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 training day', other: '${n} training days', ), 
+			'routineImport.exercises' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 exercise', other: '${n} exercises', ), 
+			'routineImport.sets' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '1 set', other: '${n} sets', ), 
 			'routineImport.preview' => 'Workout preview',
 			'routineImport.day' => 'Training day',
 			'routineImport.dayDescription' => 'Choose a day to preview. The whole program will be imported.',

@@ -103,18 +103,21 @@ struct WatchSnapshotCursor {
 @MainActor
 func workoutDeadline<T>(_ seconds: Double, operation: @escaping @MainActor () async throws -> T) async throws -> T {
     let race = WorkoutDeadlineRace<T>()
-    return try await withCheckedThrowingContinuation { continuation in
-        race.continuation = continuation
-        race.operation = Task { @MainActor in
-            do { race.finish(.success(try await operation())) }
-            catch { race.finish(.failure(error)) }
+    return try await withTaskCancellationHandler {
+        try Task.checkCancellation()
+        return try await withCheckedThrowingContinuation { continuation in
+            race.continuation = continuation
+            race.operation = Task { @MainActor in
+                do { race.finish(.success(try await operation())) }
+                catch { race.finish(.failure(error)) }
+            }
+            race.timer = Task { @MainActor in
+                do { try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000)) }
+                catch { return }
+                race.finish(.failure(WorkoutOperationError.timeout))
+            }
         }
-        race.timer = Task { @MainActor in
-            do { try await Task.sleep(nanoseconds: UInt64(seconds * 1_000_000_000)) }
-            catch { return }
-            race.finish(.failure(WorkoutOperationError.timeout))
-        }
-    }
+    } onCancel: { Task { @MainActor in race.finish(.failure(CancellationError())) } }
 }
 
 enum WorkoutOperationError: LocalizedError {

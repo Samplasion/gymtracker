@@ -63,6 +63,7 @@ private open class FlutterCommunicatorPigeonCodec : StandardMessageCodec() {
 interface GymBroNativeHostAPI {
   fun startWorkout(workoutId: String, startMilliseconds: Long)
   fun stopWorkout(workoutId: String, save: Boolean)
+  fun getRecordingStatus(): Map<String?, Any?>
   fun setExerciseParameters(parameters: Map<String?, Any?>)
   fun updateHomeWidgetParameters(parameters: Map<String, Long>, workoutDensityChartData: List<Long>)
   fun requestHealthPermission()
@@ -108,6 +109,21 @@ interface GymBroNativeHostAPI {
             val wrapped: List<Any?> = try {
               api.stopWorkout(workoutIdArg, saveArg)
               listOf(null)
+            } catch (exception: Throwable) {
+              FlutterCommunicatorPigeonUtils.wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.getRecordingStatus$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { _, reply ->
+            val wrapped: List<Any?> = try {
+              listOf(api.getRecordingStatus())
             } catch (exception: Throwable) {
               FlutterCommunicatorPigeonUtils.wrapError(exception)
             }
@@ -267,7 +283,7 @@ class GymBroNativeFlutterAPI(private val binaryMessenger: BinaryMessenger, priva
         }
       } else {
         callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
-      } 
+      }
     }
   }
   fun moveWorkoutCursorNext(callback: (Result<Boolean>) -> Unit)
@@ -287,7 +303,7 @@ class GymBroNativeFlutterAPI(private val binaryMessenger: BinaryMessenger, priva
         }
       } else {
         callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
-      } 
+      }
     }
   }
   fun moveWorkoutCursorPrevious(callback: (Result<Boolean>) -> Unit)
@@ -307,7 +323,7 @@ class GymBroNativeFlutterAPI(private val binaryMessenger: BinaryMessenger, priva
         }
       } else {
         callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
-      } 
+      }
     }
   }
   fun requestTrainingData(callback: (Result<Unit>) -> Unit)
@@ -324,7 +340,7 @@ class GymBroNativeFlutterAPI(private val binaryMessenger: BinaryMessenger, priva
         }
       } else {
         callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
-      } 
+      }
     }
   }
   fun handleWorkoutMetrics(energyArg: Double?, heartRateArg: Double?, callback: (Result<Unit>) -> Unit)
@@ -341,7 +357,24 @@ class GymBroNativeFlutterAPI(private val binaryMessenger: BinaryMessenger, priva
         }
       } else {
         callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
-      } 
+      }
+    }
+  }
+  fun handleRecordingStatus(workoutIdArg: String, statusArg: String, messageArg: String?, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.handleRecordingStatus$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(workoutIdArg, statusArg, messageArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
+      }
     }
   }
   fun updateSetParameters(weightArg: Double?, timeSecondsArg: Double?, repsArg: Long?, distanceArg: Double?, callback: (Result<Unit>) -> Unit)
@@ -358,7 +391,7 @@ class GymBroNativeFlutterAPI(private val binaryMessenger: BinaryMessenger, priva
         }
       } else {
         callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
-      } 
+      }
     }
   }
 }
@@ -384,7 +417,7 @@ class GymBroNativeLoggerChannel(private val binaryMessenger: BinaryMessenger, pr
         }
       } else {
         callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
-      } 
+      }
     }
   }
   fun logError(errorArg: String, callback: (Result<Unit>) -> Unit)
@@ -401,7 +434,7 @@ class GymBroNativeLoggerChannel(private val binaryMessenger: BinaryMessenger, pr
         }
       } else {
         callback(Result.failure(FlutterCommunicatorPigeonUtils.createConnectionError(channelName)))
-      } 
+      }
     }
   }
 }

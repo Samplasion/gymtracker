@@ -52,6 +52,7 @@ class _WorkoutHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        WorkoutRecordingIndicator(workoutId: controller.nativeWorkoutId),
         Wrap(
           alignment: WrapAlignment.spaceBetween,
           crossAxisAlignment: WrapCrossAlignment.center,

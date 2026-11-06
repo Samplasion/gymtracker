@@ -1,20 +1,16 @@
 import Foundation
 import WatchConnectivity
+import HealthKit
 
 @MainActor
 final class PhoneMessageResponder: NSObject {
     static let shared = PhoneMessageResponder()
     var workoutDelegate: WorkoutMessageDelegate? {
         didSet {
-            if let cached = UserDefaults.standard.dictionary(forKey: "watch.receivedSnapshot.v2") {
-                let workout = cached["workout"] as? [String: Any] ?? [:]
-                workoutDelegate?.apply(workoutSnapshot: workout)
-                if let id = workout["id"] as? String, let start = (workout["start"] as? NSNumber)?.int64Value {
-                    if TrainingViewModel.shared.active == nil || TrainingViewModel.shared.active?["id"] as? String == id {
-                    WorkoutManager.shared.selectWorkout(.init(id: id, start: Date(milliseconds: start)))
-                }
-                }
-            }
+            if let cached = UserDefaults.standard.dictionary(forKey: "watch.receivedWorkoutState.v1"),
+               let workout = cached["workout"] as? [String: Any] { applyWorkout(workout) }
+            else if let cached = UserDefaults.standard.dictionary(forKey: "watch.receivedSnapshot.v2"),
+                    let workout = cached["workout"] as? [String: Any] { applyWorkout(workout) }
         }
     }
     var foodDelegate: FoodMessageDelegate? {
@@ -27,95 +23,124 @@ final class PhoneMessageResponder: NSObject {
     private var sendingWater: Set<String> = []
     var session: WCSession?
     private var cursor = WatchSnapshotCursor(revision: (UserDefaults.standard.dictionary(forKey: "watch.receivedSnapshot.v2")?["revision"] as? NSNumber)?.int64Value ?? -1)
+    private var workoutRevision: Int64 = (UserDefaults.standard.dictionary(forKey: "watch.receivedWorkoutState.v1")?["revision"] as? NSNumber)?.int64Value ?? -1
+    private var commands: [String: [([String: Any]) -> Void]] = [:]
+    var hasPendingCommands: Bool { !commands.isEmpty }
+    var onWorkFinished: (() -> Void)?
 
-    nonisolated func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-        Task { @MainActor in
-            if message["method"] as? String == "trainingAcknowledged" { TrainingViewModel.shared.acknowledge(message); return }
-            if self.receiveWaterAcknowledgement(message) { return }
-            if message["method"] as? String == "snapshot", let snapshot = message["data"] as? [String: Any] {
-                self.apply(snapshot)
-            } else if message["method"] as? String == "updateHomeWidgetParameters",
-                      let parameters = message["value"] as? [String: Int64], let chart = message["workoutDensityChartData"] as? [Int64] {
-                self.workoutDelegate?.update(widgetParameters: parameters, workoutDensityChartData: chart)
-            }
-        }
-    }
-
-    nonisolated func receiveCommand(_ message: [String: Any], reply: @escaping ([String: Any]) -> Void) {
-        Task { @MainActor in
-            let action = message["action"] as? String ?? "unknown"
-            let id = message["workoutId"] as? String ?? "unknown"
-            let manager = WorkoutManager.shared
-            manager.diagnostic("Watch received command=\(action) workout=\(id) generation=\(String(describing: message["generation"])) sensorState=\(manager.sessionState.rawValue); queued")
-            if ScreenshotMode.enabled {
-                reply(["success": false, "error": "HealthKit recording is disabled during screenshots"])
-                return
-            }
-            guard message["method"] as? String == "workoutSensor" else { reply(["success": false]); return }
-            WorkoutManager.shared.enqueue {
-                do {
-                    let response = try await workoutDiagnosticOperation("Watch command=\(action) workout=\(id)", diagnostic: manager.diagnostic) {
-                        try await manager.handleSensorCommand(message)
-                    }
-                    manager.diagnostic("Watch replying command=\(action) workout=\(id) success=\(String(describing: response["success"])) running=\(String(describing: response["running"])) sensorState=\(manager.sessionState.rawValue)")
-                    reply(response)
-                }
-                catch {
-                    let id = message["workoutId"] as? String ?? ""
-                    if WorkoutManager.shared.request?.id == id {
-                        WorkoutManager.shared.phase = .failed(error.localizedDescription)
-                        WorkoutManager.shared.summary = .init(id: id, result: .failed(error.localizedDescription))
-                    }
-                    reply(["success": false, "error": error.localizedDescription])
-                }
-            }
+    func receiveMessage(_ message: [String: Any]) {
+        if WorkoutManager.shared.transport.receive(message) { return }
+        if message["method"] as? String == "trainingAcknowledged" { TrainingViewModel.shared.acknowledge(message); return }
+        if receiveWaterAcknowledgement(message) { return }
+        if message["method"] as? String == "snapshot", let snapshot = message["data"] as? [String: Any] {
+            receiveContext(snapshot)
+        } else if message["method"] as? String == "updateHomeWidgetParameters",
+                  let parameters = message["value"] as? [String: Int64], let chart = message["workoutDensityChartData"] as? [Int64] {
+            workoutDelegate?.update(widgetParameters: parameters, workoutDensityChartData: chart)
         }
     }
 
-    private func apply(_ snapshot: [String: Any]) {
-        guard cursor.accept(snapshot) else { return }
-        if let training = snapshot["training"] as? [String: Any] { TrainingViewModel.shared.receiveContext(training) }
-        UserDefaults.standard.set(snapshot, forKey: "watch.receivedSnapshot.v2")
-        if let workout = snapshot["workout"] as? [String: Any] {
-            workoutDelegate?.apply(workoutSnapshot: workout)
-            if let id = workout["id"] as? String, let start = (workout["start"] as? NSNumber)?.int64Value {
-                if TrainingViewModel.shared.active == nil || TrainingViewModel.shared.active?["id"] as? String == id {
-                    WorkoutManager.shared.selectWorkout(.init(id: id, start: Date(milliseconds: start)))
+    func receiveCommand(_ message: [String: Any], reply: @escaping ([String: Any]) -> Void) {
+        let action = message["action"] as? String ?? "unknown"
+        let id = message["workoutId"] as? String ?? "unknown"
+        let key = message["requestId"] as? String ?? UUID().uuidString
+        if commands[key] != nil { commands[key]?.append(reply); return }
+        commands[key] = [reply]
+        let manager = WorkoutManager.shared
+        manager.diagnostic("Watch received command=\(action) workout=\(id); queued")
+        let operation: @MainActor () async -> Void = {
+            var response: [String: Any]
+            do {
+                guard !ScreenshotMode.enabled, message["method"] as? String == "workoutSensor" else {
+                    throw WorkoutOperationError.unavailable
                 }
-                if let metrics = workout["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
-                    try? WorkoutManager.shared.handleReceivedData(data)
+                response = try await workoutDiagnosticOperation("Watch command=\(action) workout=\(id)", diagnostic: manager.diagnostic) {
+                    try await manager.handleSensorCommand(message)
                 }
+            } catch {
+                let permanent = manager.healthStore.authorizationStatus(for: .workoutType()) == .sharingDenied
+                if permanent && manager.request?.id == id { manager.phase = .failed(error.localizedDescription) }
+                response = ["success": false, "error": error.localizedDescription, "permanent": permanent]
             }
-            if workout["active"] as? Bool == false, let id = workout["id"] as? String {
-                // Deferred delivery also closes a workout when direct messages failed.
-                WorkoutManager.shared.enqueue {
-                    _ = try? await WorkoutManager.shared.handleSensorCommand(["action": "stop", "workoutId": id, "save": workout["save"] as? Bool ?? false])
-                }
-            }
+            response["workoutId"] = id
+            response["requestId"] = key
+            let callbacks = self.commands.removeValue(forKey: key) ?? []
+            for callback in callbacks { callback(response) }
+            self.onWorkFinished?()
         }
-        if let food = snapshot["food"] as? [String: Any], let decoded = NativeFoodStateMessage.decodeFoodState(from: food) { foodDelegate?.set(foodParameters: decoded) }
+        // Status cannot sit behind a delayed HealthKit collection callback;
+        // it only observes/reconnects and never mutates sensor ownership.
+        if action == "status" { Task { @MainActor in await operation() } }
+        else { manager.enqueue(operation) }
     }
 
-    nonisolated func session(_ session: WCSession, didReceiveApplicationContext context: [String: Any]) {
-        Task { @MainActor in
-            if context["version"] as? Int == 2 { self.apply(context) }
-            else if self.cursor.revision < 0, context["kind"] as? String == "food",
-                    let parameters = context["parameters"] as? [String: Any],
-                    let decoded = NativeFoodStateMessage.decodeFoodState(from: parameters) { self.foodDelegate?.set(foodParameters: decoded) }
+    func receiveWorkoutState(_ workout: [String: Any], revision: Int64) {
+        guard revision > workoutRevision else { return }
+        workoutRevision = revision
+        UserDefaults.standard.set(["revision": revision, "workout": workout], forKey: "watch.receivedWorkoutState.v1")
+        applyWorkout(workout)
+    }
+
+    private func applyWorkout(_ workout: [String: Any]) {
+        workoutDelegate?.apply(workoutSnapshot: workout)
+        if workout["active"] as? Bool == true, case .idle = WorkoutManager.shared.phase {
+            WorkoutManager.shared.phase = .starting
+        }
+        if let id = workout["id"] as? String, let start = (workout["start"] as? NSNumber)?.int64Value {
+            if TrainingViewModel.shared.active == nil || TrainingViewModel.shared.active?["id"] as? String == id {
+                WorkoutManager.shared.selectWorkout(.init(id: id, start: Date(milliseconds: start)))
+            }
+            if let metrics = workout["metrics"] as? [String: Any], let data = try? JSONSerialization.data(withJSONObject: metrics) {
+                try? WorkoutManager.shared.handleReceivedData(data)
+            }
+        }
+        if workout["active"] as? Bool == false, let id = workout["id"] as? String {
+            let save = workout["save"] as? Bool ?? false
+            receiveCommand(["method": "workoutSensor", "action": "stop", "workoutId": id,
+                            "save": save, "requestId": "\(id):stop:\(save)"]) { response in
+                self.sendTerminalAcknowledgement(response)
+            }
         }
     }
-    nonisolated func session(_ session: WCSession, didReceiveUserInfo info: [String: Any]) {
-        Task { @MainActor in
-            if info["method"] as? String == "trainingAcknowledged" { TrainingViewModel.shared.acknowledge(info); return }
-            if !self.receiveWaterAcknowledgement(info) { self.session(session, didReceiveApplicationContext: info) }
-        }
+
+    func receiveContext(_ context: [String: Any]) {
+        if context["version"] as? Int == 2 {
+            guard cursor.accept(context) else { return }
+            if let training = context["training"] as? [String: Any] { TrainingViewModel.shared.receiveContext(training) }
+            UserDefaults.standard.set(context, forKey: "watch.receivedSnapshot.v2")
+            if let workout = context["workout"] as? [String: Any], let revision = (context["revision"] as? NSNumber)?.int64Value {
+                receiveWorkoutState(workout, revision: revision)
+            }
+            if let food = context["food"] as? [String: Any], let decoded = NativeFoodStateMessage.decodeFoodState(from: food) { foodDelegate?.set(foodParameters: decoded) }
+        } else if cursor.revision < 0, context["kind"] as? String == "food",
+                  let parameters = context["parameters"] as? [String: Any],
+                  let decoded = NativeFoodStateMessage.decodeFoodState(from: parameters) { foodDelegate?.set(foodParameters: decoded) }
     }
-    nonisolated func sessionReachabilityDidChange(_ session: WCSession) {
-        Task { @MainActor in
-            self.workoutDelegate?.sessionReachabilityDidChange(session)
-            TrainingViewModel.shared.flush()
-            if session.isReachable { self.foodDelegate?.flushWaterEntries() }
+
+    func receiveUserInfo(_ info: [String: Any]) {
+        if info["method"] as? String == "workoutSensor", info["action"] as? String == "stop" {
+            receiveCommand(info) { self.sendTerminalAcknowledgement($0) }
+            return
         }
+        if info["method"] as? String == "trainingAcknowledged" { TrainingViewModel.shared.acknowledge(info); return }
+        if !receiveWaterAcknowledgement(info) { receiveContext(info) }
+    }
+
+    private func sendTerminalAcknowledgement(_ response: [String: Any]) {
+        guard response["success"] as? Bool == true, let session, session.activationState == .activated else { return }
+        var message = response
+        message["method"] = "workoutTerminalAcknowledged"
+        if !session.outstandingUserInfoTransfers.contains(where: { $0.userInfo["requestId"] as? String == message["requestId"] as? String }) {
+            session.transferUserInfo(message)
+        }
+        if session.isReachable { session.sendMessage(message, replyHandler: nil, errorHandler: { _ in }) }
+    }
+
+    func sessionReachabilityDidChange(_ session: WCSession) {
+        workoutDelegate?.sessionReachabilityDidChange(session)
+        TrainingViewModel.shared.flush()
+        WorkoutManager.shared.transport.flush()
+        if session.isReachable { foodDelegate?.flushWaterEntries() }
     }
     func sendWater(_ entry: WatchWaterEntry) {
         guard let session, session.activationState == .activated else { return }

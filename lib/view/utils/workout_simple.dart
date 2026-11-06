@@ -27,6 +27,7 @@ import 'package:gymtracker/view/components/maybe_rich_text.dart';
 import 'package:gymtracker/view/components/parent_viewer.dart';
 import 'package:gymtracker/view/components/rich_text_dialog.dart';
 import 'package:gymtracker/view/components/themed_subtree.dart';
+import 'package:gymtracker/view/components/workout_recording_status.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
 import 'package:gymtracker/view/utils/input_decoration.dart';
 import 'package:gymtracker/view/utils/time.dart';

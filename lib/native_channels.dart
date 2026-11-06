@@ -17,6 +17,7 @@ import 'package:pigeon/pigeon.dart';
 abstract class GymBroNativeHostAPI {
   void startWorkout(String workoutId, int startMilliseconds);
   void stopWorkout(String workoutId, bool save);
+  Map<String?, Object?> getRecordingStatus();
   void setExerciseParameters(Map<String?, Object?> parameters);
   void updateHomeWidgetParameters(
     Map<String, int> parameters,
@@ -56,6 +57,7 @@ abstract class GymBroNativeFlutterAPI {
 
   // Sends the current workout metrics
   void handleWorkoutMetrics(double? energy, double? heartRate);
+  void handleRecordingStatus(String workoutId, String status, String? message);
 
   // Update set parameters from native interfaces
   void updateSetParameters(

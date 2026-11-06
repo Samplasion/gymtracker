@@ -103,6 +103,7 @@ class FlutterCommunicatorPigeonCodec: FlutterStandardMessageCodec, @unchecked Se
 protocol GymBroNativeHostAPI {
   func startWorkout(workoutId: String, startMilliseconds: Int64) throws
   func stopWorkout(workoutId: String, save: Bool) throws
+  func getRecordingStatus() throws -> [String?: Any?]
   func setExerciseParameters(parameters: [String?: Any?]) throws
   func updateHomeWidgetParameters(parameters: [String: Int64], workoutDensityChartData: [Int64]) throws
   func requestHealthPermission() throws
@@ -148,6 +149,19 @@ class GymBroNativeHostAPISetup {
       }
     } else {
       stopWorkoutChannel.setMessageHandler(nil)
+    }
+    let getRecordingStatusChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.getRecordingStatus\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
+    if let api = api {
+      getRecordingStatusChannel.setMessageHandler { _, reply in
+        do {
+          let result = try api.getRecordingStatus()
+          reply(wrapResult(result))
+        } catch {
+          reply(wrapError(error))
+        }
+      }
+    } else {
+      getRecordingStatusChannel.setMessageHandler(nil)
     }
     let setExerciseParametersChannel = FlutterBasicMessageChannel(name: "dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.setExerciseParameters\(channelSuffix)", binaryMessenger: binaryMessenger, codec: codec)
     if let api = api {
@@ -247,6 +261,7 @@ protocol GymBroNativeFlutterAPIProtocol {
   func moveWorkoutCursorPrevious(completion: @escaping (Result<Bool, PigeonError>) -> Void)
   func requestTrainingData(completion: @escaping (Result<Void, PigeonError>) -> Void)
   func handleWorkoutMetrics(energy energyArg: Double?, heartRate heartRateArg: Double?, completion: @escaping (Result<Void, PigeonError>) -> Void)
+  func handleRecordingStatus(workoutId workoutIdArg: String, status statusArg: String, message messageArg: String?, completion: @escaping (Result<Void, PigeonError>) -> Void)
   func updateSetParameters(weight weightArg: Double?, timeSeconds timeSecondsArg: Double?, reps repsArg: Int64?, distance distanceArg: Double?, completion: @escaping (Result<Void, PigeonError>) -> Void)
 }
 class GymBroNativeFlutterAPI: GymBroNativeFlutterAPIProtocol {
@@ -362,6 +377,24 @@ class GymBroNativeFlutterAPI: GymBroNativeFlutterAPIProtocol {
     let channelName: String = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.handleWorkoutMetrics\(messageChannelSuffix)"
     let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
     channel.sendMessage([energyArg, heartRateArg] as [Any?]) { response in
+      guard let listResponse = response as? [Any?] else {
+        completion(.failure(createConnectionError(withChannelName: channelName)))
+        return
+      }
+      if listResponse.count > 1 {
+        let code: String = listResponse[0] as! String
+        let message: String? = nilOrValue(listResponse[1])
+        let details: String? = nilOrValue(listResponse[2])
+        completion(.failure(PigeonError(code: code, message: message, details: details)))
+      } else {
+        completion(.success(()))
+      }
+    }
+  }
+  func handleRecordingStatus(workoutId workoutIdArg: String, status statusArg: String, message messageArg: String?, completion: @escaping (Result<Void, PigeonError>) -> Void) {
+    let channelName: String = "dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.handleRecordingStatus\(messageChannelSuffix)"
+    let channel = FlutterBasicMessageChannel(name: channelName, binaryMessenger: binaryMessenger, codec: codec)
+    channel.sendMessage([workoutIdArg, statusArg, messageArg] as [Any?]) { response in
       guard let listResponse = response as? [Any?] else {
         completion(.failure(createConnectionError(withChannelName: channelName)))
         return

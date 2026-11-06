@@ -20,13 +20,15 @@ final class WorkoutManager: NSObject, ObservableObject {
     @Published var activeEnergy: Double = 0
     @Published var workout: HKWorkout?
     @Published var summary: WorkoutSummary?
-    @Published var phase: WorkoutPhase = .idle
+    @Published var phase: WorkoutPhase = .idle { didSet { onPhaseChanged?() } }
+    var onPhaseChanged: (() -> Void)?
 
     let healthStore = HKHealthStore()
     let typesToShare: Set<HKSampleType> = [.workoutType()]
     let typesToRead: Set<HKObjectType> = [HKQuantityType(.heartRate), HKQuantityType(.activeEnergyBurned), HKObjectType.workoutType(), HKObjectType.activitySummaryType(), HKCharacteristicType(.activityMoveMode)]
     var session: HKWorkoutSession?
     var builder: HKWorkoutBuilder?
+    var collectionStarted = false
     var listener: WorkoutMetricsListener?
     var request: WorkoutRequest?
     var generation = UUID().uuidString
@@ -39,6 +41,8 @@ final class WorkoutManager: NSObject, ObservableObject {
         #endif
     }
     var onMetricsPacket: ((WorkoutMetricsPacket) -> Void)?
+    let transport = WorkoutTransport()
+    var recordingController: WatchRecordingController?
     var onDiagnostic: ((String) -> Void)?
 
     func diagnostic(_ message: String) {
@@ -49,22 +53,17 @@ final class WorkoutManager: NSObject, ObservableObject {
     var onSensorSessionEnded: (() -> Void)?
     private var metricsMonitor: Task<Void, Never>?
     private var heartRateInvalidatedAt = Date()
-    var watchReconciliationQueued = false
-    var nextWatchProbe = Date.distantPast
     var remoteSession: HKWorkoutSession?
-    var remoteCommand: (([String: Any]) async throws -> [String: Any])?
-    var watchAvailable: (() -> Bool)?
+    var remoteConnected = false
     var watchConfigured: (() -> Bool)?
-    var reportedWatchStartFailure: String?
+    var watchConfigurationReady: (() -> Bool)?
     var onError: ((String, String) -> Void)?
     var onAuthorizationChanged: (() -> Void)?
-    var watchAttemptInProgress = false
     var device: String = "none"
     var desiredRequest: WorkoutRequest?
     let operationQueue = WorkoutOperationQueue()
     var terminalGenerations = Set<String>()
     var activeFinalization: Task<Void, Error>?
-    var pendingRemoteFinish: [String: Bool] = [:]
 
     private struct Event {
         let session: HKWorkoutSession
@@ -77,11 +76,26 @@ final class WorkoutManager: NSObject, ObservableObject {
 
     private override init() {
         super.init()
-        pendingRemoteFinish = UserDefaults.standard.dictionary(forKey: "workout.remoteFinishes.v2") as? [String: Bool] ?? [:]
+        transport.mirrorAvailable = { [weak self] in self?.remoteConnected == true }
+        transport.mirrorSend = { [weak self] data in
+            guard let self, let session = self.remoteSession ?? self.session, self.remoteConnected else {
+                throw WorkoutOperationError.unavailable
+            }
+            if #available(watchOS 10, *) { try await session.sendToRemoteWorkoutSession(data: data) }
+            else { throw WorkoutOperationError.unavailable }
+        }
+        transport.diagnostic = { [weak self] in self?.diagnostic($0) }
         Task { @MainActor in
             for await event in events.stream {
                 guard self.session === event.session else { continue }
                 self.sessionState = event.state
+                #if os(watchOS)
+                if event.state == .running, let id = self.request?.id {
+                    var ids = Set(UserDefaults.standard.stringArray(forKey: "workout.startedWatchIDs.v1") ?? [])
+                    ids.insert(id)
+                    UserDefaults.standard.set(Array(ids), forKey: "workout.startedWatchIDs.v1")
+                }
+                #endif
                 if self.builder != nil {
                     self.recordSegment(generation: self.generation, state: self.metricsState(event.state), stateDate: event.date)
                 }
@@ -128,6 +142,7 @@ final class WorkoutManager: NSObject, ObservableObject {
         session = newSession
         let liveBuilder = newSession.associatedWorkoutBuilder()
         builder = liveBuilder
+        collectionStarted = false
         newSession.delegate = self
         liveBuilder.delegate = self
         liveBuilder.dataSource = HKLiveWorkoutDataSource(healthStore: healthStore, workoutConfiguration: newSession.workoutConfiguration)
@@ -145,6 +160,7 @@ final class WorkoutManager: NSObject, ObservableObject {
             try await builder.beginCollection(at: date)
             try Task.checkCancellation()
             guard self.session === session else { throw WorkoutOperationError.stale }
+            collectionStarted = true
             phase = .active
             recordSegment(generation: generation, state: .running, activate: true)
         } catch {
@@ -204,7 +220,7 @@ final class WorkoutManager: NSObject, ObservableObject {
         activeFinalization = task
         defer {
             activeFinalization = nil
-            if self.session === session { self.session = nil; self.builder = nil; self.sessionState = .ended }
+            if self.session === session { self.session = nil; self.builder = nil; self.collectionStarted = false; self.sessionState = .ended }
         }
         try await workoutDeadline(30) { try await task.value }
     }
@@ -266,11 +282,8 @@ final class WorkoutManager: NSObject, ObservableObject {
                     do { try await Task.sleep(nanoseconds: 5_000_000_000) } catch { return }
                     self.refreshPublishedMetrics(emitPacket: false)
                     #if os(iOS)
-                    if self.desiredRequest != nil, self.watchConfigured?() == true,
-                       self.device != "watch" || self.sessionState == .ended || self.sessionState == .stopped
-                        || self.metricsStore.ledger(for: self.request?.id ?? "").activeGenerations["watch"] == nil {
-                        self.watchBecameReachable()
-                    }
+                    // Retry scheduling belongs to the controller. A metrics tick
+                    // must never start/finish a sensor session or reset its backoff.
                     #endif
                 }
             }
@@ -337,14 +350,20 @@ final class WorkoutManager: NSObject, ObservableObject {
     }
 
     func sendData(_ data: Data) async {
+        guard let session else { return }
         if #available(watchOS 10, *) {
-            do { try await session?.sendToRemoteWorkoutSession(data: data) }
+            do {
+                try await session.sendToRemoteWorkoutSession(data: data)
+                remoteConnected = true
+                transport.flush()
+            }
             catch { Logger.shared.error("Workout transport: \(error)") }
         }
     }
 
     func handleReceivedData(_ data: Data) throws {
         let raw = try JSONSerialization.jsonObject(with: data) as? [String: Any] ?? [:]
+        if transport.receive(raw) { return }
         guard let packet = WorkoutMetricsPacket.decode(raw["metrics"] as? [String: Any] ?? raw),
               packet.workoutID == request?.id, packet.device != metricsDevice else { return }
         if metricsStore.merge(packet) {
@@ -376,8 +395,9 @@ extension WorkoutManager: HKWorkoutSessionDelegate {
     }
     nonisolated func workoutSession(_ workoutSession: HKWorkoutSession, didDisconnectFromRemoteDeviceWithError error: Error?) {
         Task { @MainActor in
-            guard self.session === workoutSession else { return }
-            if self.builder == nil { self.invalidateHeartRate() }
+            guard self.session === workoutSession || self.remoteSession === workoutSession else { return }
+            self.diagnostic("HealthKit link disconnected; recording stays on its primary")
+            self.remoteConnected = false
             if let error { Logger.shared.error("Workout disconnected: \(error)") }
         }
     }

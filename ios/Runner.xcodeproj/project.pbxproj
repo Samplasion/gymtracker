@@ -161,6 +161,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WorkoutLifecycle.swift,
+				WorkoutSync.swift,
 				WorkoutManager.swift,
 				Logger.swift,
 				Model/NativeWorkoutStateMessage.swift,
@@ -174,6 +175,7 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				WorkoutLifecycle.swift,
+				WorkoutSync.swift,
 				WorkoutManager.swift,
 				Logger.swift,
 				Model/NativeWorkoutStateMessage.swift,

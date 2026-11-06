@@ -116,6 +116,25 @@ class GymBroNativeHostAPI {
     ;
   }
 
+  Future<Map<String?, Object?>> getRecordingStatus() async {
+    final pigeonVar_channelName = 'dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.getRecordingStatus$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
+        pigeonVar_replyList,
+        pigeonVar_channelName,
+        isNullValid: false,
+    )
+    ;
+    return (pigeonVar_replyValue! as Map<Object?, Object?>).cast<String?, Object?>();
+  }
+
   Future<void> setExerciseParameters(Map<String?, Object?> parameters) async {
     final pigeonVar_channelName = 'dev.flutter.pigeon.gymtracker.GymBroNativeHostAPI.setExerciseParameters$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
@@ -240,6 +259,8 @@ abstract class GymBroNativeFlutterAPI {
 
   void handleWorkoutMetrics(double? energy, double? heartRate);
 
+  void handleRecordingStatus(String workoutId, String status, String? message);
+
   void updateSetParameters(double? weight, double? timeSeconds, int? reps, double? distance);
 
   static void setUp(GymBroNativeFlutterAPI? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
@@ -357,6 +378,29 @@ abstract class GymBroNativeFlutterAPI {
           final double? arg_heartRate = args[1] as double?;
           try {
             api.handleWorkoutMetrics(arg_energy, arg_heartRate);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.gymtracker.GymBroNativeFlutterAPI.handleRecordingStatus$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          final List<Object?> args = message! as List<Object?>;
+          final String arg_workoutId = args[0]! as String;
+          final String arg_status = args[1]! as String;
+          final String? arg_message = args[2] as String?;
+          try {
+            api.handleRecordingStatus(arg_workoutId, arg_status, arg_message);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

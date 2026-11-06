@@ -1,16 +1,25 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:gymtracker/model/native.dart';
-import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/database.dart';
-import 'package:flutter/services.dart';
+import 'package:gymtracker/service/logger.dart';
 import 'package:gymtracker/service/native.g.dart';
 import 'package:gymtracker/service/wearable/training_transport.dart';
 import 'package:gymtracker/service/widgets.dart'
     show restKey, streakKey, totalWorkoutsKey;
 import 'package:rxdart/rxdart.dart';
+
+enum RecordingState { pending, confirmed, unavailable, finished }
+
+class RecordingUpdate {
+  const RecordingUpdate(this.workoutId, this.state, [this.message]);
+  final String workoutId;
+  final RecordingState state;
+  final String? message;
+}
 
 abstract class NativeService {
   static NativeService instance({
@@ -55,6 +64,7 @@ abstract class NativeService {
 
   Stream<double?> get energyStream;
   Stream<double?> get heartRateStream;
+  Stream<RecordingUpdate?> get recordingStream => const Stream.empty();
 
   void setIsWorkoutRunning(
     bool isWorkoutRunning, {
@@ -77,6 +87,13 @@ abstract class NativeService {
 class _UnsupportedNativeService extends NativeService
     implements GymBroNativeFlutterAPI {
   _UnsupportedNativeService._() : super._();
+
+  @override
+  void handleRecordingStatus(
+    String workoutId,
+    String status,
+    String? message,
+  ) {}
 
   @override
   Stream<double?> get energyStream => const Stream<double?>.empty();
@@ -194,6 +211,8 @@ class _NativeServiceImpl extends NativeService
       _heartRate$.add(null);
     }
     _workoutId = workoutId;
+    _recording$.add(null);
+    _refreshRecordingStatus();
   }
 
   @override
@@ -202,6 +221,7 @@ class _NativeServiceImpl extends NativeService
     _attached = true;
     GymBroNativeFlutterAPI.setUp(this);
     GymBroNativeLoggerChannel.setUp(this);
+    _refreshRecordingStatus();
   }
 
   @override
@@ -220,10 +240,45 @@ class _NativeServiceImpl extends NativeService
     clearCallbacks();
     unawaited(_energy$.close());
     unawaited(_heartRate$.close());
+    unawaited(_recording$.close());
   }
 
   final _energy$ = BehaviorSubject<double?>();
   final _heartRate$ = BehaviorSubject<double?>();
+  final _recording$ = BehaviorSubject<RecordingUpdate?>.seeded(null);
+
+  @override
+  Stream<RecordingUpdate?> get recordingStream => _recording$.stream;
+
+  void _refreshRecordingStatus() {
+    if (!Platform.isIOS || _disposed) return;
+    unawaited(
+      _watch
+          .getRecordingStatus()
+          .then((snapshot) {
+            if (_disposed) return;
+            final id = snapshot['workoutId'];
+            final state = snapshot['status'];
+            if (id is String && state is String) {
+              handleRecordingStatus(id, state, snapshot['message'] as String?);
+            }
+          })
+          .catchError((Object error) {
+            logger.w('Recording status temporarily unavailable', error: error);
+          }),
+    );
+  }
+
+  @override
+  void handleRecordingStatus(String workoutId, String status, String? message) {
+    if (_disposed || workoutId != _workoutId) return;
+    final state = RecordingState.values
+        .where((value) => value.name == status)
+        .firstOrNull;
+    if (state != null) {
+      _recording$.add(RecordingUpdate(workoutId, state, message));
+    }
+  }
 
   @override
   Stream<double?> get energyStream => _energy$.stream;
@@ -294,6 +349,9 @@ class _NativeServiceImpl extends NativeService
     }
     _workoutId = workoutId;
     if (isWorkoutRunning) {
+      if (Platform.isIOS) {
+        _recording$.add(RecordingUpdate(workoutId, RecordingState.pending));
+      }
       unawaited(
         _watch.startWorkout(workoutId, start.millisecondsSinceEpoch).catchError(
           (Object error) {
@@ -301,7 +359,9 @@ class _NativeServiceImpl extends NativeService
           },
         ),
       );
+      _refreshRecordingStatus();
     } else {
+      _recording$.add(RecordingUpdate(workoutId, RecordingState.finished));
       _energy$.add(null);
       _heartRate$.add(null);
       unawaited(
@@ -436,4 +496,8 @@ final nativeServiceProvider = Provider<NativeService>((ref) {
   service.attach();
   ref.onDispose(service.dispose);
   return service;
+});
+
+final recordingStatusProvider = StreamProvider<RecordingUpdate?>((ref) {
+  return ref.watch(nativeServiceProvider).recordingStream;
 });

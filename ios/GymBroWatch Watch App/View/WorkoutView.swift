@@ -99,7 +99,7 @@ struct WorkoutView: View {
                 }
                 switch recordingStatus {
                 case .starting:
-                    Label("Starting recording…", systemImage: "hourglass")
+                    Label("Waiting for confirmation…", systemImage: "hourglass")
                         .font(.caption)
                 case .unavailable:
                     Button { showRecordingError = true } label: {

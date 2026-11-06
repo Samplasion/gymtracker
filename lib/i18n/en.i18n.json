@@ -416,6 +416,11 @@
     "search": "Search workouts"
   },
   "settings": {
+    "diagnostics": {
+      "title": "Send diagnostic data",
+      "description": "Share errors, performance data, logs and sampled session recordings to help us improve the app. You can turn this off at any time.",
+      "saveError": "Unable to update your preference. Please try again."
+    },
     "title": "Settings",
     "options": {
       "useDynamicColor": {
@@ -611,6 +616,8 @@
       "generate": "Generate"
     },
     "info": {
+      "recordingPending": "Recording awaiting confirmation",
+      "recordingUnavailable": "Recording unavailable",
       "time": "Time",
       "reps": "Reps",
       "volume": "Lifted weight",

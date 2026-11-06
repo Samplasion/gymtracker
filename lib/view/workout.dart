@@ -26,6 +26,7 @@ import 'package:gymtracker/view/actions/workout.dart';
 import 'package:gymtracker/view/components/infobox.dart';
 import 'package:gymtracker/view/components/rich_text_editor.dart';
 import 'package:gymtracker/view/components/split_button.dart';
+import 'package:gymtracker/view/components/workout_recording_status.dart';
 import 'package:gymtracker/view/utils/crossfade.dart';
 import 'package:gymtracker/view/utils/date_field.dart';
 import 'package:gymtracker/view/utils/exercise.dart';
@@ -334,6 +335,15 @@ class WorkoutInfoBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
+        if (ref.watch(workoutControllerProvider) != null)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: WorkoutRecordingIndicator(
+              workoutId: ref
+                  .read(workoutControllerProvider.notifier)
+                  .nativeWorkoutId,
+            ),
+          ),
         Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: 16,

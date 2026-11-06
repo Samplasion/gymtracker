@@ -416,6 +416,11 @@
     "search": "Cerca allenamenti"
   },
   "settings": {
+    "diagnostics": {
+      "title": "Invia dati diagnostici",
+      "description": "Condividi errori, dati sulle prestazioni, log e registrazioni campionate delle sessioni per aiutarci a migliorare l’app. Puoi disattivare l’invio in qualsiasi momento.",
+      "saveError": "Impossibile aggiornare la preferenza. Riprova."
+    },
     "title": "Impostazioni",
     "options": {
       "useDynamicColor": {
@@ -611,6 +616,8 @@
       "generate": "Genera"
     },
     "info": {
+      "recordingPending": "Registrazione in attesa di conferma",
+      "recordingUnavailable": "Registrazione non disponibile",
       "time": "Tempo",
       "reps": "Ripetizioni",
       "volume": "Volume sollevato",

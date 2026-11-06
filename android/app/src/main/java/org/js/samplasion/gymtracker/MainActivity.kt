@@ -131,6 +131,8 @@ class MainActivity: FlutterFragmentActivity() {
             removeOngoingLiveNotification()
         }
 
+        override fun getRecordingStatus(): Map<String?, Any?> = emptyMap()
+
         override fun setExerciseParameters(parameters: Map<String?, Any?>) {
             val message = NativeWorkoutStateMessage.fromJson(parameters)
             state = message
